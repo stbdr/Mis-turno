@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Mis Turnos</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#11161d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mis Turnos">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+  :root{
+    --bg:#11161d;
+    --surface:#1a222c;
+    --surface2:#222d3a;
+    --border:#2c3846;
+    --text:#e9eef3;
+    --text-dim:#8fa0b3;
+    --amber:#ffb020;
+    --teal:#3fb6c2;
+    --indigo:#6c7ae0;
+    --violet:#c15fd6;
+    --grey:#4c5b6c;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  body{
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:18px 14px 40px;}
+
+  header.top{
+    display:flex;align-items:baseline;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  header.top h1{
+    font-size:22px;font-weight:800;letter-spacing:0.2px;margin:0;
+  }
+  header.top .sub{color:var(--text-dim);font-size:12.5px;margin-top:2px;}
+  .gear{
+    background:none;border:1px solid var(--border);color:var(--text-dim);
+    width:36px;height:36px;border-radius:9px;font-size:16px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+
+  .monthbar{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:10px 8px;margin-bottom:14px;
+  }
+  .monthbar button{
+    background:var(--surface2);border:1px solid var(--border);color:var(--text);
+    width:36px;height:36px;border-radius:8px;font-size:16px;cursor:pointer;
+  }
+  .monthbar .label{
+    font-weight:700;font-size:16px;text-transform:capitalize;
+  }
+
+  .viewtoggle{display:flex;gap:8px;margin-bottom:14px;}
+  .viewtoggle button{
+    flex:1;padding:9px 0;border-radius:9px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text-dim);font-size:13px;font-weight:700;cursor:pointer;
+  }
+  .viewtoggle button.active{background:var(--amber);color:#221600;border-color:var(--amber);}
+
+  .yeartable{width:100%;border-collapse:collapse;font-size:12px;}
+  .yeartable th{
+    text-align:left;color:var(--text-dim);font-weight:600;font-size:10.5px;
+    padding:4px 6px;text-transform:uppercase;letter-spacing:.3px;
+  }
+  .yeartable td{padding:6px;border-top:1px solid var(--border);}
+  .yeartable td.month{font-weight:700;width:36px;}
+  .minibar{
+    display:inline-block;width:46px;height:6px;background:var(--surface2);
+    border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden;
+  }
+  .minibar i{display:block;height:100%;border-radius:3px;}
+  .yeartable .mval{font-size:11px;font-weight:700;vertical-align:middle;}
+
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;
+  }
+  .stat{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:10px 4px;text-align:center;
+  }
+  .stat .n{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .stat .l{font-size:9.5px;color:var(--text-dim);margin-top:2px;letter-spacing:.3px;}
+  .stat.M .n{color:var(--amber);}
+  .stat.T .n{color:var(--teal);}
+  .stat.N .n{color:var(--indigo);}
+  .stat.MA .n{color:var(--violet);}
+  .stat.wide{grid-column:span 2;background:var(--surface2);}
+  .stat.wide .n{font-size:19px;}
+
+  .companystats{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;
+  }
+  .companystats .cstat{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:8px 4px;text-align:center;
+  }
+  .companystats .cstat .n{font-size:15px;font-weight:800;}
+  .companystats .cstat .l{font-size:9px;color:var(--text-dim);margin-top:2px;}
+
+  .financestats{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:16px;
+  }
+  .financestats .stat{padding:12px 6px;}
+  .financestats .stat.grand{background:var(--surface2);}
+
+  .weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;}
+  .weekdays span{
+    text-align:center;font-size:11px;color:var(--text-dim);font-weight:600;
+  }
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .day{
+    position:relative;aspect-ratio:1/1;border-radius:9px;
+    background:var(--surface);border:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;user-select:none;
+  }
+  .day.empty{background:transparent;border:none;cursor:default;}
+  .day .num{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .day.today{box-shadow:inset 0 0 0 2px var(--text-dim);}
+  .day.M{background:rgba(255,176,32,0.16);border-color:rgba(255,176,32,0.5);}
+  .day.M .num{color:var(--amber);}
+  .day.T{background:rgba(63,182,194,0.16);border-color:rgba(63,182,194,0.5);}
+  .day.T .num{color:var(--teal);}
+  .day.N{background:rgba(108,122,224,0.18);border-color:rgba(108,122,224,0.55);}
+  .day.N .num{color:var(--indigo);}
+  .day.MA{background:rgba(193,95,214,0.18);border-color:rgba(193,95,214,0.55);}
+  .day.MA .num{color:var(--violet);}
+  .day.L{background:rgba(76,91,108,0.25);border-color:var(--grey);}
+  .day.L .num{color:var(--text-dim);text-decoration:line-through;text-decoration-color:var(--text-dim);}
+  .day .tag{font-size:9px;font-weight:800;letter-spacing:.3px;margin-top:1px;}
+  .day .co{
+    position:absolute;top:3px;left:4px;font-size:8px;font-weight:800;
+    color:var(--text-dim);letter-spacing:.3px;
+  }
+  .day .note-dot{
+    position:absolute;top:4px;right:5px;width:5px;height:5px;border-radius:50%;
+    background:var(--text-dim);
+  }
+
+  .legend{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+  .legend span{font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:5px;}
+  .legend i{width:9px;height:9px;border-radius:3px;display:inline-block;}
+  .legend i.M{background:var(--amber);}
+  .legend i.T{background:var(--teal);}
+  .legend i.N{background:var(--indigo);}
+  .legend i.MA{background:var(--violet);}
+  .legend i.L{background:var(--grey);}
+
+  .hint{
+    text-align:center;color:var(--text-dim);font-size:11.5px;margin-top:14px;line-height:1.5;
+  }
+
+  /* modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(6,9,13,0.72);
+    display:none;align-items:flex-end;justify-content:center;z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .sheet{
+    width:100%;max-width:480px;background:var(--surface);
+    border-radius:16px 16px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom,0px));
+    border:1px solid var(--border);border-bottom:none;
+    max-height:88vh;overflow-y:auto;
+  }
+  .sheet h2{margin:0 0 4px;font-size:17px;}
+  .sheet .dsub{color:var(--text-dim);font-size:12.5px;margin-bottom:14px;text-transform:capitalize;}
+  .shiftpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .shiftpick button{
+    border-radius:9px;border:1px solid var(--border);background:var(--surface2);
+    color:var(--text);padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer;
+  }
+  .shiftpick button.active.M{background:var(--amber);color:#221600;border-color:var(--amber);}
+  .shiftpick button.active.T{background:var(--teal);color:#03272a;border-color:var(--teal);}
+  .shiftpick button.active.N{background:var(--indigo);color:#12123a;border-color:var(--indigo);}
+  .shiftpick button.active.MA{background:var(--violet);color:#2a0c30;border-color:var(--violet);}
+  .shiftpick button.active.L{background:var(--grey);color:#fff;border-color:var(--grey);}
+  label{display:block;font-size:11.5px;color:var(--text-dim);margin:10px 0 5px;}
+  textarea{
+    width:100%;min-height:56px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:9px;color:var(--text);padding:9px;font-size:14px;font-family:inherit;resize:vertical;
+  }
+  select{
+    width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+    border-radius:9px;padding:10px 9px;font-size:14px;font-family:inherit;
+  }
+  .field{
+    width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+    border-radius:9px;padding:10px 9px;font-size:14px;font-family:inherit;
+  }
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .sheet .row{display:flex;gap:8px;margin-top:16px;}
+  .sheet .row button{
+    flex:1;padding:12px;border-radius:9px;border:none;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  .btn-save{background:var(--amber);color:#221600;}
+  .btn-cancel{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border) !important;}
+
+  .settings-row{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:10px 0;border-bottom:1px solid var(--border);
+  }
+  .settings-row:last-of-type{border-bottom:none;}
+  .settings-row .name{font-weight:700;font-size:13.5px;}
+  .settings-row .name.M{color:var(--amber);}
+  .settings-row .name.T{color:var(--teal);}
+  .settings-row .name.N{color:var(--indigo);}
+  .settings-row .name.MA{color:var(--violet);}
+  .settings-row input[type=number]{
+    width:64px;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+    border-radius:7px;padding:7px;font-size:14px;text-align:center;
+  }
+  .settings-actions{display:flex;gap:8px;margin-top:16px;}
+  .settings-actions button{
+    flex:1;padding:10px;border-radius:9px;border:1px solid var(--border);
+    background:var(--surface2);color:var(--text);font-size:12px;cursor:pointer;font-weight:600;
+  }
+
+  .dash-section{margin-bottom:20px;}
+  .dash-section h3{font-size:12.5px;color:var(--text-dim);margin:0 0 10px;font-weight:700;letter-spacing:.2px;}
+  .barrow{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .barrow .blabel{width:78px;font-size:11.5px;color:var(--text-dim);flex-shrink:0;}
+  .barrow .btrack{flex:1;background:var(--surface2);border-radius:6px;height:16px;overflow:hidden;}
+  .barrow .bfill{height:100%;border-radius:6px;}
+  .barrow .bval{width:48px;text-align:right;font-size:11.5px;font-weight:700;flex-shrink:0;}
+  .daybars{display:flex;align-items:flex-end;gap:2px;height:90px;padding-top:6px;}
+  .daybars .dcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .daybars .dcol .dbar{width:100%;border-radius:2px 2px 0 0;min-height:2px;}
+  .daybars .dcol .dnum{font-size:7px;color:var(--text-dim);margin-top:3px;}
+  .dash-empty{color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0;}
+
+  #calcDisplay{
+    background:var(--surface2);border:1px solid var(--border);border-radius:9px;
+    padding:16px 14px;text-align:right;font-size:26px;font-weight:700;
+    font-variant-numeric:tabular-nums;margin-bottom:12px;overflow-x:auto;
+    white-space:nowrap;color:var(--text);
+  }
+  .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .calc-grid button{
+    padding:16px 0;font-size:17px;border-radius:9px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text);cursor:pointer;font-weight:700;
+  }
+  .calc-grid button.calc-fn{background:var(--surface2);color:var(--text-dim);}
+  .calc-grid button.calc-op{background:var(--surface2);color:var(--amber);}
+  .calc-grid button.calc-eq{background:var(--amber);color:#221600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Mis Turnos</h1>
+      <div class="sub">Puerto de La Luz &middot; control de jornada</div>
+    </div>
+    <div style="display:flex;">
+      <button class="gear" onclick="openBuqueSearch()" style="margin-right:8px;">&#128269;</button>
+      <button class="gear" onclick="openCalc()" style="margin-right:8px;">&#128290;</button>
+      <button class="gear" onclick="openDashboard()" style="margin-right:8px;">&#128202;</button>
+      <button class="gear" onclick="openSettings()">&#9881;</button>
+    </div>
+  </header>
+
+  <div class="viewtoggle">
+    <button id="vtMes" onclick="switchView('mes')" class="active">Mes</button>
+    <button id="vtAno" onclick="switchView('ano')">Año</button>
+  </div>
+
+  <div id="mesView">
+    <div class="monthbar">
+      <button onclick="changeMonth(-1)">&larr;</button>
+      <div class="label" id="monthLabel">—</div>
+      <button onclick="changeMonth(1)">&rarr;</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="companystats" id="companystats"></div>
+
+    <div class="weekdays">
+      <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+    </div>
+    <div class="grid" id="grid"></div>
+
+    <div class="financestats" id="financestats"></div>
+
+    <div class="legend">
+      <span><i class="M"></i>Mañana</span>
+      <span><i class="T"></i>Tarde</span>
+      <span><i class="N"></i>Noche</span>
+      <span><i class="MA"></i>Madrugada</span>
+      <span><i class="L"></i>Libre</span>
+    </div>
+
+    <div class="hint">Toca un día para abrir su ficha y elegir turno, empresa, buque y más.</div>
+  </div>
+
+  <div id="anoView" style="display:none;">
+    <div class="monthbar">
+      <button onclick="changeAnnualYear(-1)">&larr;</button>
+      <div class="label" id="yearLabel">—</div>
+      <button onclick="changeAnnualYear(1)">&rarr;</button>
+    </div>
+
+    <div class="stats" id="yearStats"></div>
+
+    <div class="dash-section" style="margin-top:18px;">
+      <h3>TURNOS Y SALARIO NETO POR MES</h3>
+      <table class="yeartable">
+        <thead><tr><th>Mes</th><th>Turnos</th><th>Neto</th></tr></thead>
+        <tbody id="yearTableBody"></tbody>
+      </table>
+      <div class="dsub" style="margin-top:8px;">* Bruto, ese mes aún no tiene salario neto añadido</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- modal día -->
+<div class="overlay" id="dayOverlay">
+  <div class="sheet">
+    <h2 id="dayTitle">Día</h2>
+    <div class="dsub" id="daySub"></div>
+    <div class="shiftpick" id="shiftPick"></div>
+    <label>Empresa</label>
+    <select id="dayCompany">
+      <option value="">Sin especificar</option>
+      <option value="OPCSA">OPCSA</option>
+      <option value="La Luz">La Luz</option>
+      <option value="Gesport">Gesport</option>
+    </select>
+    <label>Buque</label>
+    <input type="text" id="dayBuque" class="field" placeholder="Nombre del buque">
+    <div class="field-row" style="margin-top:8px;">
+      <button type="button" onclick="searchBuque('capacidad')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 4px;font-size:12.5px;font-weight:700;cursor:pointer;">Capacidad &#8599;</button>
+      <button type="button" onclick="searchBuque('posicion')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 4px;font-size:12.5px;font-weight:700;cursor:pointer;">Posición &#8599;</button>
+    </div>
+    <div class="field-row">
+      <div>
+        <label>Movimientos</label>
+        <input type="number" id="dayMovs" class="field" min="0" step="1" placeholder="0">
+      </div>
+      <div>
+        <label>Salario del día (€)</label>
+        <input type="number" id="daySalario" class="field" min="0" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <label>Extra (€)</label>
+    <input type="number" id="dayExtra" class="field" min="0" step="0.01" placeholder="0.00">
+    <label>Nota (opcional)</label>
+    <textarea id="dayNote" placeholder="Ej. cambio con Manolo, barco X..."></textarea>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeDay()">Cancelar</button>
+      <button class="btn-save" onclick="saveDay()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal calculadora -->
+<div class="overlay" id="calcOverlay">
+  <div class="sheet">
+    <h2>Calculadora</h2>
+    <div id="calcDisplay">0</div>
+    <div class="calc-grid">
+      <button class="calc-fn" onclick="calcClear()">C</button>
+      <button class="calc-fn" onclick="calcBack()">&#9003;</button>
+      <button class="calc-fn" onclick="calcPercent()">%</button>
+      <button class="calc-op" onclick="calcAppend('/')">&divide;</button>
+
+      <button onclick="calcAppend('7')">7</button>
+      <button onclick="calcAppend('8')">8</button>
+      <button onclick="calcAppend('9')">9</button>
+      <button class="calc-op" onclick="calcAppend('*')">&times;</button>
+
+      <button onclick="calcAppend('4')">4</button>
+      <button onclick="calcAppend('5')">5</button>
+      <button onclick="calcAppend('6')">6</button>
+      <button class="calc-op" onclick="calcAppend('-')">&minus;</button>
+
+      <button onclick="calcAppend('1')">1</button>
+      <button onclick="calcAppend('2')">2</button>
+      <button onclick="calcAppend('3')">3</button>
+      <button class="calc-op" onclick="calcAppend('+')">+</button>
+
+      <button onclick="calcAppend('0')" style="grid-column:span 2;">0</button>
+      <button onclick="calcAppend('.')">.</button>
+      <button class="calc-eq" onclick="calcEquals()">=</button>
+    </div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeCalc()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal buscador de buque -->
+<div class="overlay" id="buqueSearchOverlay">
+  <div class="sheet">
+    <h2>Buscar buque</h2>
+    <div class="dsub">En todos los meses guardados</div>
+    <input type="text" id="buqueSearchInput" class="field" placeholder="Nombre del buque..." oninput="runBuqueSearch()">
+    <div id="buqueSearchResults" style="margin-top:14px;"></div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeBuqueSearch()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal detalle de turno -->
+<div class="overlay" id="shiftInfoOverlay">
+  <div class="sheet">
+    <h2 id="shiftInfoTitle">Turno</h2>
+    <div class="dsub" id="shiftInfoSub"></div>
+    <div id="shiftInfoBody"></div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeShiftInfo()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal ajustes -->
+<div class="overlay" id="settingsOverlay">
+  <div class="sheet">
+    <h2>Ajustes</h2>
+
+    <h2 style="font-size:14px;margin:0 0 4px;">Tarifas por turno</h2>
+    <div class="dsub" style="margin-bottom:10px;">
+      <span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;"><i style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;"></i>festivo</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:8px;height:8px;border-radius:50%;background:var(--violet);display:inline-block;"></i>sábado mañana</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="tarifasTable" style="width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap;">
+        <thead>
+          <tr style="color:var(--text-dim);text-align:left;">
+            <th style="padding:5px 6px;">Turno</th>
+            <th style="padding:5px 6px;">Especialista</th>
+            <th style="padding:5px 6px;">Grúa</th>
+            <th style="padding:5px 6px;">Mafista</th>
+            <th style="padding:5px 6px;">Unidad</th>
+          </tr>
+        </thead>
+        <tbody id="tarifasBody"></tbody>
+      </table>
+    </div>
+    <div class="dsub" style="margin-top:8px;">Base: especialista y grúa 120 mov. &middot; mafista 138 mov.</div>
+
+    <div class="settings-actions">
+      <button onclick="exportData()">Exportar copia</button>
+      <button onclick="importFile.click()">Importar copia</button>
+    </div>
+    <div class="settings-actions" style="margin-top:8px;">
+      <button onclick="exportPDF()">Exportar PDF</button>
+      <button onclick="exportExcel()" id="btnExcel">Exportar Excel</button>
+    </div>
+    <div class="settings-actions" style="margin-top:8px;">
+      <button onclick="clearMonth()" style="color:var(--danger,#e2584d);border-color:var(--danger,#e2584d);">Vaciar turnos de este mes</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
+    <div class="row">
+      <button class="btn-cancel" onclick="closeSettings()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal dashboard -->
+<div class="overlay" id="dashboardOverlay">
+  <div class="sheet">
+    <h2>Resumen visual</h2>
+    <div class="dsub" id="dashSub"></div>
+    <div id="dashBody"></div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeDashboard()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE_KEY = 'turnos_data_v2';
+const SETTINGS_KEY = 'turnos_settings_v2';
+const NETO_KEY = 'turnos_neto_v1';
+const SHIFTS = ['M','T','N','MA','L'];
+const SHIFT_NAMES = {M:'Mañana', T:'Tarde', N:'Noche', MA:'Madrugada', L:'Libre'};
+const COMPANIES = ['OPCSA','La Luz','Gesport'];
+
+let data = {};       // { "2026-09": { "1": {shift:"M", note:"", company:""} } }
+let settings = { M:{horas:6}, T:{horas:6}, N:{horas:6}, MA:{horas:6} };
+let netoData = {};   // { "2026-09": 1850.00 }
+
+let today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth(); // 0-indexed
+
+let selectedDay = null;
+let selectedShift = '';
+
+function load(){
+  try{ data = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ data = {}; }
+  try{
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+    if(s) settings = s;
+  }catch(e){}
+  try{ netoData = JSON.parse(localStorage.getItem(NETO_KEY)) || {}; }catch(e){ netoData = {}; }
+}
+function persist(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
+}
+function persistSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }catch(e){}
+}
+function persistNeto(){
+  try{ localStorage.setItem(NETO_KEY, JSON.stringify(netoData)); }catch(e){}
+}
+function setNetoMes(){
+  const key = monthKey(viewYear, viewMonth);
+  const current = netoData[key] !== undefined ? netoData[key] : '';
+  const input = prompt('Salario neto de ' + MONTH_NAMES[viewMonth] + ' (lo que te han ingresado, ya con el IRPF aplicado):', current);
+  if(input === null) return;
+  const val = parseFloat(input.replace(',','.'));
+  if(input.trim() === ''){
+    delete netoData[key];
+  } else if(!isNaN(val)){
+    netoData[key] = val;
+  } else {
+    alert('Escribe un número válido.');
+    return;
+  }
+  persistNeto();
+  render();
+}
+
+function monthKey(y,m){ return y + '-' + String(m+1).padStart(2,'0'); }
+
+function changeMonth(delta){
+  viewMonth += delta;
+  if(viewMonth < 0){ viewMonth = 11; viewYear--; }
+  if(viewMonth > 11){ viewMonth = 0; viewYear++; }
+  render();
+}
+
+const MONTH_NAMES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const COMPANY_ABBR = {OPCSA:'OP', 'La Luz':'LL', Gesport:'GS'};
+
+function render(){
+  document.getElementById('monthLabel').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+
+  const firstOfMonth = new Date(viewYear, viewMonth, 1);
+  let startOffset = firstOfMonth.getDay() - 1; // Monday = 0
+  if(startOffset < 0) startOffset = 6;
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  for(let i=0;i<startOffset;i++){
+    const d = document.createElement('div');
+    d.className = 'day empty';
+    grid.appendChild(d);
+  }
+
+  const counts = {M:0,T:0,N:0,MA:0,L:0};
+  const companyCounts = {OPCSA:0,'La Luz':0,Gesport:0};
+  const isToday = (d) => (viewYear===today.getFullYear() && viewMonth===today.getMonth() && d===today.getDate());
+
+  for(let d=1; d<=daysInMonth; d++){
+    const entry = monthData[d];
+    const shift = entry ? entry.shift : '';
+    if(shift) counts[shift]++;
+    if(entry && entry.company && shift && shift!=='L' && companyCounts.hasOwnProperty(entry.company)){
+      companyCounts[entry.company]++;
+    }
+
+    const cell = document.createElement('div');
+    cell.className = 'day' + (shift ? ' '+shift : '') + (isToday(d) ? ' today' : '');
+    cell.innerHTML = '<span class="num">'+d+'</span>' + (shift ? '<span class="tag">'+shift+'</span>' : '');
+    if(entry && entry.company && COMPANY_ABBR[entry.company]){
+      const co = document.createElement('span');
+      co.className = 'co';
+      co.textContent = COMPANY_ABBR[entry.company];
+      cell.appendChild(co);
+    }
+    if(entry && (entry.note || entry.buque || entry.movimientos || entry.salario || entry.extra)){
+      const dot = document.createElement('span');
+      dot.className = 'note-dot';
+      cell.appendChild(dot);
+    }
+
+    cell.addEventListener('click', ()=>{ openDay(d); });
+
+    grid.appendChild(cell);
+  }
+
+  const horasTotal = counts.M*(settings.M.horas||0) + counts.T*(settings.T.horas||0)
+    + counts.N*(settings.N.horas||0) + counts.MA*(settings.MA.horas||0);
+  const turnosTotal = counts.M + counts.T + counts.N + counts.MA;
+  let movimientosTotal = 0, salarioTotal = 0, extraTotal = 0;
+  Object.values(monthData).forEach(e=>{
+    if(e.movimientos) movimientosTotal += parseFloat(e.movimientos)||0;
+    if(e.salario) salarioTotal += parseFloat(e.salario)||0;
+    if(e.extra) extraTotal += parseFloat(e.extra)||0;
+  });
+  const ingresosTotal = salarioTotal + extraTotal;
+
+  const statsEl = document.getElementById('stats');
+  statsEl.innerHTML = `
+    <div class="stat M" onclick="openShiftInfo('M')" style="cursor:pointer;"><div class="n">${counts.M}</div><div class="l">MAÑANA</div></div>
+    <div class="stat T" onclick="openShiftInfo('T')" style="cursor:pointer;"><div class="n">${counts.T}</div><div class="l">TARDE</div></div>
+    <div class="stat N" onclick="openShiftInfo('N')" style="cursor:pointer;"><div class="n">${counts.N}</div><div class="l">NOCHE</div></div>
+    <div class="stat MA" onclick="openShiftInfo('MA')" style="cursor:pointer;"><div class="n">${counts.MA}</div><div class="l">MADRUGADA</div></div>
+    <div class="stat wide"><div class="n">${turnosTotal}</div><div class="l">TURNOS TOTALES &middot; ${counts.L} libres</div></div>
+    <div class="stat wide"><div class="n">${horasTotal} h</div><div class="l">TOTAL HORAS DEL MES</div></div>
+  `;
+
+  const financeEl = document.getElementById('financestats');
+  const netoMes = netoData[key];
+  const netoRow = netoMes !== undefined
+    ? (()=>{
+        const retencion = ingresosTotal - netoMes;
+        const pct = ingresosTotal > 0 ? (retencion/ingresosTotal*100) : 0;
+        return `<div class="stat" onclick="setNetoMes()" style="cursor:pointer;"><div class="n">${netoMes.toFixed(2)} €</div><div class="l">SALARIO NETO &middot; TOCA PARA EDITAR</div></div>
+       <div class="stat"><div class="n">${retencion.toFixed(2)} €</div><div class="l">RETENCIÓN IRPF &middot; ${pct.toFixed(1)}%</div></div>`;
+      })()
+    : `<div class="stat wide" onclick="setNetoMes()" style="cursor:pointer;"><div class="n">Añadir</div><div class="l">SALARIO NETO DEL MES (TOCA AQUÍ)</div></div>`;
+  financeEl.innerHTML = `
+    <div class="stat" style="grid-column:1/-1;"><div class="n">${movimientosTotal}</div><div class="l">MOVIMIENTOS TOTALES</div></div>
+    <div class="stat"><div class="n">${salarioTotal.toFixed(2)} €</div><div class="l">SALARIO</div></div>
+    <div class="stat"><div class="n">${extraTotal.toFixed(2)} €</div><div class="l">EXTRAS</div></div>
+    <div class="stat grand" style="grid-column:1/-1;"><div class="n">${ingresosTotal.toFixed(2)} €</div><div class="l">TOTAL INGRESOS DEL MES (BRUTO)</div></div>
+    ${netoRow}
+  `;
+
+  const coEl = document.getElementById('companystats');
+  coEl.innerHTML = COMPANIES.map(c => `
+    <div class="cstat" onclick="openCompanyInfo('${c}')" style="cursor:pointer;"><div class="n">${companyCounts[c]}</div><div class="l">${c.toUpperCase()}</div></div>
+  `).join('');
+}
+
+function openDay(d, fromLongPress){
+  selectedDay = d;
+  const key = monthKey(viewYear, viewMonth);
+  const entry = (data[key] && data[key][d]) || {shift:'', note:'', company:''};
+  selectedShift = entry.shift || '';
+
+  document.getElementById('dayTitle').textContent = 'Día ' + d;
+  document.getElementById('daySub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+  document.getElementById('dayNote').value = entry.note || '';
+  document.getElementById('dayCompany').value = entry.company || '';
+  document.getElementById('dayBuque').value = entry.buque || '';
+  document.getElementById('dayMovs').value = entry.movimientos || '';
+  document.getElementById('daySalario').value = entry.salario || '';
+  document.getElementById('dayExtra').value = entry.extra || '';
+
+  const pick = document.getElementById('shiftPick');
+  pick.innerHTML = '';
+  SHIFTS.forEach(s=>{
+    const btn = document.createElement('button');
+    btn.textContent = SHIFT_NAMES[s];
+    btn.className = (s===selectedShift ? 'active '+s : '');
+    btn.onclick = ()=>{
+      selectedShift = (selectedShift===s) ? '' : s;
+      Array.from(pick.children).forEach(c=>c.className='');
+      if(selectedShift) btn.className = 'active '+selectedShift;
+    };
+    pick.appendChild(btn);
+  });
+
+  document.getElementById('dayOverlay').classList.add('open');
+}
+
+function closeDay(){
+  document.getElementById('dayOverlay').classList.remove('open');
+}
+
+function saveDay(){
+  const key = monthKey(viewYear, viewMonth);
+  if(!data[key]) data[key] = {};
+  const note = document.getElementById('dayNote').value.trim();
+  const company = document.getElementById('dayCompany').value;
+  const buque = document.getElementById('dayBuque').value.trim();
+  const movimientos = document.getElementById('dayMovs').value;
+  const salario = document.getElementById('daySalario').value;
+  const extra = document.getElementById('dayExtra').value;
+  const hasExtras = note || company || buque || movimientos || salario || extra;
+  if(!selectedShift && !hasExtras){
+    delete data[key][selectedDay];
+  } else {
+    data[key][selectedDay] = {
+      shift: selectedShift,
+      note: note,
+      company: company,
+      buque: buque,
+      movimientos: movimientos ? parseFloat(movimientos) : '',
+      salario: salario ? parseFloat(salario) : '',
+      extra: extra ? parseFloat(extra) : ''
+    };
+  }
+  persist();
+  closeDay();
+  render();
+}
+
+function searchBuque(kind){
+  const name = document.getElementById('dayBuque').value.trim();
+  if(!name){
+    alert('Escribe primero el nombre del buque.');
+    return;
+  }
+  const suffix = kind === 'posicion' ? 'buque MarineTraffic posición actual' : 'buque capacidad TEU contenedores';
+  window.open('https://www.google.com/search?q=' + encodeURIComponent(name + ' ' + suffix), '_blank');
+}
+
+function csvEscape(val){
+  const s = String(val === undefined || val === null ? '' : val);
+  if(s.includes(';') || s.includes('"') || s.includes('\n')){
+    return '"' + s.replace(/"/g,'""') + '"';
+  }
+  return s;
+}
+
+function exportCSV(){
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b);
+
+  if(days.length === 0){
+    alert('No hay datos registrados este mes para exportar.');
+    return;
+  }
+
+  const header = ['Dia','Turno','Empresa','Buque','Movimientos','Salario','Extra','Nota'];
+  const rows = days.map(d=>{
+    const e = monthData[d];
+    return [
+      d,
+      e.shift ? SHIFT_NAMES[e.shift] : '',
+      e.company || '',
+      e.buque || '',
+      e.movimientos || '',
+      e.salario || '',
+      e.extra || '',
+      e.note || ''
+    ].map(csvEscape).join(';');
+  });
+
+  const csvContent = '\uFEFF' + header.join(';') + '\n' + rows.join('\n');
+  const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'turnos_' + MONTH_NAMES[viewMonth] + '_' + viewYear + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function loadScriptOnce(src){
+  return new Promise((resolve, reject)=>{
+    if(document.querySelector('script[data-src="'+src+'"]')){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.setAttribute('data-src', src);
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('No se pudo cargar la librería'));
+    document.head.appendChild(s);
+  });
+}
+
+async function exportExcel(){
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b);
+
+  if(days.length === 0){
+    alert('No hay datos registrados este mes para exportar.');
+    return;
+  }
+
+  const btn = document.getElementById('btnExcel');
+  const originalText = btn.textContent;
+  btn.textContent = 'Generando...';
+  btn.disabled = true;
+
+  try{
+    if(!window.XlsxPopulate){
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/xlsx-populate/browser/xlsx-populate.min.js');
+    }
+
+    const header = ['Dia','Turno','Empresa','Buque','Movimientos','Salario','Extra','Nota'];
+    const rows = days.map(d=>{
+      const e = monthData[d];
+      return [
+        d,
+        e.shift ? SHIFT_NAMES[e.shift] : '',
+        e.company || '',
+        e.buque || '',
+        e.movimientos ? parseFloat(e.movimientos) : '',
+        e.salario ? parseFloat(e.salario) : '',
+        e.extra ? parseFloat(e.extra) : '',
+        e.note || ''
+      ];
+    });
+
+    const workbook = await XlsxPopulate.fromBlankAsync();
+    const sheet = workbook.sheet(0);
+    sheet.name('Turnos');
+
+    sheet.cell('A1').value([header, ...rows]);
+
+    const lastRow = rows.length + 1;
+    sheet.range('A1:H1').style({
+      bold: true, fontColor: 'FFFFFF', fill: '1C2530', horizontalAlignment: 'center'
+    });
+    sheet.range('A2:H'+lastRow).style({ horizontalAlignment: 'left' });
+
+    const widths = [6, 11, 10, 18, 12, 10, 10, 26];
+    ['A','B','C','D','E','F','G','H'].forEach((col,i)=> sheet.column(col).width(widths[i]));
+
+    sheet.row(1).height(20);
+
+    const blob = await workbook.outputAsync();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'turnos_' + MONTH_NAMES[viewMonth] + '_' + viewYear + '.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(err){
+    alert('No se ha podido generar el Excel. Comprueba que tienes conexión a internet e inténtalo de nuevo.');
+  }finally{
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}
+
+function exportPDF(){
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b);
+
+  let horasTotal=0, movimientosTotal=0, salarioTotal=0, extraTotal=0, turnosTotal=0;
+  const rows = days.map(d=>{
+    const e = monthData[d];
+    if(!e.shift && !e.note && !e.buque && !e.movimientos && !e.salario && !e.extra) return '';
+    if(e.shift && e.shift!=='L'){
+      horasTotal += (settings[e.shift]?.horas || 0);
+      turnosTotal++;
+    }
+    if(e.movimientos) movimientosTotal += parseFloat(e.movimientos)||0;
+    if(e.salario) salarioTotal += parseFloat(e.salario)||0;
+    if(e.extra) extraTotal += parseFloat(e.extra)||0;
+    return `<tr>
+      <td>${d}</td>
+      <td>${e.shift ? SHIFT_NAMES[e.shift] : '—'}</td>
+      <td>${e.company || '—'}</td>
+      <td>${e.buque || '—'}</td>
+      <td>${e.movimientos || '—'}</td>
+      <td>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : '—'}</td>
+      <td>${e.extra ? parseFloat(e.extra).toFixed(2)+' €' : '—'}</td>
+      <td>${e.note || ''}</td>
+    </tr>`;
+  }).join('');
+
+  if(!rows){
+    alert('No hay datos registrados este mes para exportar.');
+    return;
+  }
+
+  const shiftColorsHex = {M:'#ffb020', T:'#3fb6c2', N:'#6c7ae0', MA:'#c15fd6'};
+  const countsByShift = {M:0,T:0,N:0,MA:0};
+  const ingresosEmpresaPdf = {OPCSA:0,'La Luz':0,Gesport:0};
+  days.forEach(d=>{
+    const e = monthData[d];
+    if(e.shift && countsByShift.hasOwnProperty(e.shift)) countsByShift[e.shift]++;
+    if(e.shift && e.shift!=='L' && e.company && ingresosEmpresaPdf.hasOwnProperty(e.company)){
+      ingresosEmpresaPdf[e.company] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+    }
+  });
+  const maxShiftCount = Math.max(1, ...Object.values(countsByShift));
+  const shiftBars = SHIFTS.filter(s=>s!=='L').map(s => `
+    <div class="barrow">
+      <div class="blabel">${SHIFT_NAMES[s]}</div>
+      <div class="btrack"><div class="bfill" style="width:${(countsByShift[s]/maxShiftCount*100)}%;background:${shiftColorsHex[s]};"></div></div>
+      <div class="bval">${countsByShift[s]}</div>
+    </div>`).join('');
+  const maxIngresoEmp = Math.max(1, ...Object.values(ingresosEmpresaPdf));
+  const empresaBars = COMPANIES.map(c => `
+    <div class="barrow">
+      <div class="blabel">${c}</div>
+      <div class="btrack"><div class="bfill" style="width:${(ingresosEmpresaPdf[c]/maxIngresoEmp*100)}%;background:#ffb020;"></div></div>
+      <div class="bval">${ingresosEmpresaPdf[c].toFixed(0)} €</div>
+    </div>`).join('');
+
+  const ingresosPorTurno = {M:0,T:0,N:0,MA:0};
+  days.forEach(d=>{
+    const e = monthData[d];
+    if(e.shift && ingresosPorTurno.hasOwnProperty(e.shift)){
+      ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+    }
+  });
+  const maxIngresoTurno = Math.max(1, ...Object.values(ingresosPorTurno));
+  const turnoSalarioBars = SHIFTS.filter(s=>s!=='L').map(s => `
+    <div class="barrow">
+      <div class="blabel">${SHIFT_NAMES[s]}</div>
+      <div class="btrack"><div class="bfill" style="width:${(ingresosPorTurno[s]/maxIngresoTurno*100)}%;background:${shiftColorsHex[s]};"></div></div>
+      <div class="bval">${ingresosPorTurno[s].toFixed(0)} €</div>
+    </div>`).join('');
+  const turnoSalarioLines = SHIFTS.filter(s=>s!=='L').map(s => `
+    <div>De <b>${SHIFT_NAMES[s].toLowerCase()}</b> tienes ${countsByShift[s]} turno${countsByShift[s]===1?'':'s'}, y el salario ha sido de ${ingresosPorTurno[s].toFixed(2)} €.</div>
+  `).join('');
+
+  const reportHtml = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  <title>Mis Turnos — ${MONTH_NAMES[viewMonth]} ${viewYear}</title>
+  <style>
+    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    body{
+      font-family:Georgia,'Times New Roman',serif;color:#1c2530;
+      background:#f4f1ea;margin:0;padding:36px 18px;
+    }
+    .sheet{
+      max-width:760px;margin:0 auto;background:#fff;border-radius:4px;
+      padding:44px 48px;box-shadow:0 1px 3px rgba(0,0,0,0.08);
+    }
+    .masthead{border-bottom:2px solid #1c2530;padding-bottom:16px;margin-bottom:26px;display:flex;justify-content:space-between;align-items:flex-end;}
+    .masthead h1{font-size:26px;margin:0;font-weight:400;letter-spacing:.3px;}
+    .masthead .mo{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#8a6d1f;text-transform:uppercase;letter-spacing:1.4px;font-weight:700;text-align:right;}
+    .masthead .mo span{display:block;font-family:Georgia,serif;font-size:15px;color:#1c2530;text-transform:capitalize;letter-spacing:0;font-weight:400;margin-top:3px;}
+
+    .hero{
+      background:#1c2530;color:#fff;border-radius:6px;padding:20px 24px;
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    .hero .hlabel{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:#cdd6e0;margin-bottom:4px;}
+    .hero .hval{font-size:26px;font-weight:700;color:#ffb020;}
+    .hero .hcol{text-align:right;}
+
+    h2.section{
+      font-family:Arial,Helvetica,sans-serif;font-size:11px;text-transform:uppercase;
+      letter-spacing:1.2px;color:#8a6d1f;margin:0 0 14px;padding-bottom:6px;
+      border-bottom:1px solid #e6e0d2;
+    }
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-bottom:32px;}
+    .barrow{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:Arial,Helvetica,sans-serif;}
+    .barrow .blabel{width:70px;font-size:10.5px;color:#555;flex-shrink:0;}
+    .barrow .btrack{flex:1;background:#f0ece2;border-radius:5px;height:12px;overflow:hidden;}
+    .barrow .bfill{height:100%;border-radius:5px;}
+    .barrow .bval{width:44px;text-align:right;font-size:10.5px;font-weight:700;color:#1c2530;flex-shrink:0;}
+
+    table{width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;font-size:11px;margin-bottom:30px;}
+    th{
+      background:#1c2530;color:#fff;font-weight:600;text-transform:uppercase;
+      font-size:9.5px;letter-spacing:.4px;padding:9px 8px;text-align:left;
+    }
+    td{padding:8px;border-bottom:1px solid #ece7db;}
+    tbody tr:nth-child(even){background:#faf8f2;}
+
+    .summary{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#333;line-height:2;}
+    .summary b{color:#1c2530;}
+
+    .foot{
+      margin-top:34px;padding-top:14px;border-top:1px solid #e6e0d2;
+      font-family:Arial,Helvetica,sans-serif;font-size:9.5px;color:#999;
+      display:flex;justify-content:space-between;
+    }
+
+    .pbtn{
+      display:block;margin:22px auto 0;padding:11px 22px;font-size:13px;
+      border:none;border-radius:8px;background:#ffb020;color:#221600;
+      font-weight:700;cursor:pointer;font-family:Arial,Helvetica,sans-serif;
+    }
+    @media print{ .pbtn{display:none;} body{background:#fff;padding:0;} .sheet{box-shadow:none;padding:0;max-width:100%;} }
+  </style></head><body>
+   <div class="sheet">
+    <div class="masthead">
+      <h1>Mis Turnos</h1>
+      <div class="mo">Informe mensual<span>${MONTH_NAMES[viewMonth]} ${viewYear}</span></div>
+    </div>
+
+    <div class="hero">
+      <div><div class="hlabel">Turnos totales</div><div class="hval" style="color:#fff;">${turnosTotal}</div></div>
+      <div><div class="hlabel">Horas totales</div><div class="hval" style="color:#fff;">${horasTotal} h</div></div>
+      <div class="hcol"><div class="hlabel">Ingresos totales</div><div class="hval">${(salarioTotal+extraTotal).toFixed(2)} €</div></div>
+    </div>
+
+    <h2 class="section">Resumen visual</h2>
+    <div class="charts">
+      <div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#8a6d1f;margin-bottom:8px;font-weight:700;">TURNOS POR TIPO</div>
+        ${shiftBars}
+      </div>
+      <div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#8a6d1f;margin-bottom:8px;font-weight:700;">INGRESOS POR EMPRESA</div>
+        ${empresaBars}
+      </div>
+    </div>
+
+    <h2 class="section">Detalle por día</h2>
+    <table>
+      <thead><tr>
+        <th>Día</th><th>Turno</th><th>Empresa</th><th>Buque</th><th>Movim.</th><th>Salario</th><th>Extra</th><th>Nota</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <h2 class="section">Resumen económico</h2>
+    <div class="summary">
+      <b>Movimientos totales:</b> ${movimientosTotal}<br>
+      <b>Salario:</b> ${salarioTotal.toFixed(2)} € &nbsp;&middot;&nbsp;
+      <b>Extras:</b> ${extraTotal.toFixed(2)} € &nbsp;&middot;&nbsp;
+      <b>Ingresos totales:</b> ${(salarioTotal+extraTotal).toFixed(2)} €
+    </div>
+
+    <h2 class="section">Salario por turno</h2>
+    <div class="charts" style="grid-template-columns:1.1fr 1fr;">
+      <div class="summary">${turnoSalarioLines}</div>
+      <div>${turnoSalarioBars}</div>
+    </div>
+
+    <div class="foot">
+      <span>Mis Turnos &middot; Puerto de La Luz</span>
+      <span>Generado el ${new Date().toLocaleDateString('es-ES')}</span>
+    </div>
+
+    <button class="pbtn" onclick="window.print()">Imprimir / Guardar como PDF</button>
+   </div>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  if(!win){
+    alert('El navegador ha bloqueado la ventana nueva. Permite las ventanas emergentes para esta página e inténtalo de nuevo.');
+    return;
+  }
+  win.document.open();
+  win.document.write(reportHtml);
+  win.document.close();
+}
+
+let calcExpr = '0';
+let calcJustEvaluated = false;
+
+function openCalc(){
+  calcExpr = '0';
+  calcJustEvaluated = false;
+  document.getElementById('calcDisplay').textContent = calcExpr;
+  document.getElementById('calcOverlay').classList.add('open');
+}
+function closeCalc(){
+  document.getElementById('calcOverlay').classList.remove('open');
+}
+function calcRefresh(){
+  document.getElementById('calcDisplay').textContent = calcExpr;
+}
+function calcAppend(ch){
+  const isOp = ['+','-','*','/'].includes(ch);
+  if(calcJustEvaluated){
+    calcExpr = isOp ? calcExpr + ch : ch;
+    calcJustEvaluated = false;
+  } else if(calcExpr === '0' && ch !== '.'){
+    calcExpr = isOp ? '0'+ch : ch;
+  } else {
+    const lastChar = calcExpr.slice(-1);
+    if(isOp && ['+','-','*','/'].includes(lastChar)){
+      calcExpr = calcExpr.slice(0,-1) + ch;
+    } else {
+      calcExpr += ch;
+    }
+  }
+  calcRefresh();
+}
+function calcClear(){
+  calcExpr = '0';
+  calcJustEvaluated = false;
+  calcRefresh();
+}
+function calcBack(){
+  calcExpr = calcExpr.length > 1 ? calcExpr.slice(0,-1) : '0';
+  calcRefresh();
+}
+function calcPercent(){
+  const m = calcExpr.match(/^(.*[+\-*\/])(\d+\.?\d*)$/);
+  try{
+    if(m){
+      const beforeOp = m[1].slice(0,-1);
+      const op = m[1].slice(-1);
+      const num = parseFloat(m[2]);
+      const base = Function('"use strict"; return (' + beforeOp + ')')();
+      const percentVal = (op === '+' || op === '-') ? (base*num/100) : (num/100);
+      calcExpr = beforeOp + op + percentVal;
+    } else {
+      const val = Function('"use strict"; return (' + calcExpr + ')')();
+      calcExpr = String(val/100);
+    }
+  }catch(e){}
+  calcRefresh();
+}
+function calcEquals(){
+  if(!/^[0-9+\-*/.\s]+$/.test(calcExpr)) return;
+  try{
+    let result = Function('"use strict"; return (' + calcExpr + ')')();
+    if(typeof result !== 'number' || !isFinite(result)){ calcExpr = 'Error'; }
+    else { calcExpr = String(Math.round(result*10000)/10000); }
+  }catch(e){
+    calcExpr = 'Error';
+  }
+  calcJustEvaluated = true;
+  calcRefresh();
+}
+
+function openShiftInfo(shiftCode){
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b)
+    .filter(d => monthData[d].shift === shiftCode);
+
+  document.getElementById('shiftInfoTitle').textContent = SHIFT_NAMES[shiftCode];
+  document.getElementById('shiftInfoSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+
+  const body = document.getElementById('shiftInfoBody');
+
+  if(days.length === 0){
+    body.innerHTML = '<div class="dash-empty">No tienes turnos de este tipo registrados este mes.</div>';
+    document.getElementById('shiftInfoOverlay').classList.add('open');
+    return;
+  }
+
+  let ingresosTotal = 0, movimientosTotal = 0;
+  const items = days.map(d=>{
+    const e = monthData[d];
+    ingresosTotal += (parseFloat(e.salario)||0);
+    movimientosTotal += parseFloat(e.movimientos)||0;
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;">
+        <span>Día ${d}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
+        ${e.company || 'Sin empresa'}${e.buque ? ' &middot; ' + e.buque : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+      </div>
+      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${e.note}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const mediaTurno = days.length > 0 ? ingresosTotal/days.length : 0;
+
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <div class="stat" style="flex:1;"><div class="n">${days.length}</div><div class="l">TURNOS</div></div>
+      <div class="stat" style="flex:1;"><div class="n">${mediaTurno.toFixed(0)} €</div><div class="l">MEDIA POR TURNO</div></div>
+      <div class="stat" style="flex:1;"><div class="n">${ingresosTotal.toFixed(0)} €</div><div class="l">INGRESOS</div></div>
+    </div>
+    ${items}
+  `;
+
+  document.getElementById('shiftInfoOverlay').classList.add('open');
+}
+function closeShiftInfo(){
+  document.getElementById('shiftInfoOverlay').classList.remove('open');
+}
+
+function openBuqueSearch(){
+  document.getElementById('buqueSearchInput').value = '';
+  document.getElementById('buqueSearchResults').innerHTML = '<div class="dash-empty">Escribe el nombre de un buque para buscarlo.</div>';
+  document.getElementById('buqueSearchOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('buqueSearchInput').focus(), 100);
+}
+function closeBuqueSearch(){
+  document.getElementById('buqueSearchOverlay').classList.remove('open');
+}
+function runBuqueSearch(){
+  const q = document.getElementById('buqueSearchInput').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('buqueSearchResults');
+  if(!q){
+    resultsEl.innerHTML = '<div class="dash-empty">Escribe el nombre de un buque para buscarlo.</div>';
+    return;
+  }
+
+  const matches = [];
+  Object.keys(data).sort().forEach(key=>{
+    const monthData = data[key];
+    Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b).forEach(d=>{
+      const e = monthData[d];
+      if(e.buque && e.buque.toLowerCase().includes(q)){
+        matches.push({key, d, e});
+      }
+    });
+  });
+
+  if(matches.length === 0){
+    resultsEl.innerHTML = '<div class="dash-empty">No se ha encontrado ningún buque con ese nombre.</div>';
+    return;
+  }
+
+  let ingresosTotal = 0;
+  const items = matches.map(({key,d,e})=>{
+    const [y,m] = key.split('-').map(Number);
+    ingresosTotal += (parseFloat(e.salario)||0);
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;">
+        <span>${e.buque}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
+        Día ${d} de ${MONTH_NAMES[m-1]} ${y} &middot; ${e.shift ? SHIFT_NAMES[e.shift] : ''}${e.company ? ' &middot; ' + e.company : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  resultsEl.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <div class="stat" style="flex:1;"><div class="n">${matches.length}</div><div class="l">SERVICIOS</div></div>
+      <div class="stat" style="flex:1;"><div class="n">${ingresosTotal.toFixed(0)} €</div><div class="l">INGRESOS</div></div>
+    </div>
+    ${items}
+  `;
+}
+
+function openCompanyInfo(company){
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b)
+    .filter(d => monthData[d].shift && monthData[d].shift !== 'L' && monthData[d].company === company);
+
+  document.getElementById('shiftInfoTitle').textContent = company;
+  document.getElementById('shiftInfoSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+
+  const body = document.getElementById('shiftInfoBody');
+
+  if(days.length === 0){
+    body.innerHTML = '<div class="dash-empty">No tienes turnos con esta empresa registrados este mes.</div>';
+    document.getElementById('shiftInfoOverlay').classList.add('open');
+    return;
+  }
+
+  let ingresosTotal = 0;
+  const items = days.map(d=>{
+    const e = monthData[d];
+    ingresosTotal += (parseFloat(e.salario)||0);
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;">
+        <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
+        ${e.buque ? e.buque : 'Sin buque'}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+      </div>
+      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${e.note}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const mediaTurnoC = days.length > 0 ? ingresosTotal/days.length : 0;
+
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <div class="stat" style="flex:1;"><div class="n">${days.length}</div><div class="l">TURNOS</div></div>
+      <div class="stat" style="flex:1;"><div class="n">${mediaTurnoC.toFixed(0)} €</div><div class="l">MEDIA POR TURNO</div></div>
+      <div class="stat" style="flex:1;"><div class="n">${ingresosTotal.toFixed(0)} €</div><div class="l">INGRESOS</div></div>
+    </div>
+    ${items}
+  `;
+
+  document.getElementById('shiftInfoOverlay').classList.add('open');
+}
+
+function openDashboard(){
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+  const entries = Object.entries(monthData).filter(([d,e]) => e.shift);
+
+  document.getElementById('dashSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+  const body = document.getElementById('dashBody');
+
+  if(entries.length === 0){
+    body.innerHTML = '<div class="dash-empty">Todavía no hay turnos registrados este mes.</div>';
+    document.getElementById('dashboardOverlay').classList.add('open');
+    return;
+  }
+
+  // ingresos por empresa
+  const ingresosEmpresa = {OPCSA:0,'La Luz':0,Gesport:0};
+  entries.forEach(([d,e])=>{
+    if(e.shift!=='L' && e.company && ingresosEmpresa.hasOwnProperty(e.company)){
+      ingresosEmpresa[e.company] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+    }
+  });
+  const maxIngresoEmpresa = Math.max(1, ...Object.values(ingresosEmpresa));
+  const ingresoEmpresaRows = COMPANIES.map(c => `
+    <div class="barrow">
+      <div class="blabel">${c}</div>
+      <div class="btrack"><div class="bfill" style="width:${(ingresosEmpresa[c]/maxIngresoEmpresa*100)}%;background:var(--amber);"></div></div>
+      <div class="bval">${ingresosEmpresa[c].toFixed(0)} €</div>
+    </div>`).join('');
+
+  // turnos por empresa
+  const porEmpresa = {OPCSA:0,'La Luz':0,Gesport:0};
+  entries.forEach(([d,e])=>{ if(e.shift!=='L' && e.company && porEmpresa.hasOwnProperty(e.company)) porEmpresa[e.company]++; });
+  const maxEmpresa = Math.max(1, ...Object.values(porEmpresa));
+  const empresaRows = COMPANIES.map(c => `
+    <div class="barrow">
+      <div class="blabel">${c}</div>
+      <div class="btrack"><div class="bfill" style="width:${(porEmpresa[c]/maxEmpresa*100)}%;background:var(--text-dim);"></div></div>
+      <div class="bval">${porEmpresa[c]}</div>
+    </div>`).join('');
+
+  // ingresos por día
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  const ingresosDia = [];
+  for(let d=1; d<=daysInMonth; d++){
+    const e = monthData[d];
+    const val = e ? (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0) : 0;
+    ingresosDia.push(val);
+  }
+  const maxIngreso = Math.max(1, ...ingresosDia);
+  const dayBars = ingresosDia.map((v,i) => `
+    <div class="dcol">
+      <div class="dbar" style="height:${(v/maxIngreso*100)}%;background:${v>0?'var(--amber)':'var(--border)'};"></div>
+      <div class="dnum">${(i+1)%5===0 || i===0 ? (i+1) : ''}</div>
+    </div>`).join('');
+
+  // salario por turno
+  const shiftColorsVar = {M:'var(--amber)', T:'var(--teal)', N:'var(--indigo)', MA:'var(--violet)'};
+  const countsPorTurno = {M:0,T:0,N:0,MA:0};
+  const ingresosPorTurno = {M:0,T:0,N:0,MA:0};
+  entries.forEach(([d,e])=>{
+    if(countsPorTurno.hasOwnProperty(e.shift)){
+      countsPorTurno[e.shift]++;
+      ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+    }
+  });
+  const maxIngresoTurno = Math.max(1, ...Object.values(ingresosPorTurno));
+  const turnoSalarioBars = SHIFTS.filter(s=>s!=='L').map(s => `
+    <div class="barrow">
+      <div class="blabel">${SHIFT_NAMES[s]}</div>
+      <div class="btrack"><div class="bfill" style="width:${(ingresosPorTurno[s]/maxIngresoTurno*100)}%;background:${shiftColorsVar[s]};"></div></div>
+      <div class="bval">${ingresosPorTurno[s].toFixed(0)} €</div>
+    </div>`).join('');
+  const turnoSalarioLines = SHIFTS.filter(s=>s!=='L').map(s => `
+    <div style="margin-bottom:6px;">De <b>${SHIFT_NAMES[s].toLowerCase()}</b> tienes ${countsPorTurno[s]} turno${countsPorTurno[s]===1?'':'s'}, y el salario ha sido de ${ingresosPorTurno[s].toFixed(2)} €.</div>
+  `).join('');
+
+  body.innerHTML = `
+    <div class="dash-section">
+      <h3>INGRESOS POR EMPRESA</h3>
+      ${ingresoEmpresaRows}
+    </div>
+    <div class="dash-section">
+      <h3>TURNOS POR EMPRESA</h3>
+      ${empresaRows}
+    </div>
+    <div class="dash-section">
+      <h3>INGRESOS POR DÍA (€)</h3>
+      <div class="daybars">${dayBars}</div>
+    </div>
+    <div class="dash-section">
+      <h3>SALARIO POR TURNO</h3>
+      <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:10px;">${turnoSalarioLines}</div>
+      ${turnoSalarioBars}
+    </div>
+  `;
+
+  document.getElementById('dashboardOverlay').classList.add('open');
+}
+function closeDashboard(){
+  document.getElementById('dashboardOverlay').classList.remove('open');
+}
+
+const TARIFAS = [
+  {label:'Mañ/tarde', especialista:97,  grua:113, mafista:129, unidad:0.90, tag:''},
+  {label:'Noche',     especialista:140, grua:163, mafista:187, unidad:1.37, tag:''},
+  {label:'Mañ/tarde', especialista:132, grua:153, mafista:176, unidad:1.27, tag:'festivo'},
+  {label:'Noche',     especialista:182, grua:209, mafista:242, unidad:1.71, tag:'festivo'},
+  {label:'Mañana',    especialista:111, grua:130, mafista:149, unidad:1.04, tag:'sabado'},
+  {label:'Madrugada', especialista:180, grua:207, mafista:239, unidad:1.79, tag:''},
+  {label:'Madrugada', especialista:200, grua:229, mafista:266, unidad:2.08, tag:'festivo'}
+];
+
+function renderTarifas(){
+  const tbody = document.getElementById('tarifasBody');
+  if(!tbody) return;
+  tbody.innerHTML = TARIFAS.map(r=>{
+    const dotColor = r.tag==='festivo' ? 'var(--teal)' : (r.tag==='sabado' ? 'var(--violet)' : 'transparent');
+    return `<tr style="border-top:1px solid var(--border);">
+      <td style="padding:6px;display:flex;align-items:center;gap:6px;">
+        <i style="width:7px;height:7px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0;"></i>${r.label}
+      </td>
+      <td style="padding:6px;">${r.especialista} €</td>
+      <td style="padding:6px;">${r.grua} €</td>
+      <td style="padding:6px;">${r.mafista} €</td>
+      <td style="padding:6px;">${r.unidad.toFixed(2)} €</td>
+    </tr>`;
+  }).join('');
+}
+
+function openSettings(){
+  renderTarifas();
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+function clearMonth(){
+  const key = monthKey(viewYear, viewMonth);
+  const label = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+  if(!data[key] || Object.keys(data[key]).length===0){
+    alert('Ese mes ya está vacío.');
+    return;
+  }
+  if(confirm('¿Borrar todos los turnos de ' + label + '? Esta acción no se puede deshacer.')){
+    delete data[key];
+    persist();
+    closeSettings();
+    render();
+  }
+}
+
+function exportData(){
+  const payload = JSON.stringify({data, settings}, null, 2);
+  const blob = new Blob([payload], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'turnos_backup.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importData(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(parsed.data) data = parsed.data;
+      if(parsed.settings) settings = parsed.settings;
+      persist();
+      persistSettings();
+      render();
+      closeSettings();
+    }catch(err){
+      alert('El archivo no es una copia válida.');
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+let currentView = 'mes';
+let annualYear = today.getFullYear();
+
+function switchView(v){
+  currentView = v;
+  document.getElementById('vtMes').className = v==='mes' ? 'active' : '';
+  document.getElementById('vtAno').className = v==='ano' ? 'active' : '';
+  document.getElementById('mesView').style.display = v==='mes' ? 'block' : 'none';
+  document.getElementById('anoView').style.display = v==='ano' ? 'block' : 'none';
+  if(v==='ano') renderYear();
+}
+
+function changeAnnualYear(delta){
+  annualYear += delta;
+  renderYear();
+}
+
+function renderYear(){
+  document.getElementById('yearLabel').textContent = annualYear;
+
+  const monthTurnos = [];
+  const monthIngresos = [];
+  let yearTurnos = 0, yearHoras = 0, yearIngresos = 0, yearNeto = 0, mesesConNeto = 0;
+
+  for(let m=0; m<12; m++){
+    const key = monthKey(annualYear, m);
+    const monthData = data[key] || {};
+    let turnos = 0, horas = 0, ingresos = 0;
+    Object.values(monthData).forEach(e=>{
+      if(e.shift && e.shift !== 'L'){
+        turnos++;
+        horas += (settings[e.shift]?.horas || 0);
+      }
+      ingresos += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+    });
+    if(netoData[key] !== undefined){ yearNeto += netoData[key]; mesesConNeto++; }
+    monthTurnos.push(turnos);
+    monthIngresos.push(netoData[key] !== undefined ? netoData[key] : ingresos);
+    yearTurnos += turnos;
+    yearHoras += horas;
+    yearIngresos += ingresos;
+  }
+
+  document.getElementById('yearStats').innerHTML = `
+    <div class="stat" style="flex:1;"><div class="n">${yearTurnos}</div><div class="l">TURNOS DEL AÑO</div></div>
+    <div class="stat" style="flex:1;"><div class="n">${yearHoras} h</div><div class="l">HORAS DEL AÑO</div></div>
+    <div class="stat" style="flex:1;"><div class="n">${yearIngresos.toFixed(0)} €</div><div class="l">BRUTO DEL AÑO</div></div>
+    ${mesesConNeto>0 ? `<div class="stat" style="flex:1;"><div class="n">${yearNeto.toFixed(0)} €</div><div class="l">NETO DEL AÑO</div></div>` : ''}
+  `;
+  document.getElementById('yearStats').style.display = 'flex';
+  document.getElementById('yearStats').style.gap = '8px';
+
+  const maxTurnos = Math.max(1, ...monthTurnos);
+  const maxIngresos = Math.max(1, ...monthIngresos);
+  const shortMonths = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  document.getElementById('yearTableBody').innerHTML = shortMonths.map((mn,i) => {
+    const key = monthKey(annualYear, i);
+    const tieneNeto = netoData[key] !== undefined;
+    return `
+    <tr>
+      <td class="month">${mn}</td>
+      <td>
+        <span class="minibar"><i style="width:${(monthTurnos[i]/maxTurnos*100)}%;background:var(--amber);"></i></span>
+        <span class="mval">${monthTurnos[i]}</span>
+      </td>
+      <td>
+        <span class="minibar"><i style="width:${(monthIngresos[i]/maxIngresos*100)}%;background:var(--teal);"></i></span>
+        <span class="mval">${monthIngresos[i].toFixed(0)}€${tieneNeto ? '' : '*'}</span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+load();
+render();
+
+// PWA: registra el Service Worker cuando la app está publicada en HTTPS.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
