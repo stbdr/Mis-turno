@@ -2,8 +2,8 @@
   "name": "Mis Turnos",
   "short_name": "Mis Turnos",
   "description": "Gestión personal de turnos de trabajo",
-  "start_url": "/Mis-turno/",
-  "scope": "/Mis-turno/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#11161d",
@@ -11,17 +11,16 @@
   "lang": "es",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "id": "mis-turnos-vieja-2026"
+  ]
 }
