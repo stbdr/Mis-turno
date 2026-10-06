@@ -1,4 +1,4 @@
-const CACHE_NAME = "mis-turnos-v1";
+const CACHE_NAME = "turno1-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -14,7 +14,7 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+    caches.keys().then(keys => Promise.all(keys.filter(k => (k.startsWith("turno1-") && k !== CACHE_NAME) || k === "mis-turnos-v1").map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
