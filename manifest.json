@@ -2,7 +2,7 @@
   "name": "Mis Turnos",
   "short_name": "Mis Turnos",
   "description": "Gestión personal de turnos de trabajo",
-  "start_url": "./v?=2",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
