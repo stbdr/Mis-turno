@@ -174,6 +174,12 @@
     border:1px solid var(--border);border-bottom:none;
     max-height:88vh;overflow-y:auto;
   }
+  .closex{
+    position:sticky;top:0;float:right;z-index:5;margin:-4px -4px 0 8px;
+    width:34px;height:34px;border-radius:9px;
+    border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);
+    font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
   .sheet h2{margin:0 0 4px;font-size:17px;}
   .sheet .dsub{color:var(--text-dim);font-size:12.5px;margin-bottom:14px;text-transform:capitalize;}
   .shiftpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
@@ -356,6 +362,7 @@
 <!-- modal herramientas -->
 <div class="overlay" id="toolsOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeTools()" aria-label="Cerrar">&#10005;</button>
     <h2>Herramientas</h2>
     <div class="dsub">Accesos rápidos</div>
     <div class="toolgrid">
@@ -376,6 +383,7 @@
 <!-- modal ajustes (tabla salarial) -->
 <div class="overlay" id="ajustesOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeAjustes()" aria-label="Cerrar">&#10005;</button>
     <h2>Ajustes</h2>
     <div class="dsub" style="text-transform:none;">Tabla salarial por puesto &middot; los importes se pueden modificar</div>
     <label style="margin-top:0;">Puesto</label>
@@ -403,6 +411,7 @@
 <!-- modal nómina -->
 <div class="overlay" id="nominaOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeNomina()" aria-label="Cerrar">&#10005;</button>
     <h2>Nómina</h2>
     <div class="monthbar" style="margin-bottom:14px;">
       <button onclick="nominaChangeMonth(-1)">&larr;</button>
@@ -435,6 +444,7 @@
 <!-- modal compañeros -->
 <div class="overlay" id="crewOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeCrewTool()" aria-label="Cerrar">&#10005;</button>
     <h2>Compañeros</h2>
     <div class="dsub" style="text-transform:none;">Registro único: el formulario del turno usa estos datos</div>
     <div class="crewbox">
@@ -515,6 +525,7 @@
 <!-- modal calculadora -->
 <div class="overlay" id="calcOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeCalc()" aria-label="Cerrar">&#10005;</button>
     <h2>Calculadora</h2>
     <div id="calcDisplay">0</div>
     <div class="calc-grid">
@@ -551,6 +562,7 @@
 <!-- modal buscador de buque -->
 <div class="overlay" id="buqueSearchOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeBuqueSearch()" aria-label="Cerrar">&#10005;</button>
     <h2>Buscar buque</h2>
     <div class="dsub">En todos los meses guardados</div>
     <input type="text" id="buqueSearchInput" class="field" placeholder="Nombre del buque..." oninput="runBuqueSearch()">
@@ -576,6 +588,7 @@
 <!-- modal ajustes -->
 <div class="overlay" id="settingsOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeSettings()" aria-label="Cerrar">&#10005;</button>
     <h2>Copia de seguridad</h2>
 
     
@@ -600,6 +613,7 @@
 <!-- modal dashboard -->
 <div class="overlay" id="dashboardOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeDashboard()" aria-label="Cerrar">&#10005;</button>
     <h2>Resumen visual</h2>
     <div class="dsub" id="dashSub"></div>
     <div id="dashBody"></div>
@@ -1307,12 +1321,12 @@ function exportPDF(){
     return `<tr>
       <td>${d}</td>
       <td>${e.shift ? SHIFT_NAMES[e.shift] : '—'}</td>
-      <td>${e.company || '—'}</td>
-      <td>${e.buque || '—'}</td>
+      <td>${esc(e.company) || '—'}</td>
+      <td>${esc(e.buque) || '—'}</td>
       <td>${e.movimientos || '—'}</td>
       <td>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : '—'}</td>
       <td>${e.extra ? parseFloat(e.extra).toFixed(2)+' €' : '—'}</td>
-      <td>${e.note || ''}</td>
+      <td>${esc(e.note)}</td>
     </tr>`;
   }).join('');
 
@@ -1328,7 +1342,7 @@ function exportPDF(){
     const e = monthData[d];
     if(e.shift && countsByShift.hasOwnProperty(e.shift)) countsByShift[e.shift]++;
     if(e.shift && e.shift!=='L' && e.company && ingresosEmpresaPdf.hasOwnProperty(e.company)){
-      ingresosEmpresaPdf[e.company] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+      ingresosEmpresaPdf[e.company] += (parseFloat(e.salario)||0);
     }
   });
   const maxShiftCount = Math.max(1, ...Object.values(countsByShift));
@@ -1350,7 +1364,7 @@ function exportPDF(){
   days.forEach(d=>{
     const e = monthData[d];
     if(e.shift && ingresosPorTurno.hasOwnProperty(e.shift)){
-      ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+      ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0);
     }
   });
   const maxIngresoTurno = Math.max(1, ...Object.values(ingresosPorTurno));
@@ -1445,7 +1459,7 @@ function exportPDF(){
         ${shiftBars}
       </div>
       <div>
-        <div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#8a6d1f;margin-bottom:8px;font-weight:700;">INGRESOS POR EMPRESA</div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#8a6d1f;margin-bottom:8px;font-weight:700;">SALARIO POR EMPRESA</div>
         ${empresaBars}
       </div>
     </div>
@@ -1589,9 +1603,9 @@ function openShiftInfo(shiftCode){
         <span>Día ${d}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
-        ${e.company || 'Sin empresa'}${e.buque ? ' &middot; ' + e.buque : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+        ${esc(e.company) || 'Sin empresa'}${e.buque ? ' &middot; ' + esc(e.buque) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
       </div>
-      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${e.note}</div>` : ''}
+      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${esc(e.note)}</div>` : ''}
     </div>`;
   }).join('');
 
@@ -1634,9 +1648,9 @@ function openTotalInfo(){
         <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
-        ${e.company || 'Sin empresa'}${e.buque ? ' &middot; ' + e.buque : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+        ${esc(e.company) || 'Sin empresa'}${e.buque ? ' &middot; ' + esc(e.buque) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
       </div>
-      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${e.note}</div>` : ''}
+      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${esc(e.note)}</div>` : ''}
     </div>`;
   }).join('');
 
@@ -1696,10 +1710,10 @@ function runBuqueSearch(){
     ingresosTotal += (parseFloat(e.salario)||0);
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;">
-        <span>${e.buque}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
+        <span>${esc(e.buque)}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
-        Día ${d} de ${MONTH_NAMES[m-1]} ${y} &middot; ${e.shift ? SHIFT_NAMES[e.shift] : ''}${e.company ? ' &middot; ' + e.company : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+        Día ${d} de ${MONTH_NAMES[m-1]} ${y} &middot; ${e.shift ? SHIFT_NAMES[e.shift] : ''}${e.company ? ' &middot; ' + esc(e.company) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
       </div>
     </div>`;
   }).join('');
@@ -1739,9 +1753,9 @@ function openCompanyInfo(company){
         <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
-        ${e.buque ? e.buque : 'Sin buque'}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+        ${e.buque ? esc(e.buque) : 'Sin buque'}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
       </div>
-      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${e.note}</div>` : ''}
+      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${esc(e.note)}</div>` : ''}
     </div>`;
   }).join('');
 
@@ -1777,7 +1791,7 @@ function openDashboard(){
   const ingresosEmpresa = {OPCSA:0,'La Luz':0,Gesport:0};
   entries.forEach(([d,e])=>{
     if(e.shift!=='L' && e.company && ingresosEmpresa.hasOwnProperty(e.company)){
-      ingresosEmpresa[e.company] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+      ingresosEmpresa[e.company] += (parseFloat(e.salario)||0);
     }
   });
   const maxIngresoEmpresa = Math.max(1, ...Object.values(ingresosEmpresa));
@@ -1804,7 +1818,7 @@ function openDashboard(){
   const ingresosDia = [];
   for(let d=1; d<=daysInMonth; d++){
     const e = monthData[d];
-    const val = e ? (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0) : 0;
+    const val = e ? (parseFloat(e.salario)||0) : 0;
     ingresosDia.push(val);
   }
   const maxIngreso = Math.max(1, ...ingresosDia);
@@ -1821,7 +1835,7 @@ function openDashboard(){
   entries.forEach(([d,e])=>{
     if(countsPorTurno.hasOwnProperty(e.shift)){
       countsPorTurno[e.shift]++;
-      ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
+      ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0);
     }
   });
   const maxIngresoTurno = Math.max(1, ...Object.values(ingresosPorTurno));
@@ -1837,7 +1851,7 @@ function openDashboard(){
 
   body.innerHTML = `
     <div class="dash-section">
-      <h3>INGRESOS POR EMPRESA</h3>
+      <h3>SALARIO POR EMPRESA</h3>
       ${ingresoEmpresaRows}
     </div>
     <div class="dash-section">
@@ -1845,7 +1859,7 @@ function openDashboard(){
       ${empresaRows}
     </div>
     <div class="dash-section">
-      <h3>INGRESOS POR DÍA (€)</h3>
+      <h3>SALARIO POR DÍA (€)</h3>
       <div class="daybars">${dayBars}</div>
     </div>
     <div class="dash-section">
@@ -2030,6 +2044,8 @@ function importData(evt){
   reader.onload = function(e){
     try{
       const parsed = JSON.parse(e.target.result);
+      if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('formato');
+      if(!confirm('Importar esta copia sustituirá todos los datos actuales de la app. ¿Quieres continuar?')) return;
       if(parsed.data) data = parsed.data;
       if(parsed.settings) settings = parsed.settings;
       convertirCopiaAntigua(parsed);
