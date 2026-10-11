@@ -47,11 +47,6 @@
     font-size:22px;font-weight:800;letter-spacing:0.2px;margin:0;
   }
   header.top .sub{color:var(--text-dim);font-size:12.5px;margin-top:2px;}
-  .gear{
-    background:none;border:1px solid var(--border);color:var(--text-dim);
-    width:36px;height:36px;border-radius:9px;font-size:16px;
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
-  }
 
   .monthbar{
     display:flex;align-items:center;justify-content:space-between;
@@ -85,6 +80,7 @@
     border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden;
   }
   .minibar i{display:block;height:100%;border-radius:3px;}
+  .yeartable .minibar{width:30px;}
   .yeartable .mval{font-size:11px;font-weight:700;vertical-align:middle;}
 
   .stats{
@@ -211,20 +207,6 @@
   .btn-save{background:var(--amber);color:#221600;}
   .btn-cancel{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border) !important;}
 
-  .settings-row{
-    display:flex;align-items:center;justify-content:space-between;gap:10px;
-    padding:10px 0;border-bottom:1px solid var(--border);
-  }
-  .settings-row:last-of-type{border-bottom:none;}
-  .settings-row .name{font-weight:700;font-size:13.5px;}
-  .settings-row .name.M{color:var(--amber);}
-  .settings-row .name.T{color:var(--teal);}
-  .settings-row .name.N{color:var(--indigo);}
-  .settings-row .name.MA{color:var(--violet);}
-  .settings-row input[type=number]{
-    width:64px;background:var(--surface2);border:1px solid var(--border);color:var(--text);
-    border-radius:7px;padding:7px;font-size:14px;text-align:center;
-  }
   .settings-actions{display:flex;gap:8px;margin-top:16px;}
   .settings-actions button{
     flex:1;padding:10px;border-radius:9px;border:1px solid var(--border);
@@ -258,6 +240,52 @@
   .calc-grid button.calc-fn{background:var(--surface2);color:var(--text-dim);}
   .calc-grid button.calc-op{background:var(--surface2);color:var(--amber);}
   .calc-grid button.calc-eq{background:var(--amber);color:#221600;}
+
+  .toolsbtn{
+    background:var(--surface);border:1px solid var(--border);color:var(--text);
+    height:36px;padding:0 14px;border-radius:9px;font-size:13px;font-weight:700;
+    cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;
+  }
+  .toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+  .toolitem{
+    background:var(--surface2);border:1px solid var(--border);color:var(--text);
+    border-radius:var(--radius);padding:18px 8px;cursor:pointer;font-family:inherit;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    font-size:13px;font-weight:700;
+  }
+  .toolitem .ti{font-size:24px;}
+  .crew-title{margin:18px 0 4px;font-size:13.5px;font-weight:800;color:var(--text);}
+  .crew-row{margin-bottom:10px;}
+  .crew-row .ccat{font-size:11px;color:var(--amber);font-weight:800;letter-spacing:.3px;margin-bottom:4px;text-transform:uppercase;}
+  .crew-row .cfields{display:grid;grid-template-columns:92px 1fr;gap:8px;}
+  .crewbox{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 10px 12px;margin-bottom:14px;}
+  .crewbox label:first-child{margin-top:0;}
+  .crewbox .brow{display:flex;gap:8px;margin-top:12px;}
+  .crewbox .brow button{flex:1;padding:10px;border-radius:9px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .crewgroup{margin-top:14px;}
+  .crewgroup h3{margin:0 0 4px;font-size:11px;letter-spacing:.4px;color:var(--amber);text-transform:uppercase;}
+  .crewitem{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .crewitem .cinfo{flex:1;min-width:0;}
+  .crewitem .cname{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .crewitem .cmeta{font-size:11px;color:var(--text-dim);margin-top:2px;}
+  .crewitem button{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);width:34px;height:34px;border-radius:8px;font-size:14px;cursor:pointer;}
+  .nom-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .nom-row .nl{font-size:13.5px;font-weight:600;flex:1;}
+  .nom-row input{width:112px;text-align:right;padding:9px 8px;}
+  .nom-row input.pct{width:72px;}
+  .nom-sub{font-size:10.5px;color:var(--text-dim);font-weight:400;display:block;margin-top:1px;}
+  .nom-total{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--border);margin-top:12px;}
+  .nom-total .tl{font-size:12px;color:var(--text-dim);font-weight:700;letter-spacing:.3px;}
+  .nom-total .tv{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .nom-total.grand{background:rgba(255,176,32,0.14);border-color:rgba(255,176,32,0.5);}
+  .nom-total.grand .tv{color:var(--amber);font-size:24px;}
+  .puestopick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 14px;}
+  .puestopick button{border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);padding:11px 4px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .puestopick button.active{background:var(--amber);color:#221600;border-color:var(--amber);}
+  .tarif-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .tarif-table th{text-align:left;color:var(--text-dim);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding:4px 6px;}
+  .tarif-table td{padding:6px;border-top:1px solid var(--border);vertical-align:middle;}
+  .tarif-table input{width:84px;text-align:right;padding:8px 6px;}
 </style>
 </head>
 <body>
@@ -268,12 +296,7 @@
       <h1>Mis Turnos</h1>
       <div class="sub">Puerto de La Luz &middot; control de jornada</div>
     </div>
-    <div style="display:flex;">
-      <button class="gear" onclick="openBuqueSearch()" style="margin-right:8px;">&#128269;</button>
-      <button class="gear" onclick="openCalc()" style="margin-right:8px;">&#128290;</button>
-      <button class="gear" onclick="openDashboard()" style="margin-right:8px;">&#128202;</button>
-      <button class="gear" onclick="openSettings()">&#9881;</button>
-    </div>
+    <button class="toolsbtn" onclick="openTools()">&#129520; Herramientas</button>
   </header>
 
   <div class="viewtoggle">
@@ -319,15 +342,130 @@
     <div class="stats" id="yearStats"></div>
 
     <div class="dash-section" style="margin-top:18px;">
-      <h3>TURNOS Y SALARIO NETO POR MES</h3>
+      <h3>TURNOS, BRUTO Y NETO POR MES</h3>
       <table class="yeartable">
-        <thead><tr><th>Mes</th><th>Turnos</th><th>Neto</th></tr></thead>
+        <thead><tr><th>Mes</th><th>Turnos</th><th>Bruto</th><th>Neto</th></tr></thead>
         <tbody id="yearTableBody"></tbody>
       </table>
-      <div class="dsub" style="margin-top:8px;">* Bruto, ese mes aún no tiene salario neto añadido</div>
+      <div class="dsub" style="margin-top:8px;text-transform:none;">Neto = ingresos menos las retenciones de la herramienta Nómina de cada mes.</div>
     </div>
   </div>
 
+</div>
+
+<!-- modal herramientas -->
+<div class="overlay" id="toolsOverlay">
+  <div class="sheet">
+    <h2>Herramientas</h2>
+    <div class="dsub">Accesos rápidos</div>
+    <div class="toolgrid">
+      <button class="toolitem" onclick="toolGo(openBuqueSearch)"><span class="ti">&#128269;</span>Buscar buque</button>
+      <button class="toolitem" onclick="toolGo(openCalc)"><span class="ti">&#128290;</span>Calculadora</button>
+      <button class="toolitem" onclick="toolGo(openDashboard)"><span class="ti">&#128202;</span>Resumen visual</button>
+      <button class="toolitem" onclick="toolGo(openSettings)"><span class="ti">&#9881;</span>Copia de seguridad</button>
+      <button class="toolitem" onclick="toolGo(openCrewTool)"><span class="ti">&#128101;</span>Compañeros</button>
+      <button class="toolitem" onclick="toolGo(openNomina)"><span class="ti">&#129534;</span>Nómina</button>
+      <button class="toolitem" style="grid-column:1/-1;" onclick="toolGo(openAjustes)"><span class="ti">&#128188;</span>Ajustes</button>
+    </div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeTools()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal ajustes (tabla salarial) -->
+<div class="overlay" id="ajustesOverlay">
+  <div class="sheet">
+    <h2>Ajustes</h2>
+    <div class="dsub" style="text-transform:none;">Tabla salarial por puesto &middot; los importes se pueden modificar</div>
+    <label style="margin-top:0;">Puesto</label>
+    <div class="puestopick" id="puestoPick"></div>
+    <div style="overflow-x:auto;">
+      <table class="tarif-table">
+        <thead><tr><th>Turno</th><th>Importe</th><th>Unidad</th></tr></thead>
+        <tbody id="ajustesBody"></tbody>
+      </table>
+    </div>
+    <div class="dsub" style="margin-top:10px;text-transform:none;" id="ajustesBase"></div>
+    <label>Extra por turno (€)</label>
+    <input type="number" inputmode="decimal" step="0.01" min="0" class="field" id="ajustesExtra" oninput="ajusteExtraSet(this.value)">
+    <div class="dsub" style="text-transform:none;margin-top:6px;">Se pone por defecto en el campo Extra al elegir un turno trabajado. Se puede modificar en cada día.</div>
+    <div class="dsub" style="text-transform:none;">La tarifa por unidad es la misma para todos los puestos.</div>
+    <div class="settings-actions" style="margin-top:12px;">
+      <button onclick="ajustesReset()">Restablecer tabla</button>
+    </div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeAjustes()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal nómina -->
+<div class="overlay" id="nominaOverlay">
+  <div class="sheet">
+    <h2>Nómina</h2>
+    <div class="monthbar" style="margin-bottom:14px;">
+      <button onclick="nominaChangeMonth(-1)">&larr;</button>
+      <div class="label" id="nominaMonthLabel">—</div>
+      <button onclick="nominaChangeMonth(1)">&rarr;</button>
+    </div>
+    <div class="nom-total">
+      <span class="tl">TOTAL INGRESOS (BRUTO)</span>
+      <span class="tv" id="nomIngresos">0.00 €</span>
+    </div>
+    <h3 style="font-size:12.5px;color:var(--text-dim);margin:18px 0 2px;letter-spacing:.2px;">RETENCIONES</h3>
+    <div id="nominaRows"></div>
+    <div class="nom-total">
+      <span class="tl">TOTAL RETENCIONES</span>
+      <span class="tv" id="nomRetenciones">0.00 €</span>
+    </div>
+    <div class="nom-total grand">
+      <span class="tl" style="color:var(--text);">TOTAL A COBRAR</span>
+      <span class="tv" id="nomNeto">0.00 €</span>
+    </div>
+    <div class="settings-actions" style="margin-top:14px;">
+      <button onclick="nominaReset()">Restablecer importes</button>
+    </div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeNomina()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal compañeros -->
+<div class="overlay" id="crewOverlay">
+  <div class="sheet">
+    <h2>Compañeros</h2>
+    <div class="dsub" style="text-transform:none;">Registro único: el formulario del turno usa estos datos</div>
+    <div class="crewbox">
+      <label>Categoría</label>
+      <select id="crewRegCat">
+        <option>Capataz</option><option>Apuntador</option><option>Gruero</option><option>Especialista</option>
+      </select>
+      <div class="field-row">
+        <div><label>Nº censo</label><input type="text" inputmode="numeric" id="crewRegCenso" class="field" placeholder="Nº censo"></div>
+        <div><label>Nombre</label><input type="text" id="crewRegNombre" class="field" placeholder="Nombre"></div>
+      </div>
+      <label>Empresa</label>
+      <select id="crewRegEmpresa">
+        <option value="">Sin especificar</option>
+        <option value="OPCSA">OPCSA</option>
+        <option value="La Luz">La Luz</option>
+        <option value="Gesport">Gesport</option>
+      </select>
+      <label>Nota (opcional)</label>
+      <textarea id="crewRegNota" placeholder="Ej. suele hacer noches, tel..."></textarea>
+      <div class="brow">
+        <button class="btn-cancel" id="crewRegCancel" onclick="crewRegCancel()" style="display:none;border:1px solid var(--border);">Cancelar</button>
+        <button class="btn-save" id="crewRegSave" onclick="crewRegSave()">Añadir</button>
+      </div>
+    </div>
+    <input type="text" id="crewSearch" class="field" placeholder="Buscar por nombre o censo..." oninput="renderCrewList()">
+    <div id="crewList"></div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeCrewTool()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
 </div>
 
 <!-- modal día -->
@@ -336,6 +474,8 @@
     <h2 id="dayTitle">Día</h2>
     <div class="dsub" id="daySub"></div>
     <div class="shiftpick" id="shiftPick"></div>
+    <label style="margin-top:0;">Puesto</label>
+    <div class="puestopick" id="dayPuestoPick" style="margin-bottom:6px;"></div>
     <label>Empresa</label>
     <select id="dayCompany">
       <option value="">Sin especificar</option>
@@ -363,6 +503,8 @@
     <input type="number" id="dayExtra" class="field" min="0" step="0.01" placeholder="0.00">
     <label>Nota (opcional)</label>
     <textarea id="dayNote" placeholder="Ej. cambio con Manolo, barco X..."></textarea>
+    <div class="crew-title">Compañeros del turno</div>
+    <div id="crewFields"></div>
     <div class="row">
       <button class="btn-cancel" onclick="closeDay()">Cancelar</button>
       <button class="btn-save" onclick="saveDay()">Guardar</button>
@@ -434,29 +576,9 @@
 <!-- modal ajustes -->
 <div class="overlay" id="settingsOverlay">
   <div class="sheet">
-    <h2>Ajustes</h2>
+    <h2>Copia de seguridad</h2>
 
-    <h2 style="font-size:14px;margin:0 0 4px;">Tarifas por turno</h2>
-    <div class="dsub" style="margin-bottom:10px;">
-      <span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;"><i style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;"></i>festivo</span>
-      <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:8px;height:8px;border-radius:50%;background:var(--violet);display:inline-block;"></i>sábado mañana</span>
-    </div>
-    <div style="overflow-x:auto;">
-      <table id="tarifasTable" style="width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap;">
-        <thead>
-          <tr style="color:var(--text-dim);text-align:left;">
-            <th style="padding:5px 6px;">Turno</th>
-            <th style="padding:5px 6px;">Especialista</th>
-            <th style="padding:5px 6px;">Grúa</th>
-            <th style="padding:5px 6px;">Mafista</th>
-            <th style="padding:5px 6px;">Unidad</th>
-          </tr>
-        </thead>
-        <tbody id="tarifasBody"></tbody>
-      </table>
-    </div>
-    <div class="dsub" style="margin-top:8px;">Base: especialista y grúa 120 mov. &middot; mafista 138 mov.</div>
-
+    
     <div class="settings-actions">
       <button onclick="exportData()">Exportar copia</button>
       <button onclick="importFile.click()">Importar copia</button>
@@ -490,18 +612,334 @@
 <script>
 const STORE_KEY = 'turnos_data_v2';
 const SETTINGS_KEY = 'turnos_settings_v2';
-const NETO_KEY = 'turnos_neto_v1';
 const SHIFTS = ['M','T','N','MA','L'];
 const SHIFT_NAMES = {M:'Mañana', T:'Tarde', N:'Noche', MA:'Madrugada', L:'Libre'};
 const COMPANIES = ['OPCSA','La Luz','Gesport'];
 
 let data = {};       // { "2026-09": { "1": {shift:"M", note:"", company:""} } }
 let settings = { M:{horas:6}, T:{horas:6}, N:{horas:6}, MA:{horas:6} };
-let netoData = {};   // { "2026-09": 1850.00 }
 
 let today = new Date();
 let viewYear = today.getFullYear();
 let viewMonth = today.getMonth(); // 0-indexed
+
+const CREW_SLOTS = ['Capataz','Apuntador','Gruero','Gruero','Especialista'];
+
+const NOMINA_KEY = 'turnos_nomina_v1';
+const NOMINA_ITEMS = [
+  {k:'ss',        label:'Seguridad social',  def:201.68},
+  {k:'fijo',      label:'Fijo por turnos',   def:2.64},
+  {k:'sindical',  label:'Cuota sindical',    def:40.61},
+  {k:'anticipos', label:'Anticipos',         def:1025.61},
+  {k:'prestamos', label:'Préstamos',         def:100},
+  {k:'otras',     label:'Otras retenciones', def:0},
+  {k:'telefono',  label:'Tarifa telefónica', def:0},
+  {k:'seguro',    label:'Seguro médico',     def:0}
+];
+let nominaData = {};   // { "2026-10": {irpfPct, irpf, irpfModo, ss, fijo, ...} }
+let nominaCur = null;
+let nomYear = new Date().getFullYear();
+let nomMonth = new Date().getMonth();
+let nominaIngresosVal = 0;
+
+function persistNomina(){
+  try{ localStorage.setItem(NOMINA_KEY, JSON.stringify(nominaData)); }catch(e){}
+}
+function nomNum(v){
+  const n = parseFloat(String(v).replace(',','.'));
+  return isNaN(n) ? 0 : n;
+}
+function nomRound(n){ return Math.round(n*100)/100; }
+function nomVal(n){ return n ? String(n) : (n===0 ? '0' : ''); }
+
+function nominaDefaults(){
+  const o = {irpfPct:0, irpf:0, irpfModo:'pct'};
+  NOMINA_ITEMS.forEach(i=>{ o[i.k] = i.def; });
+  return o;
+}
+function nominaMonthIngresos(){
+  const monthData = data[monthKey(nomYear, nomMonth)] || {};
+  let t = 0;
+  Object.values(monthData).forEach(e=>{ t += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0); });
+  return nomRound(t);
+}
+
+function openNomina(){
+  nomYear = viewYear;
+  nomMonth = viewMonth;
+  loadNomina();
+  document.getElementById('nominaOverlay').classList.add('open');
+}
+function loadNomina(){
+  const key = monthKey(nomYear, nomMonth);
+  nominaCur = Object.assign(nominaDefaults(), nominaData[key] || {});
+  nominaIngresosVal = nominaMonthIngresos();
+  // el IRPF se recalcula con los ingresos actuales según lo último que se editó
+  if(nominaCur.irpfModo === 'total'){
+    nominaCur.irpfPct = nominaIngresosVal > 0 ? nomRound(nominaCur.irpf / nominaIngresosVal * 100) : 0;
+  } else {
+    nominaCur.irpf = nomRound(nominaIngresosVal * nominaCur.irpfPct / 100);
+  }
+  document.getElementById('nominaMonthLabel').textContent = MONTH_NAMES[nomMonth] + ' ' + nomYear;
+  renderNominaRows();
+  nominaRecalc();
+}
+function nominaChangeMonth(delta){
+  nomMonth += delta;
+  if(nomMonth < 0){ nomMonth = 11; nomYear--; }
+  if(nomMonth > 11){ nomMonth = 0; nomYear++; }
+  loadNomina();
+}
+function closeNomina(){
+  document.getElementById('nominaOverlay').classList.remove('open');
+}
+function renderNominaRows(){
+  const irpfRow = `<div class="nom-row">
+    <div class="nl">IRPF<span class="nom-sub">% y total</span></div>
+    <input type="number" inputmode="decimal" step="0.01" min="0" class="field pct" id="nomIrpfPct" value="${nomVal(nominaCur.irpfPct)}" placeholder="%" oninput="nominaIrpfPct(this.value)">
+    <input type="number" inputmode="decimal" step="0.01" min="0" class="field" id="nomIrpfTotal" value="${nomVal(nominaCur.irpf)}" placeholder="€" oninput="nominaIrpfTotal(this.value)">
+  </div>`;
+  const rows = NOMINA_ITEMS.map(i => `<div class="nom-row">
+    <div class="nl">${i.label}</div>
+    <input type="number" inputmode="decimal" step="0.01" min="0" class="field" id="nom_${i.k}" value="${nomVal(nominaCur[i.k])}" oninput="nominaSet('${i.k}', this.value)">
+  </div>`).join('');
+  document.getElementById('nominaRows').innerHTML = irpfRow + rows;
+}
+function nominaRecalc(){
+  let ret = nomNum(nominaCur.irpf);
+  NOMINA_ITEMS.forEach(i=>{ ret += nomNum(nominaCur[i.k]); });
+  ret = nomRound(ret);
+  document.getElementById('nomIngresos').textContent = nominaIngresosVal.toFixed(2) + ' €';
+  document.getElementById('nomRetenciones').textContent = ret.toFixed(2) + ' €';
+  document.getElementById('nomNeto').textContent = nomRound(nominaIngresosVal - ret).toFixed(2) + ' €';
+}
+function nominaSave(){
+  nominaData[monthKey(nomYear, nomMonth)] = nominaCur;
+  persistNomina();
+}
+function nominaSet(k, v){
+  nominaCur[k] = nomNum(v);
+  nominaSave();
+  nominaRecalc();
+}
+function nominaIrpfPct(v){
+  nominaCur.irpfPct = nomNum(v);
+  nominaCur.irpfModo = 'pct';
+  nominaCur.irpf = nomRound(nominaIngresosVal * nominaCur.irpfPct / 100);
+  document.getElementById('nomIrpfTotal').value = nomVal(nominaCur.irpf);
+  nominaSave();
+  nominaRecalc();
+}
+function nominaIrpfTotal(v){
+  nominaCur.irpf = nomNum(v);
+  nominaCur.irpfModo = 'total';
+  nominaCur.irpfPct = nominaIngresosVal > 0 ? nomRound(nominaCur.irpf / nominaIngresosVal * 100) : 0;
+  document.getElementById('nomIrpfPct').value = nomVal(nominaCur.irpfPct);
+  nominaSave();
+  nominaRecalc();
+}
+function nominaReset(){
+  if(!confirm('¿Volver a los importes por defecto en ' + MONTH_NAMES[nomMonth] + ' ' + nomYear + '?')) return;
+  delete nominaData[monthKey(nomYear, nomMonth)];
+  persistNomina();
+  loadNomina();
+}
+
+const CREW_KEY = 'turnos_crew_v1';
+const CREW_CATS = ['Capataz','Apuntador','Gruero','Especialista'];
+let crewReg = [];   // [{censo, nombre, categoria}]  registro único de compañeros
+let crewEditIdx = null;
+
+function persistCrew(){
+  try{ localStorage.setItem(CREW_KEY, JSON.stringify(crewReg)); }catch(e){}
+}
+function esc(t){
+  return String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function crewFindByCenso(c){
+  c = String(c||'').trim();
+  if(!c) return null;
+  return crewReg.find(p => String(p.censo||'').trim() === c) || null;
+}
+function crewFindByNombre(n){
+  n = String(n||'').trim().toLowerCase();
+  if(!n) return null;
+  const m = crewReg.filter(p => String(p.nombre||'').trim().toLowerCase() === n);
+  return m.length === 1 ? m[0] : null;
+}
+
+function renderCrewFields(list){
+  list = list || [];
+  document.getElementById('crewFields').innerHTML = CREW_SLOTS.map((cat,i)=>{
+    const c = list.find(x=>x.slot===i) || {};
+    const label = cat==='Gruero' ? 'Gruero ' + (CREW_SLOTS.slice(0,i+1).filter(x=>x==='Gruero').length) : cat;
+    const people = crewReg.filter(p => p.categoria === cat);
+    const dlC = people.filter(p=>p.censo).map(p=>`<option value="${esc(p.censo)}">${esc(p.nombre)}</option>`).join('');
+    const dlN = people.map(p=>`<option value="${esc(p.nombre)}">${esc(p.censo)}</option>`).join('');
+    return `<div class="crew-row">
+      <div class="ccat">${label}</div>
+      <div class="cfields">
+        <input type="text" inputmode="numeric" id="crewCenso${i}" class="field" placeholder="Nº censo" list="crewCL${i}" oninput="crewAutoCenso(${i})" value="${esc(c.censo)}">
+        <input type="text" id="crewNombre${i}" class="field" placeholder="Nombre" list="crewNL${i}" oninput="crewAutoNombre(${i})" value="${esc(c.nombre)}">
+      </div>
+      <datalist id="crewCL${i}">${dlC}</datalist>
+      <datalist id="crewNL${i}">${dlN}</datalist>
+    </div>`;
+  }).join('');
+}
+function crewAutoCenso(i){
+  const p = crewFindByCenso(document.getElementById('crewCenso'+i).value);
+  if(p) document.getElementById('crewNombre'+i).value = p.nombre;
+}
+function crewAutoNombre(i){
+  const p = crewFindByNombre(document.getElementById('crewNombre'+i).value);
+  if(p && p.censo) document.getElementById('crewCenso'+i).value = p.censo;
+}
+function collectCrew(){
+  const out = [];
+  CREW_SLOTS.forEach((cat,i)=>{
+    const censo = document.getElementById('crewCenso'+i).value.trim();
+    let nombre = document.getElementById('crewNombre'+i).value.trim();
+    if(!censo && !nombre) return;
+    const reg = crewFindByCenso(censo);
+    if(reg && reg.nombre) nombre = reg.nombre;   // el registro manda: evita nombres distintos para un mismo censo
+    out.push({slot:i, categoria:cat, censo:censo, nombre:nombre});
+  });
+  return out;
+}
+// Al guardar un turno, todo compañero nuevo pasa al registro (sin duplicar)
+function crewSync(list){
+  let changed = false;
+  list.forEach(c=>{
+    const exists = c.censo
+      ? crewFindByCenso(c.censo)
+      : crewReg.find(p => !p.censo && p.categoria===c.categoria && String(p.nombre).trim().toLowerCase()===c.nombre.toLowerCase());
+    if(!exists){
+      crewReg.push({censo:c.censo, nombre:c.nombre, categoria:c.categoria});
+      changed = true;
+    }
+  });
+  if(changed) persistCrew();
+}
+
+function crewSameAs(entryPerson, ref){
+  if(ref.censo) return String(entryPerson.censo||'').trim() === String(ref.censo).trim();
+  return !entryPerson.censo && String(entryPerson.nombre||'').trim().toLowerCase() === String(ref.nombre||'').trim().toLowerCase();
+}
+function crewCount(p){
+  let n = 0;
+  Object.values(data).forEach(month=>{
+    Object.values(month).forEach(e=>{
+      if(e.companeros && e.companeros.some(c => crewSameAs(c,p))) n++;
+    });
+  });
+  return n;
+}
+
+function openCrewTool(){
+  crewRegCancel();
+  document.getElementById('crewSearch').value = '';
+  renderCrewList();
+  document.getElementById('crewOverlay').classList.add('open');
+}
+function closeCrewTool(){
+  document.getElementById('crewOverlay').classList.remove('open');
+}
+function renderCrewList(){
+  const q = document.getElementById('crewSearch').value.trim().toLowerCase();
+  const el = document.getElementById('crewList');
+  if(crewReg.length === 0){
+    el.innerHTML = '<div class="dash-empty">Aún no hay compañeros. Añade el primero arriba o se irán guardando al registrar turnos.</div>';
+    return;
+  }
+  let html = '';
+  CREW_CATS.forEach(cat=>{
+    const items = crewReg.map((p,idx)=>({p,idx}))
+      .filter(({p}) => p.categoria===cat && (!q || String(p.nombre).toLowerCase().includes(q) || String(p.censo).toLowerCase().includes(q) || String(p.empresa||'').toLowerCase().includes(q) || String(p.nota||'').toLowerCase().includes(q)))
+      .sort((a,b)=>String(a.p.nombre).localeCompare(String(b.p.nombre),'es'));
+    if(items.length === 0) return;
+    html += `<div class="crewgroup"><h3>${cat}${cat==='Gruero'?'s':''} &middot; ${items.length}</h3>` + items.map(({p,idx})=>{
+      const n = crewCount(p);
+      return `<div class="crewitem">
+        <div class="cinfo">
+          <div class="cname">${esc(p.nombre) || '(sin nombre)'}</div>
+          <div class="cmeta">Censo ${esc(p.censo) || '—'}${p.empresa ? ' &middot; ' + esc(p.empresa) : ''} &middot; ${n} turno${n===1?'':'s'} juntos</div>
+          ${p.nota ? `<div class="cmeta" style="font-style:italic;white-space:normal;">${esc(p.nota)}</div>` : ''}
+        </div>
+        <button onclick="crewEdit(${idx})">&#9998;</button>
+        <button onclick="crewDelete(${idx})">&#10005;</button>
+      </div>`;
+    }).join('') + '</div>';
+  });
+  el.innerHTML = html || '<div class="dash-empty">Sin resultados.</div>';
+}
+function crewRegCancel(){
+  crewEditIdx = null;
+  document.getElementById('crewRegCenso').value = '';
+  document.getElementById('crewRegNombre').value = '';
+  document.getElementById('crewRegCat').value = CREW_CATS[0];
+  document.getElementById('crewRegEmpresa').value = '';
+  document.getElementById('crewRegNota').value = '';
+  document.getElementById('crewRegSave').textContent = 'Añadir';
+  document.getElementById('crewRegCancel').style.display = 'none';
+}
+function crewEdit(idx){
+  const p = crewReg[idx];
+  if(!p) return;
+  crewEditIdx = idx;
+  document.getElementById('crewRegCat').value = p.categoria;
+  document.getElementById('crewRegCenso').value = p.censo || '';
+  document.getElementById('crewRegNombre').value = p.nombre || '';
+  document.getElementById('crewRegEmpresa').value = p.empresa || '';
+  document.getElementById('crewRegNota').value = p.nota || '';
+  document.getElementById('crewRegSave').textContent = 'Guardar cambios';
+  document.getElementById('crewRegCancel').style.display = 'block';
+  document.querySelector('#crewOverlay .sheet').scrollTop = 0;
+}
+function crewRegSave(){
+  const categoria = document.getElementById('crewRegCat').value;
+  const censo = document.getElementById('crewRegCenso').value.trim();
+  const nombre = document.getElementById('crewRegNombre').value.trim();
+  const empresa = document.getElementById('crewRegEmpresa').value;
+  const nota = document.getElementById('crewRegNota').value.trim();
+  if(!censo || !nombre){
+    alert('Escribe el número de censo y el nombre.');
+    return;
+  }
+  const dup = crewReg.findIndex((p,i) => i!==crewEditIdx && String(p.censo).trim()===censo);
+  if(dup !== -1){
+    alert('El censo ' + censo + ' ya está registrado a nombre de ' + crewReg[dup].nombre + '.');
+    return;
+  }
+  if(crewEditIdx !== null){
+    const old = crewReg[crewEditIdx];
+    // mantiene coherentes los turnos ya guardados
+    Object.values(data).forEach(month=>{
+      Object.values(month).forEach(e=>{
+        (e.companeros||[]).forEach(c=>{
+          if(crewSameAs(c, old)){ c.censo = censo; c.nombre = nombre; }
+        });
+      });
+    });
+    crewReg[crewEditIdx] = {censo, nombre, categoria, empresa, nota};
+    persist();
+  } else {
+    crewReg.push({censo, nombre, categoria, empresa, nota});
+  }
+  persistCrew();
+  crewRegCancel();
+  renderCrewList();
+}
+function crewDelete(idx){
+  const p = crewReg[idx];
+  if(!p) return;
+  if(confirm('¿Quitar a ' + (p.nombre || p.censo) + ' del registro? Los turnos ya guardados conservan sus datos.')){
+    crewReg.splice(idx,1);
+    persistCrew();
+    if(crewEditIdx !== null) crewRegCancel();
+    renderCrewList();
+  }
+}
 
 let selectedDay = null;
 let selectedShift = '';
@@ -512,7 +950,9 @@ function load(){
     const s = JSON.parse(localStorage.getItem(SETTINGS_KEY));
     if(s) settings = s;
   }catch(e){}
-  try{ netoData = JSON.parse(localStorage.getItem(NETO_KEY)) || {}; }catch(e){ netoData = {}; }
+  try{ crewReg = JSON.parse(localStorage.getItem(CREW_KEY)) || []; }catch(e){ crewReg = []; }
+  try{ nominaData = JSON.parse(localStorage.getItem(NOMINA_KEY)) || {}; }catch(e){ nominaData = {}; }
+  loadTarifas();
 }
 function persist(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
@@ -520,27 +960,6 @@ function persist(){
 function persistSettings(){
   try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }catch(e){}
 }
-function persistNeto(){
-  try{ localStorage.setItem(NETO_KEY, JSON.stringify(netoData)); }catch(e){}
-}
-function setNetoMes(){
-  const key = monthKey(viewYear, viewMonth);
-  const current = netoData[key] !== undefined ? netoData[key] : '';
-  const input = prompt('Salario neto de ' + MONTH_NAMES[viewMonth] + ' (lo que te han ingresado, ya con el IRPF aplicado):', current);
-  if(input === null) return;
-  const val = parseFloat(input.replace(',','.'));
-  if(input.trim() === ''){
-    delete netoData[key];
-  } else if(!isNaN(val)){
-    netoData[key] = val;
-  } else {
-    alert('Escribe un número válido.');
-    return;
-  }
-  persistNeto();
-  render();
-}
-
 function monthKey(y,m){ return y + '-' + String(m+1).padStart(2,'0'); }
 
 function changeMonth(delta){
@@ -594,7 +1013,7 @@ function render(){
       co.textContent = COMPANY_ABBR[entry.company];
       cell.appendChild(co);
     }
-    if(entry && (entry.note || entry.buque || entry.movimientos || entry.salario || entry.extra)){
+    if(entry && (entry.note || entry.buque || entry.movimientos || entry.salario || entry.extra || (entry.companeros && entry.companeros.length))){
       const dot = document.createElement('span');
       dot.className = 'note-dot';
       cell.appendChild(dot);
@@ -622,26 +1041,16 @@ function render(){
     <div class="stat T" onclick="openShiftInfo('T')" style="cursor:pointer;"><div class="n">${counts.T}</div><div class="l">TARDE</div></div>
     <div class="stat N" onclick="openShiftInfo('N')" style="cursor:pointer;"><div class="n">${counts.N}</div><div class="l">NOCHE</div></div>
     <div class="stat MA" onclick="openShiftInfo('MA')" style="cursor:pointer;"><div class="n">${counts.MA}</div><div class="l">MADRUGADA</div></div>
-    <div class="stat wide"><div class="n">${turnosTotal}</div><div class="l">TURNOS TOTALES &middot; ${counts.L} libres</div></div>
+    <div class="stat wide" onclick="openTotalInfo()" style="cursor:pointer;"><div class="n">${turnosTotal}</div><div class="l">TURNOS TOTALES &middot; ${counts.L} libres</div></div>
     <div class="stat wide"><div class="n">${horasTotal} h</div><div class="l">TOTAL HORAS DEL MES</div></div>
   `;
 
   const financeEl = document.getElementById('financestats');
-  const netoMes = netoData[key];
-  const netoRow = netoMes !== undefined
-    ? (()=>{
-        const retencion = ingresosTotal - netoMes;
-        const pct = ingresosTotal > 0 ? (retencion/ingresosTotal*100) : 0;
-        return `<div class="stat" onclick="setNetoMes()" style="cursor:pointer;"><div class="n">${netoMes.toFixed(2)} €</div><div class="l">SALARIO NETO &middot; TOCA PARA EDITAR</div></div>
-       <div class="stat"><div class="n">${retencion.toFixed(2)} €</div><div class="l">RETENCIÓN IRPF &middot; ${pct.toFixed(1)}%</div></div>`;
-      })()
-    : `<div class="stat wide" onclick="setNetoMes()" style="cursor:pointer;"><div class="n">Añadir</div><div class="l">SALARIO NETO DEL MES (TOCA AQUÍ)</div></div>`;
   financeEl.innerHTML = `
     <div class="stat" style="grid-column:1/-1;"><div class="n">${movimientosTotal}</div><div class="l">MOVIMIENTOS TOTALES</div></div>
     <div class="stat"><div class="n">${salarioTotal.toFixed(2)} €</div><div class="l">SALARIO</div></div>
     <div class="stat"><div class="n">${extraTotal.toFixed(2)} €</div><div class="l">EXTRAS</div></div>
     <div class="stat grand" style="grid-column:1/-1;"><div class="n">${ingresosTotal.toFixed(2)} €</div><div class="l">TOTAL INGRESOS DEL MES (BRUTO)</div></div>
-    ${netoRow}
   `;
 
   const coEl = document.getElementById('companystats');
@@ -650,7 +1059,7 @@ function render(){
   `).join('');
 }
 
-function openDay(d, fromLongPress){
+function openDay(d){
   selectedDay = d;
   const key = monthKey(viewYear, viewMonth);
   const entry = (data[key] && data[key][d]) || {shift:'', note:'', company:''};
@@ -664,6 +1073,7 @@ function openDay(d, fromLongPress){
   document.getElementById('dayMovs').value = entry.movimientos || '';
   document.getElementById('daySalario').value = entry.salario || '';
   document.getElementById('dayExtra').value = entry.extra || '';
+  renderCrewFields(entry.companeros);
 
   const pick = document.getElementById('shiftPick');
   pick.innerHTML = '';
@@ -675,13 +1085,82 @@ function openDay(d, fromLongPress){
       selectedShift = (selectedShift===s) ? '' : s;
       Array.from(pick.children).forEach(c=>c.className='');
       if(selectedShift) btn.className = 'active '+selectedShift;
+      applyAutoSalario();
     };
     pick.appendChild(btn);
   });
 
+  dayPuesto = (entry.puesto && PUESTOS.some(x=>x.k===entry.puesto)) ? entry.puesto : ajustePuesto;
+  renderDayPuesto();
+  // si el salario guardado coincide con la tarifa, se sigue considerando automático
+  const tAuto = (selectedShift && selectedShift!=='L') ? tarifaInfo(d, selectedShift) : null;
+  extraAutoVal = (selectedShift && selectedShift!=='L' && entry.extra !== '' && entry.extra !== undefined && parseFloat(entry.extra) === EXTRA_DEFAULT) ? EXTRA_DEFAULT : null;
+  salarioAutoVal = (tAuto && entry.salario !== '' && entry.salario !== undefined && parseFloat(entry.salario) === tAuto.importe) ? tAuto.importe : null;
+
   document.getElementById('dayOverlay').classList.add('open');
 }
 
+// ---- Salario automático según tabla salarial (Ajustes) ----
+let salarioAutoVal = null;
+let EXTRA_DEFAULT = 39.24;
+let extraAutoVal = null;
+let dayPuesto = 'especialista';
+
+function renderDayPuesto(){
+  document.getElementById('dayPuestoPick').innerHTML = PUESTOS.map(pu =>
+    `<button class="${pu.k===dayPuesto?'active':''}" onclick="dayPuestoPickSet('${pu.k}')">${pu.label}</button>`
+  ).join('');
+}
+function dayPuestoPickSet(k){
+  dayPuesto = k;
+  renderDayPuesto();
+  applyAutoSalario();
+}
+
+// Festivo: sábado tarde, noche y madrugada, y el domingo completo.
+function tarifaInfo(d, shift, puesto){
+  puesto = puesto || dayPuesto;
+  if(!shift || shift === 'L') return null;
+  const dow = new Date(viewYear, viewMonth, d).getDay();   // 0 = domingo, 6 = sábado
+  const domingo = dow === 0;
+  const sabado = dow === 6;
+  const festivo = domingo || (sabado && shift !== 'M');
+  let idx;
+  if(shift === 'M' || shift === 'T'){
+    if(festivo) idx = 2;                       // mañ/tarde festivo
+    else if(sabado && shift === 'M') idx = 4;  // sábado por la mañana
+    else idx = 0;                              // mañ/tarde normal
+  } else if(shift === 'N'){
+    idx = festivo ? 3 : 1;
+  } else {                                     // madrugada
+    idx = festivo ? 6 : 5;
+  }
+  const row = TARIFAS[idx];
+  if(!row) return null;
+  const importe = parseFloat(row[puesto]);
+  if(isNaN(importe)) return null;
+  const desc = SHIFT_NAMES[shift] + (festivo ? ' festivo' : (sabado && shift==='M' ? ' sábado' : ''));
+  return {importe: importe, desc: desc};
+}
+function applyAutoSalario(){
+  const inp = document.getElementById('daySalario');
+  const cur = inp.value;
+  const info = (selectedShift && selectedShift!=='L') ? tarifaInfo(selectedDay, selectedShift) : null;
+  const newAuto = info ? info.importe : null;
+  // solo se sobrescribe si está vacío o si lo había puesto la propia tarifa (sin tocar lo que escribas a mano)
+  if(cur === '' || (salarioAutoVal !== null && parseFloat(cur) === salarioAutoVal)){
+    inp.value = newAuto !== null ? newAuto : '';
+    salarioAutoVal = newAuto;
+  }
+  // extra por defecto en turnos trabajados (editable)
+  const extraInp = document.getElementById('dayExtra');
+  const curE = extraInp.value;
+  const newE = (selectedShift && selectedShift!=='L' && EXTRA_DEFAULT > 0) ? EXTRA_DEFAULT : null;
+  if(curE === '' || (extraAutoVal !== null && parseFloat(curE) === extraAutoVal)){
+    extraInp.value = newE !== null ? newE : '';
+    extraAutoVal = newE;
+  }
+}
 function closeDay(){
   document.getElementById('dayOverlay').classList.remove('open');
 }
@@ -695,7 +1174,9 @@ function saveDay(){
   const movimientos = document.getElementById('dayMovs').value;
   const salario = document.getElementById('daySalario').value;
   const extra = document.getElementById('dayExtra').value;
-  const hasExtras = note || company || buque || movimientos || salario || extra;
+  const companeros = collectCrew();
+  crewSync(companeros);
+  const hasExtras = note || company || buque || movimientos || salario || extra || companeros.length;
   if(!selectedShift && !hasExtras){
     delete data[key][selectedDay];
   } else {
@@ -706,7 +1187,9 @@ function saveDay(){
       buque: buque,
       movimientos: movimientos ? parseFloat(movimientos) : '',
       salario: salario ? parseFloat(salario) : '',
-      extra: extra ? parseFloat(extra) : ''
+      extra: extra ? parseFloat(extra) : '',
+      puesto: dayPuesto,
+      companeros: companeros
     };
   }
   persist();
@@ -722,51 +1205,6 @@ function searchBuque(kind){
   }
   const suffix = kind === 'posicion' ? 'buque MarineTraffic posición actual' : 'buque capacidad TEU contenedores';
   window.open('https://www.google.com/search?q=' + encodeURIComponent(name + ' ' + suffix), '_blank');
-}
-
-function csvEscape(val){
-  const s = String(val === undefined || val === null ? '' : val);
-  if(s.includes(';') || s.includes('"') || s.includes('\n')){
-    return '"' + s.replace(/"/g,'""') + '"';
-  }
-  return s;
-}
-
-function exportCSV(){
-  const key = monthKey(viewYear, viewMonth);
-  const monthData = data[key] || {};
-  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b);
-
-  if(days.length === 0){
-    alert('No hay datos registrados este mes para exportar.');
-    return;
-  }
-
-  const header = ['Dia','Turno','Empresa','Buque','Movimientos','Salario','Extra','Nota'];
-  const rows = days.map(d=>{
-    const e = monthData[d];
-    return [
-      d,
-      e.shift ? SHIFT_NAMES[e.shift] : '',
-      e.company || '',
-      e.buque || '',
-      e.movimientos || '',
-      e.salario || '',
-      e.extra || '',
-      e.note || ''
-    ].map(csvEscape).join(';');
-  });
-
-  const csvContent = '\uFEFF' + header.join(';') + '\n' + rows.join('\n');
-  const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'turnos_' + MONTH_NAMES[viewMonth] + '_' + viewYear + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
 function loadScriptOnce(src){
@@ -1170,6 +1608,51 @@ function openShiftInfo(shiftCode){
 
   document.getElementById('shiftInfoOverlay').classList.add('open');
 }
+function openTotalInfo(){
+  const key = monthKey(viewYear, viewMonth);
+  const monthData = data[key] || {};
+  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b)
+    .filter(d => monthData[d].shift && monthData[d].shift !== 'L');
+
+  document.getElementById('shiftInfoTitle').textContent = 'Turnos totales';
+  document.getElementById('shiftInfoSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+
+  const body = document.getElementById('shiftInfoBody');
+
+  if(days.length === 0){
+    body.innerHTML = '<div class="dash-empty">No tienes turnos registrados este mes.</div>';
+    document.getElementById('shiftInfoOverlay').classList.add('open');
+    return;
+  }
+
+  let ingresosTotal = 0;
+  const items = days.map(d=>{
+    const e = monthData[d];
+    ingresosTotal += (parseFloat(e.salario)||0);
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;">
+        <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px;">
+        ${e.company || 'Sin empresa'}${e.buque ? ' &middot; ' + e.buque : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+      </div>
+      ${e.note ? `<div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;font-style:italic;">${e.note}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const mediaTurno = ingresosTotal/days.length;
+
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <div class="stat" style="flex:1;"><div class="n">${days.length}</div><div class="l">TURNOS</div></div>
+      <div class="stat" style="flex:1;"><div class="n">${mediaTurno.toFixed(0)} €</div><div class="l">MEDIA POR TURNO</div></div>
+      <div class="stat" style="flex:1;"><div class="n">${ingresosTotal.toFixed(0)} €</div><div class="l">INGRESOS</div></div>
+    </div>
+    ${items}
+  `;
+
+  document.getElementById('shiftInfoOverlay').classList.add('open');
+}
 function closeShiftInfo(){
   document.getElementById('shiftInfoOverlay').classList.remove('open');
 }
@@ -1378,7 +1861,10 @@ function closeDashboard(){
   document.getElementById('dashboardOverlay').classList.remove('open');
 }
 
-const TARIFAS = [
+const TARIFAS_KEY = 'turnos_tarifas_v1';
+const PUESTO_KEY = 'turnos_puesto_v1';
+const EXTRA_KEY = 'turnos_extra_v1';
+const TARIFAS_DEF = [
   {label:'Mañ/tarde', especialista:97,  grua:113, mafista:129, unidad:0.90, tag:''},
   {label:'Noche',     especialista:140, grua:163, mafista:187, unidad:1.37, tag:''},
   {label:'Mañ/tarde', especialista:132, grua:153, mafista:176, unidad:1.27, tag:'festivo'},
@@ -1387,26 +1873,86 @@ const TARIFAS = [
   {label:'Madrugada', especialista:180, grua:207, mafista:239, unidad:1.79, tag:''},
   {label:'Madrugada', especialista:200, grua:229, mafista:266, unidad:2.08, tag:'festivo'}
 ];
+const PUESTOS = [
+  {k:'especialista', label:'Especialista', base:120},
+  {k:'grua',         label:'Grúa',         base:120},
+  {k:'mafista',      label:'Mafista',      base:138}
+];
+let TARIFAS = JSON.parse(JSON.stringify(TARIFAS_DEF));
+let ajustePuesto = 'especialista';
 
-function renderTarifas(){
-  const tbody = document.getElementById('tarifasBody');
-  if(!tbody) return;
-  tbody.innerHTML = TARIFAS.map(r=>{
+function persistTarifas(){
+  try{
+    localStorage.setItem(TARIFAS_KEY, JSON.stringify(TARIFAS));
+    localStorage.setItem(PUESTO_KEY, ajustePuesto);
+    localStorage.setItem(EXTRA_KEY, String(EXTRA_DEFAULT));
+  }catch(e){}
+}
+function loadTarifas(){
+  try{
+    const t = JSON.parse(localStorage.getItem(TARIFAS_KEY));
+    if(Array.isArray(t) && t.length === TARIFAS_DEF.length) TARIFAS = t;
+  }catch(e){}
+  try{
+    const pu = localStorage.getItem(PUESTO_KEY);
+    if(pu && PUESTOS.some(x=>x.k===pu)) ajustePuesto = pu;
+  }catch(e){}
+  try{
+    const ex = parseFloat(localStorage.getItem(EXTRA_KEY));
+    if(!isNaN(ex) && ex >= 0) EXTRA_DEFAULT = ex;
+  }catch(e){}
+}
+function openAjustes(){
+  renderAjustes();
+  document.getElementById('ajustesOverlay').classList.add('open');
+}
+function closeAjustes(){
+  document.getElementById('ajustesOverlay').classList.remove('open');
+}
+function renderAjustes(){
+  document.getElementById('puestoPick').innerHTML = PUESTOS.map(pu =>
+    `<button class="${pu.k===ajustePuesto?'active':''}" onclick="ajustePick('${pu.k}')">${pu.label}</button>`
+  ).join('');
+  document.getElementById('ajustesBody').innerHTML = TARIFAS.map((r,i)=>{
     const dotColor = r.tag==='festivo' ? 'var(--teal)' : (r.tag==='sabado' ? 'var(--violet)' : 'transparent');
-    return `<tr style="border-top:1px solid var(--border);">
-      <td style="padding:6px;display:flex;align-items:center;gap:6px;">
-        <i style="width:7px;height:7px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0;"></i>${r.label}
-      </td>
-      <td style="padding:6px;">${r.especialista} €</td>
-      <td style="padding:6px;">${r.grua} €</td>
-      <td style="padding:6px;">${r.mafista} €</td>
-      <td style="padding:6px;">${r.unidad.toFixed(2)} €</td>
+    const tagTxt = r.tag==='festivo' ? 'festivo' : (r.tag==='sabado' ? 'sábado' : '');
+    return `<tr>
+      <td><span style="display:flex;align-items:center;gap:6px;">
+        <i style="width:7px;height:7px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0;"></i>
+        <span>${r.label}${tagTxt ? '<span class="nom-sub">'+tagTxt+'</span>' : ''}</span>
+      </span></td>
+      <td><input type="number" inputmode="decimal" step="0.01" min="0" class="field" value="${r[ajustePuesto]}" oninput="ajusteSet(${i},'${ajustePuesto}',this.value)"></td>
+      <td><input type="number" inputmode="decimal" step="0.01" min="0" class="field" value="${r.unidad}" oninput="ajusteSet(${i},'unidad',this.value)"></td>
     </tr>`;
   }).join('');
+  const pu = PUESTOS.find(x=>x.k===ajustePuesto);
+  document.getElementById('ajustesExtra').value = EXTRA_DEFAULT;
+  document.getElementById('ajustesBase').textContent = 'Base de ' + pu.label.toLowerCase() + ': ' + pu.base + ' movimientos.';
+}
+function ajusteExtraSet(v){
+  const n = parseFloat(String(v).replace(',','.'));
+  EXTRA_DEFAULT = isNaN(n) ? 0 : n;
+  persistTarifas();
+}
+function ajustePick(k){
+  ajustePuesto = k;
+  persistTarifas();
+  renderAjustes();
+}
+function ajusteSet(i, field, v){
+  const n = parseFloat(String(v).replace(',','.'));
+  TARIFAS[i][field] = isNaN(n) ? 0 : n;
+  persistTarifas();
+}
+function ajustesReset(){
+  if(!confirm('¿Volver a la tabla salarial original? Se perderán los importes que hayas modificado.')) return;
+  TARIFAS = JSON.parse(JSON.stringify(TARIFAS_DEF));
+  EXTRA_DEFAULT = 39.24;
+  persistTarifas();
+  renderAjustes();
 }
 
 function openSettings(){
-  renderTarifas();
   document.getElementById('settingsOverlay').classList.add('open');
 }
 function closeSettings(){
@@ -1429,7 +1975,7 @@ function clearMonth(){
 }
 
 function exportData(){
-  const payload = JSON.stringify({data, settings}, null, 2);
+  const payload = JSON.stringify({data, settings, crew: crewReg, nomina: nominaData, tarifas: TARIFAS, puesto: ajustePuesto, extraDefault: EXTRA_DEFAULT}, null, 2);
   const blob = new Blob([payload], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1449,6 +1995,14 @@ function importData(evt){
       const parsed = JSON.parse(e.target.result);
       if(parsed.data) data = parsed.data;
       if(parsed.settings) settings = parsed.settings;
+      if(parsed.crew){ crewReg = parsed.crew; persistCrew(); }
+      if(parsed.nomina){ nominaData = parsed.nomina; persistNomina(); }
+      if(Array.isArray(parsed.tarifas) && parsed.tarifas.length === TARIFAS_DEF.length){
+        TARIFAS = parsed.tarifas;
+        if(parsed.puesto && PUESTOS.some(x=>x.k===parsed.puesto)) ajustePuesto = parsed.puesto;
+        if(typeof parsed.extraDefault === 'number' && parsed.extraDefault >= 0) EXTRA_DEFAULT = parsed.extraDefault;
+        persistTarifas();
+      }
       persist();
       persistSettings();
       render();
@@ -1460,6 +2014,10 @@ function importData(evt){
   reader.readAsText(file);
   evt.target.value = '';
 }
+
+function openTools(){ document.getElementById('toolsOverlay').classList.add('open'); }
+function closeTools(){ document.getElementById('toolsOverlay').classList.remove('open'); }
+function toolGo(fn){ closeTools(); fn(); }
 
 let currentView = 'mes';
 let annualYear = today.getFullYear();
@@ -1478,48 +2036,72 @@ function changeAnnualYear(delta){
   renderYear();
 }
 
+function monthIngresosByKey(key){
+  const monthData = data[key] || {};
+  let t = 0;
+  Object.values(monthData).forEach(e=>{ t += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0); });
+  return nomRound(t);
+}
+// Neto de un mes con los mismos cálculos de la herramienta Nómina
+function nominaCalcKey(key){
+  const ing = monthIngresosByKey(key);
+  const cur = Object.assign(nominaDefaults(), nominaData[key] || {});
+  const irpf = cur.irpfModo === 'total' ? nomNum(cur.irpf) : nomRound(ing * nomNum(cur.irpfPct) / 100);
+  let ret = irpf;
+  NOMINA_ITEMS.forEach(i=>{ ret += nomNum(cur[i.k]); });
+  ret = nomRound(ret);
+  return {ingresos: ing, retenciones: ret, neto: nomRound(ing - ret)};
+}
+
 function renderYear(){
   document.getElementById('yearLabel').textContent = annualYear;
 
   const monthTurnos = [];
-  const monthIngresos = [];
-  let yearTurnos = 0, yearHoras = 0, yearIngresos = 0, yearNeto = 0, mesesConNeto = 0;
+  const monthBruto = [];
+  const monthNeto = [];
+  let yearTurnos = 0, yearHoras = 0, yearBruto = 0, yearNeto = 0, mesesConNeto = 0;
 
   for(let m=0; m<12; m++){
     const key = monthKey(annualYear, m);
     const monthData = data[key] || {};
-    let turnos = 0, horas = 0, ingresos = 0;
+    let turnos = 0, horas = 0;
     Object.values(monthData).forEach(e=>{
       if(e.shift && e.shift !== 'L'){
         turnos++;
         horas += (settings[e.shift]?.horas || 0);
       }
-      ingresos += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0);
     });
-    if(netoData[key] !== undefined){ yearNeto += netoData[key]; mesesConNeto++; }
+    const bruto = monthIngresosByKey(key);
+    let neto = null;
+    if(bruto > 0){
+      neto = nominaCalcKey(key).neto;
+      yearNeto += neto;
+      mesesConNeto++;
+    }
     monthTurnos.push(turnos);
-    monthIngresos.push(netoData[key] !== undefined ? netoData[key] : ingresos);
+    monthBruto.push(bruto);
+    monthNeto.push(neto);
     yearTurnos += turnos;
     yearHoras += horas;
-    yearIngresos += ingresos;
+    yearBruto += bruto;
   }
 
   document.getElementById('yearStats').innerHTML = `
     <div class="stat" style="flex:1;"><div class="n">${yearTurnos}</div><div class="l">TURNOS DEL AÑO</div></div>
     <div class="stat" style="flex:1;"><div class="n">${yearHoras} h</div><div class="l">HORAS DEL AÑO</div></div>
-    <div class="stat" style="flex:1;"><div class="n">${yearIngresos.toFixed(0)} €</div><div class="l">BRUTO DEL AÑO</div></div>
+    <div class="stat" style="flex:1;"><div class="n">${yearBruto.toFixed(0)} €</div><div class="l">BRUTO DEL AÑO</div></div>
     ${mesesConNeto>0 ? `<div class="stat" style="flex:1;"><div class="n">${yearNeto.toFixed(0)} €</div><div class="l">NETO DEL AÑO</div></div>` : ''}
   `;
   document.getElementById('yearStats').style.display = 'flex';
   document.getElementById('yearStats').style.gap = '8px';
 
   const maxTurnos = Math.max(1, ...monthTurnos);
-  const maxIngresos = Math.max(1, ...monthIngresos);
+  const maxBruto = Math.max(1, ...monthBruto);
+  const maxNeto = Math.max(1, ...monthNeto.map(v => v === null ? 0 : v));
   const shortMonths = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
   document.getElementById('yearTableBody').innerHTML = shortMonths.map((mn,i) => {
-    const key = monthKey(annualYear, i);
-    const tieneNeto = netoData[key] !== undefined;
+    const neto = monthNeto[i];
     return `
     <tr>
       <td class="month">${mn}</td>
@@ -1528,8 +2110,12 @@ function renderYear(){
         <span class="mval">${monthTurnos[i]}</span>
       </td>
       <td>
-        <span class="minibar"><i style="width:${(monthIngresos[i]/maxIngresos*100)}%;background:var(--teal);"></i></span>
-        <span class="mval">${monthIngresos[i].toFixed(0)}€${tieneNeto ? '' : '*'}</span>
+        <span class="minibar"><i style="width:${(monthBruto[i]/maxBruto*100)}%;background:var(--indigo);"></i></span>
+        <span class="mval">${monthBruto[i] > 0 ? monthBruto[i].toFixed(0)+'€' : '—'}</span>
+      </td>
+      <td>
+        <span class="minibar"><i style="width:${neto === null ? 0 : Math.max(0, neto)/maxNeto*100}%;background:var(--teal);"></i></span>
+        <span class="mval">${neto === null ? '—' : neto.toFixed(0)+'€'}</span>
       </td>
     </tr>`;
   }).join('');
