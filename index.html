@@ -1986,6 +1986,43 @@ function exportData(){
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+const EQUIPO_MAP = {capataz:[0,'Capataz'], apuntador:[1,'Apuntador'], gruero1:[2,'Gruero'], gruero2:[3,'Gruero'], especialista:[4,'Especialista']};
+// Convierte copias del formato anterior (equipo / companeros / retenciones) al formato de esta versión
+function convertirCopiaAntigua(parsed){
+  Object.values(data).forEach(m => Object.values(m).forEach(e => {
+    if(!e.equipo || e.companeros) return;
+    e.companeros = [];
+    Object.entries(e.equipo).forEach(([k,p]) => {
+      const mp = EQUIPO_MAP[k];
+      const censo = String(p.censo||'').trim(), nombre = String(p.nombre||'').trim();
+      if(!mp || (!censo && !nombre)) return;
+      e.companeros.push({slot:mp[0], categoria:mp[1], censo, nombre});
+    });
+    delete e.equipo;
+  }));
+  if(Array.isArray(parsed.companeros) && !parsed.crew){
+    crewReg = [];
+    parsed.companeros.forEach(c => {
+      const censo = String(c.censo||'').trim(), nombre = String(c.nombre||'').trim();
+      let categoria = 'Especialista';
+      Object.values(data).forEach(m => Object.values(m).forEach(e => (e.companeros||[]).forEach(p => {
+        if(p.censo === censo) categoria = p.categoria;
+      })));
+      if(censo && nombre && !crewFindByCenso(censo)) crewReg.push({censo, nombre, categoria});
+    });
+    Object.values(data).forEach(m => Object.values(m).forEach(e => crewSync((e.companeros||[]).filter(c => c.nombre))));
+    persistCrew();
+  }
+  if(parsed.retenciones && !parsed.nomina){
+    nominaData = {};
+    Object.entries(parsed.retenciones).forEach(([k,v]) => {
+      const o = Object.assign({}, v);
+      if(o.irpfEur !== undefined){ o.irpf = o.irpfEur; delete o.irpfEur; }
+      nominaData[k] = o;
+    });
+    persistNomina();
+  }
+}
 function importData(evt){
   const file = evt.target.files[0];
   if(!file) return;
@@ -1995,6 +2032,7 @@ function importData(evt){
       const parsed = JSON.parse(e.target.result);
       if(parsed.data) data = parsed.data;
       if(parsed.settings) settings = parsed.settings;
+      convertirCopiaAntigua(parsed);
       if(parsed.crew){ crewReg = parsed.crew; persistCrew(); }
       if(parsed.nomina){ nominaData = parsed.nomina; persistNomina(); }
       if(Array.isArray(parsed.tarifas) && parsed.tarifas.length === TARIFAS_DEF.length){
