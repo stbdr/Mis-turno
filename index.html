@@ -564,6 +564,10 @@
   .bigact.danger{border-color:var(--danger,#e2584d);}
   .bigact.danger .bt{color:var(--danger,#e2584d);}
   .bigact:disabled{opacity:.6;}
+
+  .nom-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .nom-pair .nom-total{display:block;margin-top:0;padding:12px;}
+  .nom-pair .nom-total .tv{display:block;margin-top:4px;font-size:19px;}
 </style>
 </head>
 <body>
@@ -626,7 +630,7 @@
         <thead><tr><th>Mes</th><th>Turnos</th><th>Bruto</th><th>Neto</th></tr></thead>
         <tbody id="yearTableBody"></tbody>
       </table>
-      <div class="dsub" style="margin-top:8px;text-transform:none;">Neto = ingresos menos las retenciones de la herramienta Nómina de cada mes.</div>
+      <div class="dsub" style="margin-top:8px;text-transform:none;">Neto = ingresos menos las retenciones de la herramienta Nómina de cada mes (el anticipo no cuenta como retención).</div>
     </div>
   </div>
 
@@ -702,6 +706,16 @@
       <span class="tl">TOTAL RETENCIONES</span>
       <span class="tv" id="nomRetenciones">0.00 €</span>
     </div>
+    <div class="nom-pair">
+      <div class="nom-total">
+        <span class="tl">ANTICIPO</span>
+        <span class="tv" id="nomAnticipo">0.00 €</span>
+      </div>
+      <div class="nom-total">
+        <span class="tl">SUELDO</span>
+        <span class="tv" id="nomSueldo" style="color:var(--teal);">0.00 €</span>
+      </div>
+    </div>
     <div class="nom-total grand">
       <span class="tl" style="color:var(--text);">TOTAL A COBRAR</span>
       <span class="tv" id="nomNeto">0.00 €</span>
@@ -755,6 +769,7 @@
 <!-- modal día -->
 <div class="overlay" id="dayOverlay">
   <div class="sheet">
+    <button class="closex" onclick="closeDay()" aria-label="Cerrar">&#10005;</button>
     <h2 id="dayTitle">Día</h2>
     <div class="dsub" id="daySub"></div>
     <div class="shiftpick" id="shiftPick"></div>
@@ -999,18 +1014,22 @@ function renderNominaRows(){
     <input type="number" inputmode="decimal" step="0.01" min="0" class="field" id="nomIrpfTotal" value="${nomVal(nominaCur.irpf)}" placeholder="€" oninput="nominaIrpfTotal(this.value)">
   </div>`;
   const rows = NOMINA_ITEMS.map(i => `<div class="nom-row">
-    <div class="nl">${i.label}</div>
+    <div class="nl">${i.label}${i.k==='anticipos' ? '<span class="nom-sub">no suma en el total de retenciones</span>' : ''}</div>
     <input type="number" inputmode="decimal" step="0.01" min="0" class="field" id="nom_${i.k}" value="${nomVal(nominaCur[i.k])}" oninput="nominaSet('${i.k}', this.value)">
   </div>`).join('');
   document.getElementById('nominaRows').innerHTML = irpfRow + rows;
 }
 function nominaRecalc(){
   let ret = nomNum(nominaCur.irpf);
-  NOMINA_ITEMS.forEach(i=>{ ret += nomNum(nominaCur[i.k]); });
+  NOMINA_ITEMS.forEach(i=>{ if(i.k !== 'anticipos') ret += nomNum(nominaCur[i.k]); });   // el anticipo no es una retención
   ret = nomRound(ret);
+  const cobrar = nomRound(nominaIngresosVal - ret);
+  const anticipo = nomNum(nominaCur.anticipos);
   document.getElementById('nomIngresos').textContent = nominaIngresosVal.toFixed(2) + ' €';
   document.getElementById('nomRetenciones').textContent = ret.toFixed(2) + ' €';
-  document.getElementById('nomNeto').textContent = nomRound(nominaIngresosVal - ret).toFixed(2) + ' €';
+  document.getElementById('nomNeto').textContent = cobrar.toFixed(2) + ' €';
+  document.getElementById('nomAnticipo').textContent = anticipo.toFixed(2) + ' €';
+  document.getElementById('nomSueldo').textContent = nomRound(cobrar - anticipo).toFixed(2) + ' €';
 }
 function nominaSave(){
   nominaData[monthKey(nomYear, nomMonth)] = nominaCur;
@@ -2903,7 +2922,7 @@ function nominaCalcKey(key){
   const cur = Object.assign(nominaDefaults(), nominaData[key] || {});
   const irpf = cur.irpfModo === 'total' ? nomNum(cur.irpf) : nomRound(ing * nomNum(cur.irpfPct) / 100);
   let ret = irpf;
-  NOMINA_ITEMS.forEach(i=>{ ret += nomNum(cur[i.k]); });
+  NOMINA_ITEMS.forEach(i=>{ if(i.k !== 'anticipos') ret += nomNum(cur[i.k]); });
   ret = nomRound(ret);
   return {ingresos: ing, retenciones: ret, neto: nomRound(ing - ret)};
 }
