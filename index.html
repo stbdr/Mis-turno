@@ -522,6 +522,48 @@
     --bgimg:linear-gradient(160deg,#0b2018 0%,#1b4332 55%,#081c15 100%);
   }
   /* ===== fin ESTILOS (2) ===== */
+
+  /* ---- Resumen visual: pestañas y vistas ---- */
+  .dashtabs{display:flex;gap:6px;overflow-x:auto;margin:2px 0 14px;scrollbar-width:none;}
+  .dashtabs::-webkit-scrollbar{display:none;}
+  .dashtabs button{
+    flex:0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid var(--border);
+    background:var(--surface2);color:var(--text-dim);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .dashtabs button.active{background:var(--amber);color:var(--on-accent,#221600);border-color:var(--amber);}
+  .ringwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-around;}
+  .hgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .hcell{
+    position:relative;aspect-ratio:1/1;border-radius:var(--r2,8px);border:1px solid var(--border);
+    background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .hcell.empty{background:transparent;border:none;}
+  .hcell .hn{position:absolute;top:2px;left:4px;font-size:8px;color:var(--text-dim);}
+  .hcell .hv{font-size:11px;font-weight:800;}
+  .hcell.hot{color:var(--on-accent,#221600);}
+  .hcell.hot .hn{color:inherit;opacity:.7;}
+  .hcell.free{background:color-mix(in srgb,var(--grey) 22%,transparent);}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+  .kpis .stat .n{font-size:17px;}
+  .kpis .stat .l{line-height:1.3;}
+
+  /* ---- Copia de seguridad: botones grandes ---- */
+  .bighead{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--amber);text-transform:uppercase;margin:18px 0 8px;}
+  .biggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .bigact{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;
+    padding:18px 8px;border-radius:var(--radius);border:1px solid var(--border);
+    background:var(--surface2);color:var(--text);cursor:pointer;font-family:inherit;
+  }
+  .bigact .bi{font-size:28px;line-height:1;}
+  .bigact .bt{font-size:14px;font-weight:800;}
+  .bigact .bd{font-size:11px;color:var(--text-dim);line-height:1.3;}
+  .bigact .mlabel{text-transform:capitalize;}
+  .bigact.wide{grid-column:1/-1;padding:14px 10px;}
+  .bigact.danger{border-color:var(--danger,#e2584d);}
+  .bigact.danger .bt{color:var(--danger,#e2584d);}
+  .bigact:disabled{opacity:.6;}
 </style>
 </head>
 <body>
@@ -597,14 +639,14 @@
     <h2>Herramientas</h2>
     <div class="dsub">Accesos rápidos</div>
     <div class="toolgrid">
+      <button class="toolitem" onclick="toolGo(openDashboard)"><span class="ti">&#128202;</span>Resumen visual</button>
+      <button class="toolitem" onclick="toolGo(openNomina)"><span class="ti">&#129534;</span>Nómina</button>
       <button class="toolitem" onclick="toolGo(openBuqueSearch)"><span class="ti">&#128269;</span>Buscar buque</button>
       <button class="toolitem" onclick="toolGo(openCalc)"><span class="ti">&#128290;</span>Calculadora</button>
-      <button class="toolitem" onclick="toolGo(openDashboard)"><span class="ti">&#128202;</span>Resumen visual</button>
-      <button class="toolitem" onclick="toolGo(openSettings)"><span class="ti">&#9881;</span>Copia de seguridad</button>
       <button class="toolitem" onclick="toolGo(openCrewTool)"><span class="ti">&#128101;</span>Compañeros</button>
-      <button class="toolitem" onclick="toolGo(openNomina)"><span class="ti">&#129534;</span>Nómina</button>
-      <button class="toolitem" onclick="toolGo(openAjustes)"><span class="ti">&#128188;</span>Ajustes</button>
       <button class="toolitem" onclick="toolGo(openEstilo)"><span class="ti">&#127912;</span>Estilo</button>
+      <button class="toolitem" onclick="toolGo(openSettings)"><span class="ti">&#128190;</span>Copia de seguridad</button>
+      <button class="toolitem" onclick="toolGo(openAjustes)"><span class="ti">&#9881;&#65039;</span>Ajustes</button>
     </div>
     <div class="row">
       <button class="btn-cancel" onclick="closeTools()" style="flex:none;width:100%;">Cerrar</button>
@@ -716,9 +758,6 @@
     <h2 id="dayTitle">Día</h2>
     <div class="dsub" id="daySub"></div>
     <div class="shiftpick" id="shiftPick"></div>
-    <label style="margin-top:0;">Festivo</label>
-    <div class="puestopick" id="dayFestPick" style="margin-bottom:4px;"></div>
-    <div class="dsub" id="dayFestHint" style="text-transform:none;margin-bottom:10px;"></div>
     <label style="margin-top:0;">Puesto</label>
     <div class="puestopick" id="dayPuestoPick" style="margin-bottom:6px;"></div>
     <label>Empresa</label>
@@ -825,18 +864,23 @@
   <div class="sheet">
     <button class="closex" onclick="closeSettings()" aria-label="Cerrar">&#10005;</button>
     <h2>Copia de seguridad</h2>
+    <div class="dsub" style="text-transform:none;">Tus datos solo están en este dispositivo. Haz una copia de vez en cuando.</div>
 
-    
-    <div class="settings-actions">
-      <button onclick="exportData()">Exportar copia</button>
-      <button onclick="importFile.click()">Importar copia</button>
+    <div class="bighead">Tus datos</div>
+    <div class="biggrid">
+      <button class="bigact" onclick="exportData()"><span class="bi">&#128190;</span><span class="bt">Exportar copia</span><span class="bd">Guarda todo en un archivo</span></button>
+      <button class="bigact" onclick="importFile.click()"><span class="bi">&#128194;</span><span class="bt">Importar copia</span><span class="bd">Recupera una copia guardada</span></button>
     </div>
-    <div class="settings-actions" style="margin-top:8px;">
-      <button onclick="exportPDF()">Exportar PDF</button>
-      <button onclick="exportExcel()" id="btnExcel">Exportar Excel</button>
+
+    <div class="bighead">Informes</div>
+    <div class="biggrid">
+      <button class="bigact" onclick="exportPDF()"><span class="bi">&#128196;</span><span class="bt">Exportar PDF</span><span class="bd">Informe de <span class="mlabel"></span></span></button>
+      <button class="bigact" onclick="exportExcel()" id="btnExcel"><span class="bi">&#128202;</span><span class="bt">Exportar Excel</span><span class="bd">Tabla de <span class="mlabel"></span></span></button>
     </div>
-    <div class="settings-actions" style="margin-top:8px;">
-      <button onclick="clearMonth()" style="color:var(--danger,#e2584d);border-color:var(--danger,#e2584d);">Vaciar turnos de este mes</button>
+
+    <div class="bighead">Borrar</div>
+    <div class="biggrid">
+      <button class="bigact wide danger" onclick="clearMonth()"><span class="bi">&#128465;</span><span class="bt">Vaciar turnos de este mes</span><span class="bd">Borra los turnos de <span class="mlabel"></span></span></button>
     </div>
     <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
     <div class="row">
@@ -851,6 +895,12 @@
     <button class="closex" onclick="closeDashboard()" aria-label="Cerrar">&#10005;</button>
     <h2>Resumen visual</h2>
     <div class="dsub" id="dashSub"></div>
+    <div class="monthbar" style="margin-bottom:12px;">
+      <button onclick="dashChangeMonth(-1)">&larr;</button>
+      <div class="label" id="dashMonthLabel">—</div>
+      <button onclick="dashChangeMonth(1)">&rarr;</button>
+    </div>
+    <div class="dashtabs" id="dashTabs"></div>
     <div id="dashBody"></div>
     <div class="row">
       <button class="btn-cancel" onclick="closeDashboard()">Cerrar</button>
@@ -1201,7 +1251,6 @@ function load(){
   }catch(e){}
   try{ crewReg = JSON.parse(localStorage.getItem(CREW_KEY)) || []; }catch(e){ crewReg = []; }
   try{ nominaData = JSON.parse(localStorage.getItem(NOMINA_KEY)) || {}; }catch(e){ nominaData = {}; }
-  try{ festOv = JSON.parse(localStorage.getItem(FEST_KEY)) || {}; }catch(e){ festOv = {}; }
   loadTarifas();
 }
 function persist(){
@@ -1314,8 +1363,6 @@ function openDay(d){
   const key = monthKey(viewYear, viewMonth);
   const entry = (data[key] && data[key][d]) || {shift:'', note:'', company:''};
   selectedShift = entry.shift || '';
-  const ovS = festOv[festKey(viewYear, viewMonth, d)];
-  dayFestOv = ovS === true ? 'si' : (ovS === false ? 'no' : '');
 
   document.getElementById('dayTitle').textContent = 'Día ' + d;
   document.getElementById('daySub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
@@ -1342,7 +1389,6 @@ function openDay(d){
     pick.appendChild(btn);
   });
 
-  renderDayFest();
   dayPuesto = (entry.puesto && PUESTOS.some(x=>x.k===entry.puesto)) ? entry.puesto : ajustePuesto;
   renderDayPuesto();
   // si el salario guardado coincide con la tarifa, se sigue considerando automático
@@ -1377,8 +1423,7 @@ function tarifaInfo(d, shift, puesto){
   const dow = new Date(viewYear, viewMonth, d).getDay();   // 0 = domingo, 6 = sábado
   const domingo = dow === 0;
   const sabado = dow === 6;
-  const ovF = dayFestOv === 'si' ? true : (dayFestOv === 'no' ? false : undefined);
-  const festivo = ovF !== undefined ? ovF : (domingo || !!festAutoName(viewYear, viewMonth, d) || (sabado && shift !== 'M'));
+  const festivo = domingo || !!festAutoName(viewYear, viewMonth, d) || (sabado && shift !== 'M');
   let idx;
   if(shift === 'M' || shift === 'T'){
     if(festivo) idx = 2;                       // mañ/tarde festivo
@@ -1446,11 +1491,6 @@ function saveDay(){
       companeros: companeros
     };
   }
-  const fk = festKey(viewYear, viewMonth, selectedDay);
-  if(dayFestOv === 'si') festOv[fk] = true;
-  else if(dayFestOv === 'no') festOv[fk] = false;
-  else delete festOv[fk];
-  persistFest();
   persist();
   closeDay();
   render();
@@ -1489,7 +1529,7 @@ async function exportExcel(){
   }
 
   const btn = document.getElementById('btnExcel');
-  const originalText = btn.textContent;
+  const originalHtml = btn.innerHTML;
   btn.textContent = 'Generando...';
   btn.disabled = true;
 
@@ -1542,7 +1582,7 @@ async function exportExcel(){
   }catch(err){
     alert('No se ha podido generar el Excel. Comprueba que tienes conexión a internet e inténtalo de nuevo.');
   }finally{
-    btn.textContent = originalText;
+    btn.innerHTML = originalHtml;
     btn.disabled = false;
   }
 }
@@ -2018,7 +2058,7 @@ function openCompanyInfo(company){
   document.getElementById('shiftInfoOverlay').classList.add('open');
 }
 
-function openDashboard(){
+function dashBarras(){
   const key = monthKey(viewYear, viewMonth);
   const monthData = data[key] || {};
   const entries = Object.entries(monthData).filter(([d,e]) => e.shift);
@@ -2027,9 +2067,7 @@ function openDashboard(){
   const body = document.getElementById('dashBody');
 
   if(entries.length === 0){
-    body.innerHTML = '<div class="dash-empty">Todavía no hay turnos registrados este mes.</div>';
-    document.getElementById('dashboardOverlay').classList.add('open');
-    return;
+    return null;
   }
 
   // ingresos por empresa
@@ -2058,21 +2096,6 @@ function openDashboard(){
       <div class="bval">${porEmpresa[c]}</div>
     </div>`).join('');
 
-  // ingresos por día
-  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
-  const ingresosDia = [];
-  for(let d=1; d<=daysInMonth; d++){
-    const e = monthData[d];
-    const val = e ? (parseFloat(e.salario)||0) : 0;
-    ingresosDia.push(val);
-  }
-  const maxIngreso = Math.max(1, ...ingresosDia);
-  const dayBars = ingresosDia.map((v,i) => `
-    <div class="dcol">
-      <div class="dbar" style="height:${(v/maxIngreso*100)}%;background:${v>0?'var(--amber)':'var(--border)'};"></div>
-      <div class="dnum">${(i+1)%5===0 || i===0 ? (i+1) : ''}</div>
-    </div>`).join('');
-
   // salario por turno
   const shiftColorsVar = {M:'var(--amber)', T:'var(--teal)', N:'var(--indigo)', MA:'var(--violet)'};
   const countsPorTurno = {M:0,T:0,N:0,MA:0};
@@ -2094,28 +2117,516 @@ function openDashboard(){
     <div style="margin-bottom:6px;">De <b>${SHIFT_NAMES[s].toLowerCase()}</b> tienes ${countsPorTurno[s]} turno${countsPorTurno[s]===1?'':'s'}, y el salario ha sido de ${ingresosPorTurno[s].toFixed(2)} €.</div>
   `).join('');
 
-  body.innerHTML = `
-    <div class="dash-section">
-      <h3>SALARIO POR EMPRESA</h3>
-      ${ingresoEmpresaRows}
-    </div>
-    <div class="dash-section">
-      <h3>TURNOS POR EMPRESA</h3>
-      ${empresaRows}
-    </div>
-    <div class="dash-section">
-      <h3>SALARIO POR DÍA (€)</h3>
-      <div class="daybars">${dayBars}</div>
-    </div>
-    <div class="dash-section">
-      <h3>SALARIO POR TURNO</h3>
-      <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:10px;">${turnoSalarioLines}</div>
-      ${turnoSalarioBars}
-    </div>
-  `;
-
-  document.getElementById('dashboardOverlay').classList.add('open');
+  return {
+    empIng: `<div class="dash-section"><h3>SALARIO POR EMPRESA</h3>${ingresoEmpresaRows}</div>`,
+    empTurn: `<div class="dash-section"><h3>TURNOS POR EMPRESA</h3>${empresaRows}</div>`,
+    turno: `<div class="dash-section"><h3>SALARIO POR TURNO</h3><div style="font-size:12.5px;color:var(--text-dim);margin-bottom:10px;">${turnoSalarioLines}</div>${turnoSalarioBars}</div>`
+  };
 }
+
+let dashView = 'resumen';
+let dashYear = new Date().getFullYear();
+let dashMonth = new Date().getMonth();
+const DASH_VIEWS = [['resumen','Resumen'],['reparto','Reparto'],['evolucion','Evolución'],['ano','Año']];
+function openDashboard(){
+  // arranca en el mes que se está viendo en el calendario; luego se puede cambiar sin tocar el calendario
+  dashYear = viewYear;
+  dashMonth = viewMonth;
+  document.getElementById('dashboardOverlay').classList.add('open');
+  dashRender();
+}
+function dashSetView(v){ dashView = v; dashRender(); }
+// En la pestaña Año las flechas cambian de año; en las demás, de mes
+function dashChangeMonth(delta){
+  if(dashView === 'ano'){ dashYear += delta; }
+  else {
+    dashMonth += delta;
+    if(dashMonth < 0){ dashMonth = 11; dashYear--; }
+    if(dashMonth > 11){ dashMonth = 0; dashYear++; }
+  }
+  dashRender();
+}
+function dashRender(){
+  document.getElementById('dashTabs').innerHTML = DASH_VIEWS.map(v =>
+    `<button class="${v[0]===dashView?'active':''}" onclick="dashSetView('${v[0]}')">${v[1]}</button>`
+  ).join('');
+  document.getElementById('dashMonthLabel').textContent = dashView === 'ano' ? String(dashYear) : (MONTH_NAMES[dashMonth] + ' ' + dashYear);
+  document.getElementById('dashSub').style.display = 'none';
+  // las vistas leen viewYear/viewMonth: se cambian solo durante el dibujado y se restauran
+  const sy = viewYear, sm = viewMonth;
+  viewYear = dashYear; viewMonth = dashMonth;
+  try{
+    const bp = dashBarras();   // secciones de barras, o null si el mes no tiene turnos
+    let html = '';
+    if(dashView === 'resumen') html = dashCifrasHtml();
+    else if(dashView === 'reparto') html = dashAnillosHtml() + (bp ? bp.empIng + bp.empTurn + bp.turno : '');
+    else if(dashView === 'evolucion') html = dashAcumHtml() + dashBolsaHtml() + dashBolsaLineaHtml() + dashDiaAltHtml() + dashCalorHtml();
+    else html = dashAnoHtml();
+    if(html) document.getElementById('dashBody').innerHTML = html;
+    else if(dashView === 'ano') dashEmpty('No hay ingresos registrados en ' + dashYear + '.');
+    else dashEmpty('Todavía no hay turnos registrados en ' + MONTH_NAMES[dashMonth] + ' ' + dashYear + '.');
+  } finally {
+    viewYear = sy; viewMonth = sm;
+  }
+}
+
+function dashEmpty(msg){
+  document.getElementById('dashBody').innerHTML = '<div class="dash-empty">' + msg + '</div>';
+}
+function dashMonthEntries(){
+  const md = data[monthKey(viewYear, viewMonth)] || {};
+  return Object.keys(md).map(n=>parseInt(n)).sort((a,b)=>a-b)
+    .map(d => ({d:d, e:md[d]})).filter(x => x.e.shift);
+}
+// ¿Cuenta este turno como festivo? (mismas reglas que la tarifa del salario)
+function esFestivoEfectivo(y, m, d, shift){
+  const dow = new Date(y, m, d).getDay();
+  return dow === 0 || !!festAutoName(y, m, d) || (dow === 6 && shift !== 'M');
+}
+
+// ---- Vista: Anillos ----
+function dashDonut(parts, big, small){
+  const R = 44, C = 2*Math.PI*R;
+  const tot = parts.reduce((a,p)=>a+p.v, 0);
+  let off = 0, segs = '';
+  if(tot > 0){
+    parts.forEach(p=>{
+      if(p.v <= 0) return;
+      const len = p.v/tot*C;
+      segs += `<circle cx="60" cy="60" r="${R}" fill="none" stroke-width="16" style="stroke:${p.c}" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+      off += len;
+    });
+  }
+  return `<svg viewBox="0 0 120 120" width="132" height="132">
+    <circle cx="60" cy="60" r="${R}" fill="none" stroke-width="16" style="stroke:var(--surface2)"/>
+    ${segs}
+    <text x="60" y="63" text-anchor="middle" style="fill:var(--text);font-size:20px;font-weight:800">${big}</text>
+    <text x="60" y="76" text-anchor="middle" style="fill:var(--text-dim);font-size:8px">${small}</text>
+  </svg>`;
+}
+function dashLegend(parts){
+  return '<div style="width:100%;max-width:200px;">' + parts.map(p => `
+    <div style="display:flex;align-items:center;gap:7px;font-size:12px;margin-top:5px;">
+      <i style="width:10px;height:10px;border-radius:3px;background:${p.c};flex-shrink:0;"></i>
+      <span style="flex:1;color:var(--text-dim);">${p.l}</span><b>${p.t}</b>
+    </div>`).join('') + '</div>';
+}
+function dashAnillosHtml(){
+  const es = dashMonthEntries();
+  if(!es.length) return '';
+  const col = {M:'var(--amber)', T:'var(--teal)', N:'var(--indigo)', MA:'var(--violet)'};
+  const cnt = {M:0,T:0,N:0,MA:0};
+  es.forEach(({e})=>{
+    if(e.shift === 'L') return;
+    if(cnt.hasOwnProperty(e.shift)) cnt[e.shift]++;
+  });
+  const tTot = cnt.M + cnt.T + cnt.N + cnt.MA;
+  const partsT = ['M','T','N','MA'].map(k => ({v:cnt[k], c:col[k], l:SHIFT_NAMES[k], t:String(cnt[k])}));
+  return `
+    <div class="dash-section">
+      <h3>TURNOS POR TIPO</h3>
+      <div class="ringwrap">${dashDonut(partsT, tTot, 'TURNOS')}${dashLegend(partsT)}</div>
+    </div>
+`;
+}
+
+// ---- Vista: Año (líneas bruto y neto) ----
+function dashAnoHtml(){
+  const y = viewYear;
+  const br = [], ne = [];
+  for(let m=0; m<12; m++){
+    const key = monthKey(y, m);
+    const b = monthIngresosByKey(key);
+    br.push(b);
+    ne.push(b > 0 ? nominaCalcKey(key).neto : null);
+  }
+  const totB = br.reduce((a,v)=>a+v, 0);
+  if(totB <= 0) return '';
+  const netos = ne.filter(v => v !== null);
+  const totN = netos.reduce((a,v)=>a+v, 0);
+  const maxV = Math.max(1, ...br, ...netos);
+  const minN = netos.length ? Math.min(...netos) : 0;
+  const stepY = maxV > 1000 ? 500 : 100;
+  const hi = Math.ceil(maxV/stepY)*stepY;
+  const lo = minN < 0 ? Math.floor(minN/stepY)*stepY : 0;
+  const L = 38, W = 340, T = 10, H = 150;
+  const X = i => L + i*((W - L - 8)/11);
+  const Y = v => T + (hi - v)/(hi - lo)*H;
+  let grid = '';
+  for(let i=0; i<=4; i++){
+    const v = lo + (hi - lo)*i/4;
+    grid += `<line x1="${L}" x2="${W-8}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" style="stroke:var(--border)" stroke-width="0.6"/>
+      <text x="${L-4}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end" style="fill:var(--text-dim);font-size:8px">${Math.round(v)}</text>`;
+  }
+  if(lo < 0) grid += `<line x1="${L}" x2="${W-8}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" style="stroke:var(--text-dim)" stroke-width="1"/>`;
+  const mi = ['E','F','M','A','M','J','J','A','S','O','N','D'];
+  const labels = mi.map((l,i)=>`<text x="${X(i).toFixed(1)}" y="${T+H+14}" text-anchor="middle" style="fill:var(--text-dim);font-size:9px">${l}</text>`).join('');
+  function line(vals, color){
+    let d = '', pts = '', pen = false;
+    vals.forEach((v,i)=>{
+      if(v === null || v === 0 && color === 'var(--amber)' && br[i] === 0){ pen = false; return; }
+      d += (pen ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1) + ' ';
+      pts += `<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="2.6" style="fill:${color}"/>`;
+      pen = true;
+    });
+    return `<path d="${d}" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="stroke:${color}"/>${pts}`;
+  }
+  const brLine = br.map(v => v > 0 ? v : null);
+  let best = 0;
+  br.forEach((v,i)=>{ if(v > br[best]) best = i; });
+  const full = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return `
+    <div class="dash-section">
+      <h3>BRUTO Y NETO POR MES · ${y} (€)</h3>
+      <svg viewBox="0 0 ${W} ${T+H+22}" width="100%">${grid}${labels}${line(brLine,'var(--amber)')}${line(ne,'var(--teal)')}</svg>
+      <div style="display:flex;gap:14px;justify-content:center;font-size:11.5px;color:var(--text-dim);margin-top:4px;">
+        <span><i style="display:inline-block;width:10px;height:3px;border-radius:2px;background:var(--amber);vertical-align:middle;margin-right:5px;"></i>Bruto</span>
+        <span><i style="display:inline-block;width:10px;height:3px;border-radius:2px;background:var(--teal);vertical-align:middle;margin-right:5px;"></i>Neto</span>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="stat"><div class="n">${totB.toFixed(0)} €</div><div class="l">BRUTO DEL AÑO</div></div>
+      <div class="stat"><div class="n">${totN.toFixed(0)} €</div><div class="l">NETO DEL AÑO</div></div>
+      <div class="stat" style="grid-column:1/-1;"><div class="n" style="text-transform:capitalize;">${full[best]} · ${br[best].toFixed(0)} €</div><div class="l">MEJOR MES (BRUTO)</div></div>
+    </div>`;
+}
+
+// ---- Vista: Calor (calendario con intensidad) ----
+function dashCalorHtml(){
+  const es = dashMonthEntries();
+  if(!es.length) return '';
+  const md = data[monthKey(viewYear, viewMonth)] || {};
+  const dim = new Date(viewYear, viewMonth+1, 0).getDate();
+  let off = new Date(viewYear, viewMonth, 1).getDay() - 1; if(off < 0) off = 6;
+  const vals = {};
+  let max = 1;
+  for(let d=1; d<=dim; d++){
+    const e = md[d];
+    if(e && e.shift && e.shift !== 'L'){
+      const v = parseFloat(e.salario) || 0;
+      vals[d] = v;
+      if(v > max) max = v;
+    }
+  }
+  let cells = '';
+  for(let i=0; i<off; i++) cells += '<div class="hcell empty"></div>';
+  for(let d=1; d<=dim; d++){
+    const e = md[d];
+    if(e && e.shift === 'L'){
+      cells += `<div class="hcell free"><span class="hn">${d}</span><span class="hv" style="color:var(--text-dim);font-weight:600;">L</span></div>`;
+    } else if(vals[d] !== undefined){
+      const pc = Math.round(18 + 82*vals[d]/max);
+      cells += `<div class="hcell ${pc>=58?'hot':''}" style="background:color-mix(in srgb,var(--amber) ${pc}%,var(--surface2));"><span class="hn">${d}</span><span class="hv">${vals[d].toFixed(0)}</span></div>`;
+    } else {
+      cells += `<div class="hcell"><span class="hn">${d}</span></div>`;
+    }
+  }
+  const top = Object.keys(vals).map(Number).sort((a,b)=>vals[b]-vals[a]).slice(0,3);
+  const topHtml = top.map(d => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+      <span><b>Día ${d}</b> <span style="color:var(--text-dim);">· ${SHIFT_NAMES[md[d].shift]}</span></span><b>${vals[d].toFixed(2)} €</b>
+    </div>`).join('');
+  return `
+    <div class="dash-section">
+      <h3>SALARIO POR DÍA · CALENDARIO</h3>
+      <div class="weekdays"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div class="hgrid">${cells}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:var(--text-dim);">
+        <span>menos</span>
+        <div style="flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--amber) 18%,var(--surface2)),var(--amber));"></div>
+        <span>más</span>
+      </div>
+    </div>
+    <div class="dash-section">
+      <h3>MEJORES DÍAS</h3>
+      ${topHtml}
+    </div>`;
+}
+
+// ---- Vista: Cifras ----
+function dashAcumHtml(){
+  const md = data[monthKey(viewYear, viewMonth)] || {};
+  const dim = new Date(viewYear, viewMonth+1, 0).getDate();
+  const vals = [];
+  let lastD = 0, total = 0, n = 0;
+  for(let d=1; d<=dim; d++){
+    const e = md[d];
+    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    vals.push(v);
+    if(v > 0){ lastD = d; total += v; n++; }
+  }
+  if(!lastD) return '';
+  const pts = [];
+  let acc = 0;
+  for(let d=1; d<=lastD; d++){ acc += vals[d-1]; pts.push({d:d, a:acc, v:vals[d-1]}); }
+  const step = total > 2000 ? 500 : (total > 1000 ? 250 : (total > 500 ? 100 : 50));
+  const hi = Math.ceil(total*1.05/step)*step;
+  const W = 340, T = 10, H = 150, x0 = 8, x1 = W - 36;
+  const colW = (x1 - x0)/dim;
+  const X = d => x0 + (d - 0.5)*colW;
+  const Y = v => T + (hi - v)/hi*H;
+  let grid = '';
+  for(let i=0; i<=4; i++){
+    const v = hi*i/4;
+    grid += `<line x1="${x0}" x2="${x1}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" style="stroke:var(--border)" stroke-width="0.6"/>
+      <text x="${x1+4}" y="${(Y(v)+3).toFixed(1)}" style="fill:var(--text-dim);font-size:8px">${Math.round(v)}</text>`;
+  }
+  let lbl = '';
+  for(let d=1; d<=dim; d++){
+    if(d === 1 || d % 5 === 0) lbl += `<text x="${X(d).toFixed(1)}" y="${T+H+14}" text-anchor="middle" style="fill:var(--text-dim);font-size:9px">${d}</text>`;
+  }
+  const poly = pts.map(p => X(p.d).toFixed(1) + ',' + Y(p.a).toFixed(1)).join(' ');
+  const base = Y(0).toFixed(1);
+  const area = `<polygon points="${X(1).toFixed(1)},${base} ${poly} ${X(lastD).toFixed(1)},${base}" style="fill:url(#acumGrad)"/>`;
+  const line = `<polyline points="${poly}" fill="none" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="stroke:var(--amber)"/>`;
+  const dots = pts.filter(p => p.v > 0).map(p => `<circle cx="${X(p.d).toFixed(1)}" cy="${Y(p.a).toFixed(1)}" r="2.3" style="fill:var(--surface);stroke:var(--amber)" stroke-width="1.4"/>`).join('');
+  const yl = Y(total);
+  const marks = `
+    <line x1="${x0}" x2="${x1}" y1="${yl.toFixed(1)}" y2="${yl.toFixed(1)}" stroke-dasharray="3 3" stroke-width="0.9" style="stroke:var(--amber)"/>
+    <circle cx="${X(lastD).toFixed(1)}" cy="${yl.toFixed(1)}" r="6" style="fill:var(--amber);opacity:.25"/>
+    <circle cx="${X(lastD).toFixed(1)}" cy="${yl.toFixed(1)}" r="3.4" style="fill:var(--amber)"/>
+    <rect x="${x1+1}" y="${(yl-7).toFixed(1)}" width="33" height="14" rx="3" style="fill:var(--amber)"/>
+    <text x="${x1+17.5}" y="${(yl+3).toFixed(1)}" text-anchor="middle" style="fill:var(--on-accent,#221600);font-size:8.5px;font-weight:700">${total.toFixed(0)}</text>`;
+  return `<div class="dash-section">
+    <h3>SALARIO ACUMULADO DEL MES</h3>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+      <span style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;">${total.toFixed(2)} €</span>
+      <span style="font-size:11.5px;color:var(--text-dim);">${n} turno${n===1?'':'s'} · hasta el día ${lastD}</span>
+    </div>
+    <svg viewBox="0 0 ${W} ${T+H+22}" width="100%">
+      <defs><linearGradient id="acumGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color:var(--amber);stop-opacity:.4"/><stop offset="1" style="stop-color:var(--amber);stop-opacity:0"/>
+      </linearGradient></defs>
+      ${grid}${lbl}${area}${line}${dots}${marks}
+    </svg>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">Suma del salario día a día, sin extras. Cada punto es un turno con salario indicado.</div>
+  </div>`;
+}
+function dashBolsaHtml(){
+  const md = data[monthKey(viewYear, viewMonth)] || {};
+  const dim = new Date(viewYear, viewMonth+1, 0).getDate();
+  const worked = [];
+  for(let d=1; d<=dim; d++){
+    const e = md[d];
+    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    if(v > 0) worked.push({d:d, v:v});
+  }
+  if(!worked.length) return '';
+  // cada vela: de lo que cobraste en el turno anterior a lo que cobras en este
+  const candles = worked.map((w,i) => ({d:w.d, o:(i ? worked[i-1].v : w.v), c:w.v}));
+  const all = worked.map(w => w.v);
+  const mx = Math.max(...all), mn = Math.min(...all);
+  const media = all.reduce((a,v)=>a+v, 0)/all.length;
+  const pad = Math.max(10, (mx - mn)*0.15);
+  const step = (mx - mn) > 100 ? 20 : 10;
+  const lo = Math.max(0, Math.floor((mn - pad)/step)*step);
+  const hi = Math.ceil((mx + pad)/step)*step;
+  const W = 340, T = 10, H = 150, x0 = 8, x1 = W - 36;
+  const colW = (x1 - x0)/dim;
+  const cw = Math.min(10, colW*0.62);
+  const X = d => x0 + (d - 0.5)*colW;
+  const Y = v => T + (hi - v)/(hi - lo)*H;
+  const UP = '#2ebd85', DOWN = '#e5484d';
+  let grid = '';
+  for(let i=0; i<=4; i++){
+    const v = lo + (hi - lo)*i/4;
+    grid += `<line x1="${x0}" x2="${x1}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" style="stroke:var(--border)" stroke-width="0.6"/>
+      <text x="${x1+4}" y="${(Y(v)+3).toFixed(1)}" style="fill:var(--text-dim);font-size:8px">${Math.round(v)}</text>`;
+  }
+  let lbl = '';
+  for(let d=1; d<=dim; d++){
+    if(d === 1 || d % 5 === 0) lbl += `<text x="${X(d).toFixed(1)}" y="${T+H+14}" text-anchor="middle" style="fill:var(--text-dim);font-size:9px">${d}</text>`;
+  }
+  const bodies = candles.map(k => {
+    const col = k.c > k.o ? UP : (k.c < k.o ? DOWN : 'var(--text-dim)');
+    const yTop = Y(Math.max(k.o, k.c)), yBot = Y(Math.min(k.o, k.c));
+    const h = Math.max(1.6, yBot - yTop);
+    return `<rect x="${(X(k.d)-cw/2).toFixed(1)}" y="${yTop.toFixed(1)}" width="${cw.toFixed(1)}" height="${h.toFixed(1)}" rx="1" style="fill:${col}"/>`;
+  }).join('');
+  const last = candles[candles.length-1];
+  const lastCol = last.c > last.o ? UP : (last.c < last.o ? DOWN : 'var(--text-dim)');
+  const yl = Y(last.c);
+  const tag = `<line x1="${x0}" x2="${x1}" y1="${yl.toFixed(1)}" y2="${yl.toFixed(1)}" stroke-dasharray="3 3" stroke-width="0.9" style="stroke:${lastCol}"/>
+    <rect x="${x1+1}" y="${(yl-7).toFixed(1)}" width="33" height="14" rx="3" style="fill:${lastCol}"/>
+    <text x="${x1+17.5}" y="${(yl+3).toFixed(1)}" text-anchor="middle" style="fill:#fff;font-size:8.5px;font-weight:700">${last.c.toFixed(0)}</text>`;
+  let delta = '';
+  if(worked.length > 1){
+    const dif = last.c - last.o;
+    const pc = last.o > 0 ? dif/last.o*100 : 0;
+    const arrow = dif > 0 ? '▲' : (dif < 0 ? '▼' : '■');
+    delta = `<span style="color:${lastCol};font-weight:800;font-size:13px;">${arrow} ${dif>0?'+':''}${dif.toFixed(2)} € (${pc>0?'+':''}${pc.toFixed(1)} %)</span>
+      <span style="font-size:11px;color:var(--text-dim);">respecto al turno anterior</span>`;
+  }
+  return `<div class="dash-section">
+    <h3>SALARIO POR DÍA · BOLSA (VELAS)</h3>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+      <span style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;">${last.c.toFixed(2)} €</span>${delta}
+    </div>
+    <svg viewBox="0 0 ${W} ${T+H+22}" width="100%">${grid}${lbl}${bodies}${tag}</svg>
+    <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-dim);margin-top:6px;">
+      <span>Máx <b style="color:var(--text);">${mx.toFixed(0)} €</b></span>
+      <span>Mín <b style="color:var(--text);">${mn.toFixed(0)} €</b></span>
+      <span>Media <b style="color:var(--text);">${media.toFixed(0)} €</b></span>
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">Cada vela compara el salario de un turno con el del turno anterior: verde si sube, rojo si baja. Solo cuenta turnos con salario indicado.</div>
+  </div>`;
+}
+function dashBolsaLineaHtml(){
+  const md = data[monthKey(viewYear, viewMonth)] || {};
+  const dim = new Date(viewYear, viewMonth+1, 0).getDate();
+  const w = [];
+  for(let d=1; d<=dim; d++){
+    const e = md[d];
+    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    if(v > 0) w.push({d:d, v:v});
+  }
+  if(!w.length) return '';
+  const all = w.map(p => p.v);
+  const mx = Math.max(...all), mn = Math.min(...all);
+  const media = all.reduce((a,v)=>a+v, 0)/all.length;
+  const pad = Math.max(10, (mx - mn)*0.15);
+  const step = (mx - mn) > 100 ? 20 : 10;
+  const lo = Math.max(0, Math.floor((mn - pad)/step)*step);
+  const hi = Math.ceil((mx + pad)/step)*step;
+  const W = 340, T = 10, H = 150, x0 = 8, x1 = W - 36;
+  const colW = (x1 - x0)/dim;
+  const X = d => x0 + (d - 0.5)*colW;
+  const Y = v => T + (hi - v)/(hi - lo)*H;
+  const UP = '#2ebd85', DOWN = '#e5484d', FLAT = 'var(--text-dim)';
+  const first = w[0], last = w[w.length-1];
+  const trend = last.v >= first.v ? UP : DOWN;
+  let grid = '';
+  for(let i=0; i<=4; i++){
+    const v = lo + (hi - lo)*i/4;
+    grid += `<line x1="${x0}" x2="${x1}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" style="stroke:var(--border)" stroke-width="0.6"/>
+      <text x="${x1+4}" y="${(Y(v)+3).toFixed(1)}" style="fill:var(--text-dim);font-size:8px">${Math.round(v)}</text>`;
+  }
+  let lbl = '';
+  for(let d=1; d<=dim; d++){
+    if(d === 1 || d % 5 === 0) lbl += `<text x="${X(d).toFixed(1)}" y="${T+H+14}" text-anchor="middle" style="fill:var(--text-dim);font-size:9px">${d}</text>`;
+  }
+  const poly = w.map(p => X(p.d).toFixed(1) + ',' + Y(p.v).toFixed(1)).join(' ');
+  const base = Y(lo).toFixed(1);
+  const area = `<polygon points="${X(first.d).toFixed(1)},${base} ${poly} ${X(last.d).toFixed(1)},${base}" style="fill:url(#bolsaGrad)"/>`;
+  let segs = '';
+  for(let i=1; i<w.length; i++){
+    const a = w[i-1], b = w[i];
+    const col = b.v > a.v ? UP : (b.v < a.v ? DOWN : FLAT);
+    segs += `<line x1="${X(a.d).toFixed(1)}" y1="${Y(a.v).toFixed(1)}" x2="${X(b.d).toFixed(1)}" y2="${Y(b.v).toFixed(1)}" stroke-width="2.2" stroke-linecap="round" style="stroke:${col}"/>`;
+  }
+  const dots = w.map(p => `<circle cx="${X(p.d).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.2" style="fill:var(--surface);stroke:${trend}" stroke-width="1.4"/>`).join('');
+  const yl = Y(last.v);
+  const ym = Y(media);
+  const marks = `
+    <line x1="${x0}" x2="${x1}" y1="${ym.toFixed(1)}" y2="${ym.toFixed(1)}" stroke-dasharray="2 4" stroke-width="0.9" style="stroke:var(--text-dim)"/>
+    <text x="${x0+2}" y="${(ym-3).toFixed(1)}" style="fill:var(--text-dim);font-size:8px">media ${media.toFixed(0)}</text>
+    <line x1="${x0}" x2="${x1}" y1="${yl.toFixed(1)}" y2="${yl.toFixed(1)}" stroke-dasharray="3 3" stroke-width="0.9" style="stroke:${trend}"/>
+    <circle cx="${X(last.d).toFixed(1)}" cy="${yl.toFixed(1)}" r="6" style="fill:${trend};opacity:.25"/>
+    <circle cx="${X(last.d).toFixed(1)}" cy="${yl.toFixed(1)}" r="3.4" style="fill:${trend}"/>
+    <rect x="${x1+1}" y="${(yl-7).toFixed(1)}" width="33" height="14" rx="3" style="fill:${trend}"/>
+    <text x="${x1+17.5}" y="${(yl+3).toFixed(1)}" text-anchor="middle" style="fill:#fff;font-size:8.5px;font-weight:700">${last.v.toFixed(0)}</text>`;
+  let delta = '';
+  if(w.length > 1){
+    const dif = last.v - first.v;
+    const pc = first.v > 0 ? dif/first.v*100 : 0;
+    const arrow = dif > 0 ? '▲' : (dif < 0 ? '▼' : '■');
+    delta = `<span style="color:${trend};font-weight:800;font-size:13px;">${arrow} ${dif>0?'+':''}${dif.toFixed(2)} € (${pc>0?'+':''}${pc.toFixed(1)} %)</span>
+      <span style="font-size:11px;color:var(--text-dim);">desde el primer turno</span>`;
+  }
+  return `<div class="dash-section">
+    <h3>SALARIO POR DÍA · BOLSA (LÍNEA)</h3>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+      <span style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;">${last.v.toFixed(2)} €</span>${delta}
+    </div>
+    <svg viewBox="0 0 ${W} ${T+H+22}" width="100%">
+      <defs><linearGradient id="bolsaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color:${trend};stop-opacity:.38"/><stop offset="1" style="stop-color:${trend};stop-opacity:0"/>
+      </linearGradient></defs>
+      ${grid}${lbl}${area}${segs}${dots}${marks}
+    </svg>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">Une solo los turnos con salario indicado: tramo verde si el salario sube respecto al turno anterior, rojo si baja.</div>
+  </div>`;
+}
+function dashDiaAltHtml(){
+  const md = data[monthKey(viewYear, viewMonth)] || {};
+  const dim = new Date(viewYear, viewMonth+1, 0).getDate();
+  const vals = [];
+  let max = 0;
+  for(let d=1; d<=dim; d++){
+    const e = md[d];
+    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    vals.push(v);
+    if(v > max) max = v;
+  }
+  if(max <= 0) return '';
+  const col = {M:'var(--amber)', T:'var(--teal)', N:'var(--indigo)', MA:'var(--violet)'};
+  const orden = [];
+  vals.forEach((v,i)=>{ if(v > 0) orden.push({d:i+1, v:v}); });
+  orden.sort((a,b)=>b.v-a.v);
+  const top = orden.slice(0,10);
+  const rows = top.map(x => `
+    <div class="barrow">
+      <div class="blabel">Día ${x.d}</div>
+      <div class="btrack"><div class="bfill" style="width:${x.v/max*100}%;background:${col[md[x.d].shift] || 'var(--amber)'};"></div></div>
+      <div class="bval">${x.v.toFixed(0)} €</div>
+    </div>`).join('');
+  return `<div class="dash-section">
+    <h3>SALARIO POR DÍA · ORDENADO${orden.length > 10 ? ' (10 MEJORES)' : ''}</h3>
+    ${rows}</div>`;
+}
+function dashCifrasHtml(){
+  const es = dashMonthEntries();
+  const trab = es.filter(x => x.e.shift !== 'L');
+  if(!trab.length) return '';
+  const n = trab.length;
+  const libres = es.length - n;
+  let salTot = 0, movs = 0, festN = 0, festEur = 0, bestD = trab[0].d, bestV = -1;
+  const porTurno = {M:0,T:0,N:0,MA:0};
+  const buq = {};
+  trab.forEach(({d,e})=>{
+    const b = parseFloat(e.salario) || 0;
+    salTot += b;
+    movs += parseFloat(e.movimientos) || 0;
+    if(b > bestV){ bestV = b; bestD = d; }
+    if(esFestivoEfectivo(viewYear, viewMonth, d, e.shift)){ festN++; festEur += b; }
+    if(porTurno.hasOwnProperty(e.shift)) porTurno[e.shift] += (parseFloat(e.salario)||0);
+    const nm = String(e.buque||'').trim();
+    if(nm){
+      const k = nm.toLowerCase();
+      if(!buq[k]) buq[k] = {name:nm, n:0, sal:0};
+      buq[k].n++;
+      buq[k].sal += (parseFloat(e.salario)||0);
+    }
+  });
+  let topT = 'M';
+  Object.keys(porTurno).forEach(k=>{ if(porTurno[k] > porTurno[topT]) topT = k; });
+  const lista = Object.values(buq).sort((a,b)=>b.n-a.n || b.sal-a.sal).slice(0,5);
+  const maxN = Math.max(1, ...lista.map(x=>x.n));
+  const buqHtml = lista.length ? lista.map(x => `
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:700;">
+        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(x.name)}</span>
+        <span style="flex-shrink:0;color:var(--text-dim);font-weight:600;">${x.n} serv. · ${x.sal.toFixed(0)} €</span>
+      </div>
+      <div class="btrack" style="height:8px;margin-top:4px;"><div class="bfill" style="width:${x.n/maxN*100}%;background:var(--amber);"></div></div>
+    </div>`).join('') : '<div class="dash-empty" style="padding:8px 0;">Aún no has indicado buques este mes.</div>';
+  return `
+    <div class="kpis">
+      <div class="stat"><div class="n">${n}</div><div class="l">TURNOS TRABAJADOS</div></div>
+      <div class="stat"><div class="n">${(salTot/n).toFixed(0)} €</div><div class="l">MEDIA POR TURNO · SOLO SALARIO</div></div>
+      <div class="stat"><div class="n">Día ${bestD}</div><div class="l">MEJOR DÍA · ${bestV.toFixed(0)} €</div></div>
+      <div class="stat"><div class="n">${movs}</div><div class="l">MOVIMIENTOS · ${(movs/n).toFixed(1)} POR TURNO</div></div>
+      <div class="stat"><div class="n">${festN}</div><div class="l">TURNOS EN FESTIVO · ${festEur.toFixed(0)} €</div></div>
+      <div class="stat"><div class="n">${SHIFT_NAMES[topT]}</div><div class="l">TURNO QUE MÁS APORTA · ${porTurno[topT].toFixed(0)} €</div></div>
+      <div class="stat" style="grid-column:1/-1;"><div class="n">${libres}</div><div class="l">DÍAS LIBRES</div></div>
+    </div>
+    <div class="dash-section">
+      <h3>BUQUES DEL MES</h3>
+      ${buqHtml}
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);text-align:center;">Todos los importes de esta pestaña son solo salario (sin extras).</div>`;
+}
+
 function closeDashboard(){
   document.getElementById('dashboardOverlay').classList.remove('open');
 }
@@ -2141,9 +2652,6 @@ let TARIFAS = JSON.parse(JSON.stringify(TARIFAS_DEF));
 let ajustePuesto = 'especialista';
 
 // ---- Festivos (Las Palmas de Gran Canaria) ----
-const FEST_KEY = 'turnos_festivos_v1';
-let festOv = {};        // cambios manuales: { "2026-10-12": true | false }
-let dayFestOv = '';     // en el formulario del día: '' (automático) | 'si' | 'no'
 const FEST_FIJOS = {
   '01-01':'Año Nuevo', '01-06':'Reyes', '05-01':'Fiesta del Trabajo', '05-30':'Día de Canarias',
   '08-15':'Asunción de la Virgen', '09-08':'Virgen del Pino', '10-12':'Fiesta Nacional de España',
@@ -2184,34 +2692,8 @@ function festivosAuto(y){
   _festCache[y] = o;
   return o;
 }
-function festKey(y,m,d){ return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
 function festAutoName(y,m,d){ return festivosAuto(y)[String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0')] || ''; }
-function festOverride(y,m,d){ const v = festOv[festKey(y,m,d)]; return (v===true || v===false) ? v : undefined; }
-function esFestivoMarcado(y,m,d){ const ov = festOverride(y,m,d); return ov !== undefined ? ov : !!festAutoName(y,m,d); }
-function persistFest(){
-  try{ localStorage.setItem(FEST_KEY, JSON.stringify(festOv)); }catch(e){}
-}
-function renderDayFest(){
-  const opts = [['','Automático'],['si','Festivo'],['no','No festivo']];
-  document.getElementById('dayFestPick').innerHTML = opts.map(o =>
-    `<button class="${o[0]===dayFestOv?'active':''}" onclick="dayFestSet('${o[0]}')">${o[1]}</button>`
-  ).join('');
-  const dow = new Date(viewYear, viewMonth, selectedDay).getDay();
-  const nm = festAutoName(viewYear, viewMonth, selectedDay);
-  let hint;
-  if(dayFestOv === 'si') hint = 'Marcado como festivo.';
-  else if(dayFestOv === 'no') hint = 'Marcado como no festivo.';
-  else if(nm) hint = 'Festivo: ' + nm;
-  else if(dow === 0) hint = 'Domingo: cuenta como festivo.';
-  else if(dow === 6) hint = 'Sábado: tarde, noche y madrugada cuentan como festivo.';
-  else hint = 'Día laborable.';
-  document.getElementById('dayFestHint').textContent = hint;
-}
-function dayFestSet(v){
-  dayFestOv = v;
-  renderDayFest();
-  applyAutoSalario();
-}
+function esFestivoMarcado(y,m,d){ return !!festAutoName(y,m,d); }
 
 function persistTarifas(){
   try{
@@ -2285,6 +2767,7 @@ function ajustesReset(){
 }
 
 function openSettings(){
+  document.querySelectorAll('.mlabel').forEach(el => { el.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear; });
   document.getElementById('settingsOverlay').classList.add('open');
 }
 function closeSettings(){
@@ -2307,7 +2790,7 @@ function clearMonth(){
 }
 
 function exportData(){
-  const payload = JSON.stringify({data, settings, crew: crewReg, nomina: nominaData, tarifas: TARIFAS, puesto: ajustePuesto, extraDefault: EXTRA_DEFAULT, festivos: festOv}, null, 2);
+  const payload = JSON.stringify({data, settings, crew: crewReg, nomina: nominaData, tarifas: TARIFAS, puesto: ajustePuesto, extraDefault: EXTRA_DEFAULT}, null, 2);
   const blob = new Blob([payload], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -2369,7 +2852,6 @@ function importData(evt){
       convertirCopiaAntigua(parsed);
       if(parsed.crew){ crewReg = parsed.crew; persistCrew(); }
       if(parsed.nomina){ nominaData = parsed.nomina; persistNomina(); }
-      if(parsed.festivos && typeof parsed.festivos === 'object'){ festOv = parsed.festivos; persistFest(); }
       if(Array.isArray(parsed.tarifas) && parsed.tarifas.length === TARIFAS_DEF.length){
         TARIFAS = parsed.tarifas;
         if(parsed.puesto && PUESTOS.some(x=>x.k===parsed.puesto)) ajustePuesto = parsed.puesto;
