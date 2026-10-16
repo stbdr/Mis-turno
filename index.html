@@ -568,6 +568,21 @@
   .nom-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
   .nom-pair .nom-total{display:block;margin-top:0;padding:12px;}
   .nom-pair .nom-total .tv{display:block;margin-top:4px;font-size:19px;}
+
+  /* ---- Compañeros: categorías desplegables ---- */
+  .crewgroup{margin-top:8px;}
+  .crewhead{
+    width:100%;display:flex;align-items:center;gap:10px;text-align:left;
+    padding:11px 12px;border-radius:var(--r2,9px);border:1px solid var(--border);
+    background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;
+  }
+  .crewhead .chev{display:inline-block;color:var(--amber);transition:transform .15s;font-size:13px;}
+  .crewhead.open .chev{transform:rotate(90deg);}
+  .crewhead .cht{flex:1;}
+  .crewhead .chn{
+    min-width:26px;text-align:center;padding:2px 8px;border-radius:999px;
+    background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-size:12px;font-weight:700;
+  }
 </style>
 </head>
 <body>
@@ -738,7 +753,7 @@
     <div class="crewbox">
       <label>Categoría</label>
       <select id="crewRegCat">
-        <option>Capataz</option><option>Apuntador</option><option>Gruero</option><option>Especialista</option>
+        <option>Capataz</option><option>Apuntador</option><option>Gruero</option><option>Transtainero</option><option>Mafista</option><option>Especialista</option>
       </select>
       <div class="field-row">
         <div><label>Nº censo</label><input type="text" inputmode="numeric" id="crewRegCenso" class="field" placeholder="Nº censo"></div>
@@ -1064,7 +1079,9 @@ function nominaReset(){
 }
 
 const CREW_KEY = 'turnos_crew_v1';
-const CREW_CATS = ['Capataz','Apuntador','Gruero','Especialista'];
+const CREW_CATS = ['Capataz','Apuntador','Gruero','Transtainero','Mafista','Especialista'];
+const CREW_LABELS = {Capataz:'Capataces', Apuntador:'Apuntadores', Gruero:'Grueros', Transtainero:'Transtaineros', Mafista:'Mafistas', Especialista:'Especialistas'};
+let crewOpen = {};   // categorías desplegadas en la lista
 let crewReg = [];   // [{censo, nombre, categoria}]  registro único de compañeros
 let crewEditIdx = null;
 
@@ -1184,6 +1201,10 @@ function openCrewTool(){
 function closeCrewTool(){
   document.getElementById('crewOverlay').classList.remove('open');
 }
+function crewToggle(cat){
+  crewOpen[cat] = !crewOpen[cat];
+  renderCrewList();
+}
 function renderCrewList(){
   const q = document.getElementById('crewSearch').value.trim().toLowerCase();
   const el = document.getElementById('crewList');
@@ -1196,19 +1217,27 @@ function renderCrewList(){
     const items = crewReg.map((p,idx)=>({p,idx}))
       .filter(({p}) => p.categoria===cat && (!q || String(p.nombre).toLowerCase().includes(q) || String(p.censo).toLowerCase().includes(q) || String(p.empresa||'').toLowerCase().includes(q) || String(p.nota||'').toLowerCase().includes(q)))
       .sort((a,b)=>String(a.p.nombre).localeCompare(String(b.p.nombre),'es'));
-    if(items.length === 0) return;
-    html += `<div class="crewgroup"><h3>${cat}${cat==='Gruero'?'s':''} &middot; ${items.length}</h3>` + items.map(({p,idx})=>{
-      const n = crewCount(p);
-      return `<div class="crewitem">
-        <div class="cinfo">
-          <div class="cname">${esc(p.nombre) || '(sin nombre)'}</div>
-          <div class="cmeta">Censo ${esc(p.censo) || '—'}${p.empresa ? ' &middot; ' + esc(p.empresa) : ''} &middot; ${n} turno${n===1?'':'s'} juntos</div>
-          ${p.nota ? `<div class="cmeta" style="font-style:italic;white-space:normal;">${esc(p.nota)}</div>` : ''}
-        </div>
-        <button onclick="crewEdit(${idx})">&#9998;</button>
-        <button onclick="crewDelete(${idx})">&#10005;</button>
-      </div>`;
-    }).join('') + '</div>';
+    if(q && items.length === 0) return;      // buscando: solo las categorías con resultados
+    const abierta = q ? true : !!crewOpen[cat];
+    html += `<div class="crewgroup">
+      <button class="crewhead ${abierta?'open':''}" onclick="crewToggle('${cat}')">
+        <span class="chev">&#9656;</span><span class="cht">${CREW_LABELS[cat] || cat}</span><span class="chn">${items.length}</span>
+      </button>`;
+    if(abierta){
+      html += items.length ? items.map(({p,idx})=>{
+        const n = crewCount(p);
+        return `<div class="crewitem">
+          <div class="cinfo">
+            <div class="cname">${esc(p.nombre) || '(sin nombre)'}</div>
+            <div class="cmeta">Censo ${esc(p.censo) || '—'}${p.empresa ? ' &middot; ' + esc(p.empresa) : ''} &middot; ${n} turno${n===1?'':'s'} juntos</div>
+            ${p.nota ? `<div class="cmeta" style="font-style:italic;white-space:normal;">${esc(p.nota)}</div>` : ''}
+          </div>
+          <button onclick="crewEdit(${idx})">&#9998;</button>
+          <button onclick="crewDelete(${idx})">&#10005;</button>
+        </div>`;
+      }).join('') : '<div class="cmeta" style="padding:10px 4px;">Sin compañeros en esta categoría.</div>';
+    }
+    html += '</div>';
   });
   el.innerHTML = html || '<div class="dash-empty">Sin resultados.</div>';
 }
@@ -1265,6 +1294,7 @@ function crewRegSave(){
   } else {
     crewReg.push({censo, nombre, categoria, empresa, nota});
   }
+  crewOpen[categoria] = true;
   persistCrew();
   crewRegCancel();
   renderCrewList();
