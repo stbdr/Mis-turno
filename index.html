@@ -1125,19 +1125,40 @@ function collectCrew(){
   });
   return out;
 }
-// Al guardar un turno, todo compañero nuevo pasa al registro (sin duplicar)
+// Al guardar un turno, todo compañero nuevo pasa al registro (sin duplicar).
+// Si ya estaba registrado con datos a medias (solo censo o solo nombre), se completan.
 function crewSync(list){
-  let changed = false;
+  let changed = false, dataChanged = false;
   list.forEach(c=>{
-    const exists = c.censo
+    let exists = c.censo
       ? crewFindByCenso(c.censo)
       : crewReg.find(p => !p.censo && p.categoria===c.categoria && String(p.nombre).trim().toLowerCase()===c.nombre.toLowerCase());
+    if(!exists && c.censo && c.nombre){
+      // estaba registrado solo con el nombre: se le añade el censo en vez de duplicarlo
+      const solo = crewReg.find(p => !String(p.censo||'').trim() && p.categoria===c.categoria && String(p.nombre||'').trim().toLowerCase()===c.nombre.toLowerCase());
+      if(solo){ solo.censo = c.censo; exists = solo; changed = true; }
+    }
     if(!exists){
       crewReg.push({censo:c.censo, nombre:c.nombre, categoria:c.categoria});
       changed = true;
+    } else if(c.censo && c.nombre && !String(exists.nombre||'').trim()){
+      // estaba registrado solo con el censo: se le añade el nombre, también en los turnos ya guardados
+      exists.nombre = c.nombre;
+      changed = true;
+      Object.values(data).forEach(month=>{
+        Object.values(month).forEach(e=>{
+          (e.companeros||[]).forEach(x=>{
+            if(String(x.censo||'').trim() === String(c.censo).trim() && !String(x.nombre||'').trim()){
+              x.nombre = c.nombre;
+              dataChanged = true;
+            }
+          });
+        });
+      });
     }
   });
   if(changed) persistCrew();
+  if(dataChanged) persist();
 }
 
 function crewSameAs(entryPerson, ref){
