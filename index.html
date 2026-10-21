@@ -185,6 +185,11 @@
     border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);
     font-size:calc(16px*var(--fs,1));line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;
   }
+  .lockx{margin-right:6px;}
+  .lockx svg{display:block;}
+  .lockx.on{color:var(--text);}
+  #dayOverlay input:disabled,#dayOverlay select:disabled,#dayOverlay textarea:disabled,#dayOverlay .shiftpick button:disabled,#dayOverlay .puestopick button:disabled{opacity:.55;cursor:not-allowed;}
+  #dayOverlay .btn-save:disabled{opacity:.4;cursor:not-allowed;}
   .sheet h2{margin:0 0 4px;font-size:calc(17px*var(--fs,1));}
   .sheet .dsub{color:var(--text-dim);font-size:calc(12.5px*var(--fs,1));margin-bottom:14px;text-transform:capitalize;}
   .shiftpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
@@ -265,6 +270,27 @@
     font-size:calc(13px*var(--fs,1));font-weight:700;
   }
   .toolitem .ti{font-size:calc(24px*var(--fs,1));}
+  .toolitem:disabled{opacity:.5;cursor:not-allowed;}
+  .toolitem .tool-soon{font-size:calc(10.5px*var(--fs,1));font-weight:600;color:var(--text-dim);}
+  /* ===== Buscador de turnos ===== */
+  .sr-top{display:flex;gap:8px;}
+  .sr-top .field{flex:1;min-width:0;}
+  .srbtn{flex:none;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);padding:0 14px;font-size:calc(13px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
+  .srbtn.on{border-color:var(--amber);color:var(--amber);}
+  #srPanel{margin-top:4px;padding-bottom:4px;}
+  #srPanel .shiftpick{margin-bottom:0;}
+  .sr-clear{margin-top:12px;}
+  .sr-item{padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+  .sr-item .r1{display:flex;justify-content:space-between;gap:8px;font-size:calc(13.5px*var(--fs,1));font-weight:700;}
+  .sr-item .r2{font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;}
+  .sr-note{text-align:center;color:var(--text-dim);font-size:calc(11.5px*var(--fs,1));margin-top:10px;}
+  /* ===== Buques ===== */
+  .bq-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .bq-main{flex:1;min-width:0;cursor:pointer;}
+  .bq-name{font-size:calc(13.5px*var(--fs,1));font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bq-meta{font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;}
+  .bq-info{flex:none;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);padding:8px 12px;font-size:calc(12px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
+  .bq-info:disabled{opacity:.5;cursor:not-allowed;}
   .crew-title{margin:18px 0 4px;font-size:calc(13.5px*var(--fs,1));font-weight:800;color:var(--text);}
   .crew-row{margin-bottom:10px;}
   .crew-row .ccat{font-size:calc(11px*var(--fs,1));color:var(--amber);font-weight:800;letter-spacing:.3px;margin-bottom:4px;text-transform:uppercase;}
@@ -656,7 +682,53 @@
     display:block;width:100%;margin-top:14px;background:none;border:none;color:var(--text-dim);
     font-size:calc(13px*var(--fs,1));cursor:pointer;font-family:inherit;padding:8px;
   }
+    /* ===== Entretenimiento ===== */
+  .sn-bar{display:flex;justify-content:space-between;font-size:calc(13px*var(--fs,1));color:var(--text-dim);margin-bottom:8px;}
+  .sn-bar b{color:var(--text);font-variant-numeric:tabular-nums;}
+  .sn-wrap{position:relative;max-width:360px;margin:0 auto;}
+  .sn-wrap canvas{display:block;width:100%;aspect-ratio:1/1;border-radius:var(--radius);border:1px solid var(--border);touch-action:none;}
+  .sn-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;font-weight:800;font-size:calc(15px*var(--fs,1));line-height:1.4;background:rgba(6,9,13,.55);border-radius:var(--radius);pointer-events:none;}
+  .sn-pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,56px);gap:8px;justify-content:center;margin:14px 0 4px;}
+  .sn-pad button{border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:20px;cursor:pointer;touch-action:manipulation;font-family:inherit;}
+  .g48{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;touch-action:none;user-select:none;}
+  .g48 div{aspect-ratio:1/1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-variant-numeric:tabular-nums;background:var(--surface2);color:var(--text);}
+  .mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:340px;margin:0 auto;}
+  .mem button{aspect-ratio:1/1;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-size:calc(28px*var(--fs,1));cursor:pointer;font-family:inherit;padding:0;touch-action:manipulation;}
+  .mem button.up{background:var(--surface);color:var(--text);}
+  .mem button.done{background:var(--surface);color:var(--text);border-color:var(--teal);opacity:.7;}
+  .ent-note{text-align:center;color:var(--text-dim);font-size:calc(12px*var(--fs,1));margin-top:10px;min-height:1.4em;}
+  /* ===== Tiempo ===== */
+  .wx-hero{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
+  .wx-hero .wx-big{font-size:calc(40px*var(--fs,1));font-weight:800;font-variant-numeric:tabular-nums;line-height:1;}
+  .wx-hero .wx-desc{font-size:calc(12.5px*var(--fs,1));color:var(--text-dim);margin-top:4px;}
+  .wx-hero .wx-ico{font-size:calc(46px*var(--fs,1));line-height:1;}
+  .wx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
+  .wx-grid .stat .n{font-size:calc(15px*var(--fs,1));}
+  .wx-sub{font-size:calc(10.5px*var(--fs,1));color:var(--text-dim);font-weight:400;}
+  .wx-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+  .wx-h{flex:0 0 76px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 2px;text-align:center;font-variant-numeric:tabular-nums;}
+  .wx-h .hh{font-size:calc(11px*var(--fs,1));color:var(--text-dim);font-weight:700;}
+  .wx-h .hi{font-size:calc(20px*var(--fs,1));margin:3px 0;}
+  .wx-h .ht{font-size:calc(13px*var(--fs,1));font-weight:800;}
+  .wx-h .hw{font-size:calc(11.5px*var(--fs,1));color:var(--text);margin-top:5px;white-space:nowrap;}
+  .wx-h .hw .ei{font-size:calc(11px*var(--fs,1));margin-right:2px;}
+  .wx-h .hv{font-size:calc(10px*var(--fs,1));color:var(--text-dim);margin-top:2px;}
+  .wx-day{display:grid;grid-template-columns:44px 28px 1fr auto;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);font-size:calc(12.5px*var(--fs,1));}
+  .wx-day .dn{font-weight:800;text-transform:capitalize;}
+  .wx-day .dt{font-weight:700;font-variant-numeric:tabular-nums;}
+  .wx-day .dw{font-size:calc(11px*var(--fs,1));color:var(--text-dim);text-align:right;}
+  .wx-status{font-size:calc(11px*var(--fs,1));color:var(--text-dim);text-align:center;margin:10px 0 4px;}
+  .bqf-ais{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+  .bqf-ais h3{margin:0 0 8px;font-size:calc(13px*var(--fs,1));font-weight:800;}
+  .bqf-ship{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-top:10px;font-size:calc(12.5px*var(--fs,1));line-height:1.6;}
+  .bqf-ship .sn{font-size:calc(14px*var(--fs,1));font-weight:800;}
+  .bqf-ship .sd{color:var(--text-dim);}
+  .bqf-ship a{color:var(--amber);font-weight:700;text-decoration:none;}
+  .bqf-mini{margin-top:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:calc(12px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
+  .bqf-btn{width:100%;margin-top:8px;padding:11px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:calc(13px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
+  .bqf-btn:disabled{opacity:.6;cursor:wait;}
 </style>
+
 </head>
 <body>
 <!-- bloqueo con PIN -->
@@ -759,12 +831,15 @@
     <div class="toolgrid">
       <button class="toolitem" onclick="toolGo(openDashboard)"><span class="ti">&#128202;</span>Resumen visual</button>
       <button class="toolitem" onclick="toolGo(openNomina)"><span class="ti">&#129534;</span>Nómina</button>
-      <button class="toolitem" onclick="toolGo(openBuqueSearch)"><span class="ti">&#128269;</span>Buscar buque</button>
+      <button class="toolitem" onclick="toolGo(openSearch)"><span class="ti">&#128269;</span>Buscar</button>
       <button class="toolitem" onclick="toolGo(openCalc)"><span class="ti">&#128290;</span>Calculadora</button>
       <button class="toolitem" onclick="toolGo(openCrewTool)"><span class="ti">&#128101;</span>Compañeros</button>
+      <button class="toolitem" onclick="toolGo(openBuques)"><span class="ti">&#128674;</span>Buques</button>
       <button class="toolitem" onclick="toolGo(openEstilo)"><span class="ti">&#127912;</span>Estilo</button>
       <button class="toolitem" onclick="toolGo(openSettings)"><span class="ti">&#128190;</span>Copia de seguridad</button>
-      <button class="toolitem" onclick="toolGo(openAjustes)"><span class="ti">&#9881;&#65039;</span>Ajustes</button>
+      <button class="toolitem" id="toolTiempo" onclick="toolGo(openTiempo)"><span class="ti">&#127780;</span>Tiempo<span class="tool-soon"></span></button>
+      <button class="toolitem" id="toolEnt" onclick="toolGo(openEnt)"><span class="ti">&#127918;</span>Entretenimiento<span class="tool-soon"></span></button>
+      <button class="toolitem" style="grid-column:1/-1;" onclick="toolGo(openAjustes)"><span class="ti">&#9881;&#65039;</span>Ajustes</button>
     </div>
     <div class="row">
       <button class="btn-cancel" onclick="closeTools()" style="flex:none;width:100%;">Cerrar</button>
@@ -883,10 +958,97 @@
   </div>
 </div>
 
+<!-- modal entretenimiento -->
+<div class="overlay" id="entOverlay">
+  <div class="sheet">
+    <button class="closex" onclick="closeEnt()" aria-label="Cerrar">&#10005;</button>
+    <h2 id="entTitle">Entretenimiento</h2>
+    <div class="dsub" id="entSub" style="text-transform:none;">Elige un juego</div>
+    <div class="toolgrid" id="entMenu">
+      <button class="toolitem" onclick="entOpenGame('snake')"><span class="ti">&#128013;</span>Serpiente</button>
+      <button class="toolitem" onclick="entOpenGame('g2048')"><span class="ti">&#128290;</span>2048</button>
+      <button class="toolitem" onclick="entOpenGame('mem')"><span class="ti">&#127183;</span>Memoria</button>
+      <button class="toolitem" onclick="entOpenGame('stack')"><span class="ti">&#128230;</span>Apila contenedores</button>
+    </div>
+
+    <div id="entSnake" style="display:none;">
+      <div class="sn-bar"><span>Puntos <b id="snScore">0</b></span><span>Récord <b id="snBest">0</b></span></div>
+      <div class="sn-wrap">
+        <canvas id="snCanvas" width="360" height="360"></canvas>
+        <div class="sn-msg" id="snMsg"></div>
+      </div>
+      <div class="sn-pad">
+        <span></span>
+        <button onpointerdown="snDir(0,-1)" aria-label="Arriba">&#9650;</button>
+        <span></span>
+        <button onpointerdown="snDir(-1,0)" aria-label="Izquierda">&#9664;</button>
+        <button onpointerdown="snDir(0,1)" aria-label="Abajo">&#9660;</button>
+        <button onpointerdown="snDir(1,0)" aria-label="Derecha">&#9654;</button>
+      </div>
+      <div class="settings-actions">
+        <button id="snBtn" onclick="snMain()">Jugar</button>
+      </div>
+    </div>
+
+    <div id="entG2048" style="display:none;">
+      <div class="sn-bar"><span>Puntos <b id="g48Score">0</b></span><span>Récord <b id="g48Best">0</b></span></div>
+      <div class="sn-wrap" style="max-width:340px;">
+        <div class="g48" id="g48Board"></div>
+        <div class="sn-msg" id="g48Msg" style="display:none;"></div>
+      </div>
+      <div class="ent-note">Desliza sobre el tablero para juntar fichas iguales.</div>
+      <div class="settings-actions">
+        <button onclick="g48New()">Nueva partida</button>
+      </div>
+    </div>
+
+    <div id="entMem" style="display:none;">
+      <div class="sn-bar"><span>Movimientos <b id="memMoves">0</b></span><span>Mejor <b id="memBest">—</b></span></div>
+      <div class="mem" id="memBoard"></div>
+      <div class="ent-note" id="memMsg"></div>
+      <div class="settings-actions">
+        <button onclick="memNew()">Nueva partida</button>
+      </div>
+    </div>
+
+    <div id="entStack" style="display:none;">
+      <div class="sn-bar"><span>Contenedores <b id="stScore">0</b></span><span>Récord <b id="stBest">0</b></span></div>
+      <div class="sn-wrap" style="max-width:300px;">
+        <canvas id="stCanvas" width="300" height="420" style="aspect-ratio:300/420;"></canvas>
+        <div class="sn-msg" id="stMsg"></div>
+      </div>
+      <div class="settings-actions">
+        <button id="stBtn" onclick="stMain()">Jugar</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn-cancel" id="entBack" onclick="entBack()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal tiempo -->
+<div class="overlay" id="tiempoOverlay">
+  <div class="sheet">
+    <button class="closex" onclick="closeTiempo()" aria-label="Cerrar">&#10005;</button>
+    <h2>Tiempo</h2>
+    <div class="dsub" style="text-transform:none;">Puerto de La Luz &middot; Las Palmas de Gran Canaria</div>
+    <div id="tiempoBody"><div class="dash-empty">Cargando…</div></div>
+    <div class="settings-actions">
+      <button onclick="wxRefresh(true)" id="wxBtn">Actualizar</button>
+    </div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeTiempo()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- modal día -->
 <div class="overlay" id="dayOverlay">
   <div class="sheet">
     <button class="closex" onclick="closeDay()" aria-label="Cerrar">&#10005;</button>
+    <button class="closex lockx" id="dayLock" onclick="dayLockToggle()" aria-label="Bloquear día"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></button>
     <h2 id="dayTitle">Día</h2>
     <div class="dsub" id="daySub"></div>
     <div class="shiftpick" id="shiftPick"></div>
@@ -965,16 +1127,102 @@
   </div>
 </div>
 
-<!-- modal buscador de buque -->
-<div class="overlay" id="buqueSearchOverlay">
+<!-- modal buscador de turnos -->
+<div class="overlay" id="searchOverlay">
   <div class="sheet">
-    <button class="closex" onclick="closeBuqueSearch()" aria-label="Cerrar">&#10005;</button>
-    <h2>Buscar buque</h2>
-    <div class="dsub">En todos los meses guardados</div>
-    <input type="text" id="buqueSearchInput" class="field" placeholder="Nombre del buque..." oninput="runBuqueSearch()">
-    <div id="buqueSearchResults" style="margin-top:14px;"></div>
+    <button class="closex" onclick="closeSearch()" aria-label="Cerrar">&#10005;</button>
+    <h2>Buscar</h2>
+    <div class="dsub" style="text-transform:none;">En todos los turnos guardados</div>
+    <div class="sr-top">
+      <input type="text" id="srText" class="field" placeholder="Buque, nota, compañero, empresa..." oninput="srRun()">
+      <button class="srbtn" id="srToggle" onclick="srTogglePanel()">Filtros</button>
+    </div>
+    <div id="srPanel" style="display:none;">
+      <label>Turno</label>
+      <div class="shiftpick" id="srShiftPick"></div>
+      <div class="field-row">
+        <div><label>Empresa</label><select id="srEmpresa" oninput="srRun()"></select></div>
+        <div><label>Puesto</label><select id="srPuesto" oninput="srRun()"></select></div>
+      </div>
+      <div class="field-row">
+        <div><label>Buque</label><input type="text" id="srBuque" class="field" placeholder="Nombre" oninput="srRun()"></div>
+        <div><label>Compañero</label><input type="text" id="srCompa" class="field" placeholder="Nombre o censo" oninput="srRun()"></div>
+      </div>
+      <div class="field-row">
+        <div><label>Desde</label><input type="date" id="srDesde" class="field" oninput="srRun()"></div>
+        <div><label>Hasta</label><input type="date" id="srHasta" class="field" oninput="srRun()"></div>
+      </div>
+      <div class="field-row">
+        <div><label>Movimientos mín.</label><input type="number" inputmode="numeric" id="srMovMin" class="field" min="0" placeholder="0" oninput="srRun()"></div>
+        <div><label>Movimientos máx.</label><input type="number" inputmode="numeric" id="srMovMax" class="field" min="0" placeholder="Sin límite" oninput="srRun()"></div>
+      </div>
+      <div class="field-row">
+        <div><label>Salario mín. (€)</label><input type="number" inputmode="decimal" id="srSalMin" class="field" min="0" step="0.01" placeholder="0" oninput="srRun()"></div>
+        <div><label>Salario máx. (€)</label><input type="number" inputmode="decimal" id="srSalMax" class="field" min="0" step="0.01" placeholder="Sin límite" oninput="srRun()"></div>
+      </div>
+      <div class="field-row">
+        <div><label>Extra</label>
+          <select id="srExtra" oninput="srRun()"><option value="">Todos</option><option value="con">Con extra</option><option value="sin">Sin extra</option></select></div>
+        <div><label>Nota</label>
+          <select id="srNota" oninput="srRun()"><option value="">Todas</option><option value="con">Con nota</option><option value="sin">Sin nota</option></select></div>
+      </div>
+      <div class="settings-actions sr-clear">
+        <button onclick="srClear()">Limpiar filtros</button>
+      </div>
+    </div>
+    <div id="srResults" style="margin-top:14px;"></div>
     <div class="row">
-      <button class="btn-cancel" onclick="closeBuqueSearch()" style="flex:none;width:100%;">Cerrar</button>
+      <button class="btn-cancel" onclick="closeSearch()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal buques -->
+<div class="overlay" id="buquesOverlay">
+  <div class="sheet">
+    <button class="closex" onclick="closeBuques()" aria-label="Cerrar">&#10005;</button>
+    <h2>Buques</h2>
+    <div class="dsub" id="bqSub" style="text-transform:none;">Los que has registrado en tus turnos</div>
+    <input type="text" id="bqText" class="field" placeholder="Filtrar por nombre..." oninput="renderBuques()">
+    <div class="viewtoggle" style="margin-top:12px;">
+      <button id="bqSortaz" onclick="bqSetSort('az')" class="active">A-Z</button>
+      <button id="bqSortrec" onclick="bqSetSort('rec')">Recientes</button>
+      <button id="bqSortn" onclick="bqSetSort('n')">Más servicios</button>
+    </div>
+    <div id="bqList"></div>
+    <div class="dsub" id="bqNote" style="text-transform:none;margin-top:12px;"></div>
+    <div class="row">
+      <button class="btn-cancel" onclick="closeBuques()" style="flex:none;width:100%;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal ficha de buque -->
+<div class="overlay" id="bqFichaOverlay">
+  <div class="sheet">
+    <button class="closex" onclick="closeBqFicha()" aria-label="Cerrar">&#10005;</button>
+    <h2 id="bqFichaTitle">Buque</h2>
+    <div class="dsub" id="bqFichaSub" style="text-transform:none;">Ficha del buque</div>
+    <label style="margin-top:0;">Capacidad (TEU)</label>
+    <input type="number" inputmode="numeric" min="0" step="1" id="bqfTeu" class="field" placeholder="Ej. 8000">
+    <div class="field-row">
+      <div><label>Eslora (m)</label><input type="number" inputmode="decimal" min="0" step="1" id="bqfEslora" class="field" placeholder="0"></div>
+      <div><label>Manga (m)</label><input type="number" inputmode="decimal" min="0" step="1" id="bqfManga" class="field" placeholder="0"></div>
+    </div>
+    <label>Notas</label>
+    <textarea id="bqfNota" placeholder="Ej. grúas propias, escala habitual..."></textarea>
+    <button class="bqf-btn" onclick="bqCapacidadWeb()">Buscar capacidad en Google &#8599;</button>
+
+    <div class="bqf-ais">
+      <h3>Posición en directo (AIS)</h3>
+      <div class="dsub" style="text-transform:none;margin-bottom:0;">Solo aparece si el buque emite señal dentro de la zona de Las Palmas.</div>
+      <button class="bqf-btn" id="bqAisBtn" onclick="bqAisQuery()">Consultar posición en directo</button>
+      <div id="bqAisOut"></div>
+    </div>
+
+    <div class="row">
+      <button class="btn-cancel" onclick="closeBqFicha()">Cerrar</button>
+      <button class="btn-save" onclick="bqFichaSave()">Guardar ficha</button>
     </div>
   </div>
 </div>
@@ -1571,7 +1819,32 @@ function openDay(d){
   extraAutoVal = (selectedShift && selectedShift!=='L' && entry.extra !== '' && entry.extra !== undefined && parseFloat(entry.extra) === EXTRA_DEFAULT) ? EXTRA_DEFAULT : null;
   salarioAutoVal = (tAuto && entry.salario !== '' && entry.salario !== undefined && parseFloat(entry.salario) === tAuto.importe) ? tAuto.importe : null;
 
+  dayLocked = !!entry.bloqueado;
+  applyDayLock();
   document.getElementById('dayOverlay').classList.add('open');
+}
+
+// ---- Bloqueo del día (candado junto a la X) ----
+let dayLocked = false;
+const LOCK_OPEN = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
+const LOCK_CLOSED = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+function applyDayLock(){
+  document.querySelectorAll('#dayOverlay input, #dayOverlay select, #dayOverlay textarea, #dayOverlay .shiftpick button, #dayOverlay .puestopick button, #dayOverlay .btn-save')
+    .forEach(el => { el.disabled = dayLocked; });
+  const b = document.getElementById('dayLock');
+  b.innerHTML = dayLocked ? LOCK_CLOSED : LOCK_OPEN;
+  b.classList.toggle('on', dayLocked);
+  b.setAttribute('aria-label', dayLocked ? 'Desbloquear día' : 'Bloquear día');
+}
+function dayLockToggle(){
+  dayLocked = !dayLocked;
+  applyDayLock();
+  // si el día ya está guardado, el candado se recuerda
+  const key = monthKey(viewYear, viewMonth);
+  if(data[key] && data[key][selectedDay]){
+    data[key][selectedDay].bloqueado = dayLocked;
+    persist();
+  }
 }
 
 // ---- Salario automático según tabla salarial (Ajustes) ----
@@ -1663,7 +1936,8 @@ function saveDay(){
       salario: salario ? parseFloat(salario) : '',
       extra: extra ? parseFloat(extra) : '',
       puesto: dayPuesto,
-      companeros: companeros
+      companeros: companeros,
+      bloqueado: true   // al guardar, el día queda bloqueado (solo consulta) hasta que se desbloquee
     };
   }
   persist();
@@ -2131,60 +2405,345 @@ function closeShiftInfo(){
   document.getElementById('shiftInfoOverlay').classList.remove('open');
 }
 
-function openBuqueSearch(){
-  document.getElementById('buqueSearchInput').value = '';
-  document.getElementById('buqueSearchResults').innerHTML = '<div class="dash-empty">Escribe el nombre de un buque para buscarlo.</div>';
-  document.getElementById('buqueSearchOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('buqueSearchInput').focus(), 100);
-}
-function closeBuqueSearch(){
-  document.getElementById('buqueSearchOverlay').classList.remove('open');
-}
-function runBuqueSearch(){
-  const q = document.getElementById('buqueSearchInput').value.trim().toLowerCase();
-  const resultsEl = document.getElementById('buqueSearchResults');
-  if(!q){
-    resultsEl.innerHTML = '<div class="dash-empty">Escribe el nombre de un buque para buscarlo.</div>';
-    return;
-  }
+// ===== Buscador de turnos (texto libre + filtros por categoría) =====
+const SR_LIMIT = 100;
+let srShifts = new Set();
+let srReady = false;
 
-  const matches = [];
-  Object.keys(data).sort().forEach(key=>{
-    const monthData = data[key];
-    Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b).forEach(d=>{
-      const e = monthData[d];
-      if(e.buque && e.buque.toLowerCase().includes(q)){
-        matches.push({key, d, e});
+function srNorm(s){ return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+function srVal(id){ return document.getElementById(id).value.trim(); }
+function srNum(id){
+  const v = srVal(id).replace(',', '.');
+  if(v === '') return null;
+  const n = parseFloat(v);
+  return isNaN(n) ? null : n;
+}
+function srInit(){
+  srReady = true;
+  document.getElementById('srEmpresa').innerHTML = '<option value="">Todas</option>' + COMPANIES.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+  document.getElementById('srPuesto').innerHTML = '<option value="">Todos</option>' + PUESTOS.map(p => '<option value="' + p.k + '">' + p.label + '</option>').join('');
+  srRenderShiftPick();
+}
+function openSearch(){
+  if(!srReady) srInit();
+  document.getElementById('searchOverlay').classList.add('open');
+  srRun();
+}
+function closeSearch(){
+  document.getElementById('searchOverlay').classList.remove('open');
+}
+function srTogglePanel(){
+  const p = document.getElementById('srPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+function srRenderShiftPick(){
+  document.getElementById('srShiftPick').innerHTML = SHIFTS.map(s =>
+    '<button class="' + (srShifts.has(s) ? 'active ' + s : '') + '" onclick="srToggleShift(\'' + s + '\')">' + SHIFT_NAMES[s] + '</button>'
+  ).join('');
+}
+function srToggleShift(s){
+  if(srShifts.has(s)) srShifts.delete(s); else srShifts.add(s);
+  srRenderShiftPick();
+  srRun();
+}
+function srClear(){
+  ['srEmpresa','srPuesto','srBuque','srCompa','srDesde','srHasta','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota']
+    .forEach(id => { document.getElementById(id).value = ''; });
+  srShifts = new Set();
+  srRenderShiftPick();
+  srRun();
+}
+// número de filtros activos (sin contar el texto libre)
+function srActiveCount(){
+  let n = 0;
+  if(srShifts.size) n++;
+  ['srEmpresa','srPuesto','srBuque','srCompa','srExtra','srNota'].forEach(id => { if(srVal(id)) n++; });
+  if(srVal('srDesde') || srVal('srHasta')) n++;
+  if(srVal('srMovMin') || srVal('srMovMax')) n++;
+  if(srVal('srSalMin') || srVal('srSalMax')) n++;
+  return n;
+}
+function srRun(){
+  const words = srNorm(srVal('srText')).split(/\s+/).filter(Boolean);
+  const emp = srVal('srEmpresa'), pue = srVal('srPuesto');
+  const buq = srNorm(srVal('srBuque')), com = srNorm(srVal('srCompa'));
+  const d1 = srVal('srDesde'), d2 = srVal('srHasta');
+  const m1 = srNum('srMovMin'), m2 = srNum('srMovMax'), s1 = srNum('srSalMin'), s2 = srNum('srSalMax');
+  const ext = srVal('srExtra'), nota = srVal('srNota');
+
+  const nf = srActiveCount();
+  const tg = document.getElementById('srToggle');
+  tg.textContent = nf ? 'Filtros (' + nf + ')' : 'Filtros';
+  tg.classList.toggle('on', nf > 0);
+
+  const res = [];
+  let total = 0;
+  Object.keys(data).forEach(key => {
+    const md = data[key] || {};
+    Object.keys(md).forEach(dk => {
+      const e = md[dk];
+      if(!e) return;
+      total++;
+      const d = parseInt(dk, 10);
+      const ymd = key + '-' + String(d).padStart(2, '0');
+      if(srShifts.size && !srShifts.has(e.shift)) return;
+      if(emp && e.company !== emp) return;
+      if(pue && e.puesto !== pue) return;
+      if(buq && !srNorm(e.buque).includes(buq)) return;
+      const crew = e.companeros || [];
+      if(com && !crew.some(c => srNorm(c.nombre).includes(com) || srNorm(c.censo).includes(com))) return;
+      if(d1 && ymd < d1) return;
+      if(d2 && ymd > d2) return;
+      const mv = parseFloat(e.movimientos) || 0, sa = parseFloat(e.salario) || 0, ex = parseFloat(e.extra) || 0;
+      if(m1 !== null && mv < m1) return;
+      if(m2 !== null && mv > m2) return;
+      if(s1 !== null && sa < s1) return;
+      if(s2 !== null && sa > s2) return;
+      if(ext === 'con' && !(ex > 0)) return;
+      if(ext === 'sin' && ex > 0) return;
+      const hasNote = !!String(e.note || '').trim();
+      if(nota === 'con' && !hasNote) return;
+      if(nota === 'sin' && hasNote) return;
+      if(words.length){
+        const hay = srNorm([e.buque, e.note, e.company, e.shift ? SHIFT_NAMES[e.shift] : '']
+          .concat(crew.map(c => (c.nombre || '') + ' ' + (c.censo || ''))).join(' '));
+        if(!words.every(w => hay.includes(w))) return;
       }
+      res.push({key, d, ymd, e, mv, ing: sa + ex});
     });
   });
+  res.sort((a, b) => a.ymd < b.ymd ? 1 : (a.ymd > b.ymd ? -1 : 0));
 
-  if(matches.length === 0){
-    resultsEl.innerHTML = '<div class="dash-empty">No se ha encontrado ningún buque con ese nombre.</div>';
-    return;
-  }
+  const out = document.getElementById('srResults');
+  if(total === 0){ out.innerHTML = '<div class="dash-empty">Todavía no hay turnos guardados.</div>'; return; }
+  if(res.length === 0){ out.innerHTML = '<div class="dash-empty">No hay turnos con esos criterios.</div>'; return; }
 
-  let ingresosTotal = 0;
-  const items = matches.map(({key,d,e})=>{
-    const [y,m] = key.split('-').map(Number);
-    ingresosTotal += (parseFloat(e.salario)||0);
-    return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
-      <div style="display:flex;justify-content:space-between;font-size:calc(13.5px*var(--fs,1));font-weight:700;">
-        <span>${esc(e.buque)}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
-      </div>
-      <div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;">
-        Día ${d} de ${MONTH_NAMES[m-1]} ${y} &middot; ${e.shift ? SHIFT_NAMES[e.shift] : ''}${e.company ? ' &middot; ' + esc(e.company) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
-      </div>
-    </div>`;
+  let movs = 0, ing = 0;
+  res.forEach(r => { movs += r.mv; ing += r.ing; });
+  const showCrew = words.length > 0 || !!com;
+  const items = res.slice(0, SR_LIMIT).map(r => {
+    const y = r.key.split('-')[0], m = parseInt(r.key.split('-')[1], 10);
+    const pu = PUESTOS.find(p => p.k === r.e.puesto);
+    const parts = [r.e.company ? esc(r.e.company) : '', r.e.buque ? esc(r.e.buque) : '', r.mv ? r.mv + ' mov.' : '', pu ? pu.label : ''].filter(Boolean);
+    const crew = r.e.companeros || [];
+    return '<div class="sr-item" onclick="srGo(\'' + r.key + '\',' + r.d + ')">' +
+      '<div class="r1"><span>' + r.d + ' ' + MONTH_NAMES[m - 1].slice(0, 3) + ' ' + y + (r.e.shift ? ' &middot; ' + SHIFT_NAMES[r.e.shift] : '') + '</span>' +
+      '<span>' + (r.ing ? r.ing.toFixed(2) + ' €' : '') + '</span></div>' +
+      (parts.length ? '<div class="r2">' + parts.join(' &middot; ') + '</div>' : '') +
+      (showCrew && crew.length ? '<div class="r2">' + crew.map(c => esc(c.nombre || c.censo)).join(', ') + '</div>' : '') +
+      (r.e.note ? '<div class="r2" style="font-style:italic;">' + esc(r.e.note) + '</div>' : '') +
+      '</div>';
   }).join('');
 
-  resultsEl.innerHTML = `
-    <div style="display:flex;gap:8px;margin-bottom:14px;">
-      <div class="stat" style="flex:1;"><div class="n">${matches.length}</div><div class="l">SERVICIOS</div></div>
-      <div class="stat" style="flex:1;"><div class="n">${ingresosTotal.toFixed(0)} €</div><div class="l">INGRESOS</div></div>
-    </div>
-    ${items}
-  `;
+  out.innerHTML =
+    '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
+      '<div class="stat" style="flex:1;"><div class="n">' + res.length + '</div><div class="l">RESULTADOS</div></div>' +
+      '<div class="stat" style="flex:1;"><div class="n">' + movs + '</div><div class="l">MOVIMIENTOS</div></div>' +
+      '<div class="stat" style="flex:1;"><div class="n">' + ing.toFixed(0) + ' €</div><div class="l">INGRESOS</div></div>' +
+    '</div>' + items +
+    (res.length > SR_LIMIT ? '<div class="sr-note">Mostrando los ' + SR_LIMIT + ' más recientes de ' + res.length + '. Afina con los filtros.</div>' : '');
+}
+// al tocar un resultado se abre ese día en el calendario
+function srGo(key, d){
+  const p = key.split('-');
+  viewYear = parseInt(p[0], 10);
+  viewMonth = parseInt(p[1], 10) - 1;
+  closeSearch();
+  if(currentView !== 'mes') switchView('mes');
+  render();
+  openDay(d);
+}
+
+// ===== Herramienta: Buques (listado de los buques registrados en los turnos) =====
+// El botón Info abre la ficha del buque: datos manuales (TEU, tamaño, notas) y posición AIS en directo vía proxy.
+const BUQUE_INFO_ON = true;
+const AIS_PROXY = 'https://turnos-proxy.albyregistro1.workers.dev';
+const BQ_FICHAS_KEY = 'turnos_buques_fichas_v1';
+let bqFichas = {};   // { clave-normalizada: {teu, eslora, manga, nota} }
+try{ bqFichas = JSON.parse(localStorage.getItem(BQ_FICHAS_KEY)) || {}; }catch(e){ bqFichas = {}; }
+function persistBqFichas(){
+  try{ localStorage.setItem(BQ_FICHAS_KEY, JSON.stringify(bqFichas)); }catch(e){}
+}
+let bqFichaCur = null;
+let buquesList = [];
+let bqSort = 'az';
+
+function openBuques(){
+  document.getElementById('bqText').value = '';
+  bqSort = 'az';
+  renderBuques();
+  document.getElementById('buquesOverlay').classList.add('open');
+}
+function closeBuques(){
+  document.getElementById('buquesOverlay').classList.remove('open');
+}
+function bqSetSort(k){
+  bqSort = k;
+  renderBuques();
+}
+// junta los distintos modos de escribir un mismo buque (mayúsculas, tildes, espacios)
+function buquesCollect(){
+  const map = new Map();
+  Object.keys(data).forEach(key => {
+    const md = data[key] || {};
+    Object.keys(md).forEach(dk => {
+      const e = md[dk];
+      const raw = String((e && e.buque) || '').trim().replace(/\s+/g, ' ');
+      if(!raw) return;
+      const k = srNorm(raw);
+      const ymd = key + '-' + String(parseInt(dk, 10)).padStart(2, '0');
+      let b = map.get(k);
+      if(!b){ b = {k, names:{}, services:0, movs:0, last:'', lastName:raw}; map.set(k, b); }
+      b.names[raw] = (b.names[raw] || 0) + 1;
+      b.services++;
+      b.movs += parseFloat(e.movimientos) || 0;
+      if(ymd > b.last){ b.last = ymd; b.lastName = raw; }
+    });
+  });
+  return Array.from(map.values()).map(b => {
+    // se muestra el nombre escrito más veces (si empatan, el más reciente)
+    let best = b.lastName, n = b.names[b.lastName] || 0;
+    Object.keys(b.names).forEach(nm => { if(b.names[nm] > n){ best = nm; n = b.names[nm]; } });
+    b.name = best;
+    return b;
+  });
+}
+function renderBuques(){
+  const all = buquesCollect();
+  const q = srNorm(document.getElementById('bqText').value.trim());
+  let list = all.filter(b => !q || b.k.includes(q));
+  if(bqSort === 'rec') list.sort((a, b) => a.last < b.last ? 1 : (a.last > b.last ? -1 : a.name.localeCompare(b.name, 'es')));
+  else if(bqSort === 'n') list.sort((a, b) => b.services - a.services || a.name.localeCompare(b.name, 'es'));
+  else list.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  buquesList = list;
+
+  ['az', 'rec', 'n'].forEach(k => { document.getElementById('bqSort' + k).className = (k === bqSort ? 'active' : ''); });
+  document.getElementById('bqSub').textContent = all.length
+    ? all.length + (all.length === 1 ? ' buque registrado' : ' buques registrados') + ' en tus turnos'
+    : 'Los que has registrado en tus turnos';
+  document.getElementById('bqNote').textContent = 'Toca un buque para ver todos sus servicios. El botón Info abre su ficha (capacidad, tamaño, notas y posición en directo).';
+
+  const el = document.getElementById('bqList');
+  if(all.length === 0){ el.innerHTML = '<div class="dash-empty">Todavía no has registrado ningún buque. Se añaden solos al escribir el nombre en el formulario de un turno.</div>'; return; }
+  if(list.length === 0){ el.innerHTML = '<div class="dash-empty">No hay ningún buque con ese nombre.</div>'; return; }
+  el.innerHTML = list.map((b, i) => {
+    const p = b.last.split('-');
+    const fecha = parseInt(p[2], 10) + ' ' + MONTH_NAMES[parseInt(p[1], 10) - 1].slice(0, 3) + ' ' + p[0];
+    return '<div class="bq-item">' +
+      '<div class="bq-main" onclick="buquesSearch(' + i + ')">' +
+        '<div class="bq-name">' + esc(b.name) + '</div>' +
+        '<div class="bq-meta">' + b.services + (b.services === 1 ? ' servicio' : ' servicios') + (b.movs ? ' &middot; ' + b.movs + ' mov.' : '') + ((bqFichas[b.k] && bqFichas[b.k].teu) ? ' &middot; ' + bqFichas[b.k].teu + ' TEU' : '') + ' &middot; último ' + fecha + '</div>' +
+      '</div>' +
+      '<button class="bq-info" onclick="buquesInfo(' + i + ')"' + (BUQUE_INFO_ON ? '' : ' disabled') + ' aria-label="Información del buque">Info</button>' +
+    '</div>';
+  }).join('');
+}
+// toca un buque: abre el buscador ya filtrado por ese buque
+function buquesSearch(i){
+  const b = buquesList[i];
+  if(!b) return;
+  closeBuques();
+  openSearch();
+  srClear();
+  document.getElementById('srText').value = '';
+  document.getElementById('srBuque').value = b.name;
+  document.getElementById('srPanel').style.display = 'block';
+  srRun();
+}
+function buquesInfo(i){
+  if(!BUQUE_INFO_ON) return;
+  const b = buquesList[i];
+  if(!b) return;
+  bqFichaCur = {k: b.k, name: b.name};
+  const f = bqFichas[b.k] || {};
+  document.getElementById('bqFichaTitle').textContent = b.name;
+  document.getElementById('bqFichaSub').textContent = b.services + (b.services === 1 ? ' servicio' : ' servicios') + ' registrados en tus turnos';
+  document.getElementById('bqfTeu').value = f.teu || '';
+  document.getElementById('bqfEslora').value = f.eslora || '';
+  document.getElementById('bqfManga').value = f.manga || '';
+  document.getElementById('bqfNota').value = f.nota || '';
+  document.getElementById('bqAisOut').innerHTML = '';
+  const btn = document.getElementById('bqAisBtn');
+  btn.disabled = false;
+  btn.textContent = 'Consultar posición en directo';
+  document.getElementById('bqFichaOverlay').classList.add('open');
+}
+function closeBqFicha(){
+  document.getElementById('bqFichaOverlay').classList.remove('open');
+}
+function bqFichaSave(){
+  if(!bqFichaCur) return;
+  const teu = parseFloat(document.getElementById('bqfTeu').value);
+  const eslora = parseFloat(document.getElementById('bqfEslora').value);
+  const manga = parseFloat(document.getElementById('bqfManga').value);
+  const nota = document.getElementById('bqfNota').value.trim();
+  const f = {};
+  if(!isNaN(teu) && teu > 0) f.teu = teu;
+  if(!isNaN(eslora) && eslora > 0) f.eslora = eslora;
+  if(!isNaN(manga) && manga > 0) f.manga = manga;
+  if(nota) f.nota = nota;
+  if(Object.keys(f).length) bqFichas[bqFichaCur.k] = f;
+  else delete bqFichas[bqFichaCur.k];
+  persistBqFichas();
+  closeBqFicha();
+  renderBuques();
+}
+function bqCapacidadWeb(){
+  if(!bqFichaCur) return;
+  window.open('https://www.google.com/search?q=' + encodeURIComponent(bqFichaCur.name + ' buque capacidad TEU contenedores'), '_blank');
+}
+function bqUseSize(eslora, manga){
+  if(eslora) document.getElementById('bqfEslora').value = eslora;
+  if(manga) document.getElementById('bqfManga').value = manga;
+}
+function bqEtaText(eta){
+  if(!eta || !eta.Month || !eta.Day) return '';
+  const p = n => String(n || 0).padStart(2, '0');
+  return eta.Day + '/' + eta.Month + ' ' + p(eta.Hour) + ':' + p(eta.Minute) + ' UTC';
+}
+async function bqAisQuery(){
+  if(!bqFichaCur) return;
+  const btn = document.getElementById('bqAisBtn');
+  const out = document.getElementById('bqAisOut');
+  const nameQ = bqFichaCur.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  btn.disabled = true;
+  btn.textContent = 'Escuchando señal AIS...';
+  out.innerHTML = '<div class="dash-empty">Esperando señal del buque, unos 20 segundos.</div>';
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 45000);
+  try{
+    const r = await fetch(AIS_PROXY + '/ais?seconds=20&name=' + encodeURIComponent(nameQ), {signal: ctrl.signal});
+    const j = await r.json();
+    if(!r.ok || j.error) throw new Error(j.error || ('Error ' + r.status));
+    const ships = j.buques || [];
+    if(!ships.length){
+      out.innerHTML = '<div class="dash-empty">No se ha recibido señal de este buque en la zona de Las Palmas durante esos segundos. Puede que no esté en la zona o que no haya emitido todavía; prueba de nuevo en un rato.</div>';
+    } else {
+      out.innerHTML = ships.map(s => {
+        const pos = (s.lat != null && s.lon != null)
+          ? '<a href="https://www.google.com/maps?q=' + s.lat + ',' + s.lon + '" target="_blank" rel="noopener">Ver posición en el mapa &#8599;</a>'
+          : '<span class="sd">Sin posición todavía</span>';
+        const lines = [];
+        if(s.velocidad != null) lines.push('Velocidad: ' + s.velocidad + ' nudos' + (s.rumbo != null ? ' &middot; rumbo ' + Math.round(s.rumbo) + '°' : ''));
+        if(s.eslora) lines.push('Tamaño: ' + s.eslora + ' m de eslora' + (s.manga ? ' x ' + s.manga + ' m de manga' : ''));
+        if(s.destino) lines.push('Destino: ' + esc(s.destino));
+        const eta = bqEtaText(s.eta);
+        if(eta) lines.push('Llegada prevista: ' + eta);
+        if(s.hora) lines.push('<span class="sd">Último dato: ' + esc(String(s.hora).slice(0, 19)) + ' UTC</span>');
+        const useBtn = s.eslora ? '<button class="bqf-mini" onclick="bqUseSize(' + (Number(s.eslora) || 0) + ',' + (Number(s.manga) || 0) + ')">Copiar tamaño a la ficha</button>' : '';
+        return '<div class="bqf-ship"><div class="sn">' + esc(s.nombre || ('MMSI ' + s.mmsi)) + '</div>' +
+          '<div class="sd">MMSI ' + esc(s.mmsi) + (s.imo ? ' &middot; IMO ' + esc(s.imo) : '') + '</div>' +
+          lines.map(l => '<div>' + l + '</div>').join('') + '<div>' + pos + '</div>' + useBtn + '</div>';
+      }).join('');
+    }
+  }catch(e){
+    const msg = (e && e.name === 'AbortError') ? 'La consulta ha tardado demasiado.' : 'No se ha podido consultar el proxy (' + esc(e.message || e) + ').';
+    out.innerHTML = '<div class="dash-empty">' + msg + ' Comprueba la conexión e inténtalo de nuevo.</div>';
+  }finally{
+    clearTimeout(timer);
+    btn.disabled = false;
+    btn.textContent = 'Consultar posición en directo';
+  }
 }
 
 function openCompanyInfo(company){
@@ -3117,7 +3676,7 @@ function clearMonth(){
 }
 
 function exportData(){
-  const payload = JSON.stringify({data, settings, crew: crewReg, nomina: nominaData, tarifas: TARIFAS, puesto: ajustePuesto, extraDefault: EXTRA_DEFAULT, panel: panelSel}, null, 2);
+  const payload = JSON.stringify({data, settings, crew: crewReg, nomina: nominaData, tarifas: TARIFAS, puesto: ajustePuesto, extraDefault: EXTRA_DEFAULT, panel: panelSel, buquesFichas: bqFichas}, null, 2);
   const blob = new Blob([payload], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3179,6 +3738,7 @@ function importData(evt){
       convertirCopiaAntigua(parsed);
       if(parsed.crew){ crewReg = parsed.crew; persistCrew(); }
       if(parsed.nomina){ nominaData = parsed.nomina; persistNomina(); }
+      if(parsed.buquesFichas && typeof parsed.buquesFichas === 'object' && !Array.isArray(parsed.buquesFichas)){ bqFichas = parsed.buquesFichas; persistBqFichas(); }
       if(Array.isArray(parsed.panel)){ panelSel = parsed.panel.filter(k => PANEL_ITEMS.some(x => x.k === k)); persistPanel(); }
       if(Array.isArray(parsed.tarifas) && parsed.tarifas.length === TARIFAS_DEF.length){
         TARIFAS = parsed.tarifas;
@@ -3305,6 +3865,677 @@ function renderYear(){
     </tr>`;
   }).join('');
 }
+
+// ===== Herramienta: Entretenimiento (juegos) =====
+const ENT_GAMES = {
+  snake: {title:'Serpiente',           sub:'Desliza sobre el tablero o usa los botones', el:'entSnake', open:snOpen,  stop:snPause},
+  g2048: {title:'2048',                sub:'Desliza para juntar fichas iguales',         el:'entG2048', open:g48Open, stop:function(){}},
+  mem:   {title:'Memoria',             sub:'Encuentra las parejas',                      el:'entMem',   open:memOpen, stop:memStop},
+  stack: {title:'Apila contenedores',  sub:'Toca para soltar cada contenedor',           el:'entStack', open:stOpen,  stop:stPause}
+};
+let entCur = null;
+
+function openEnt(){
+  if(!TOOLS_ON.ent) return;
+  document.getElementById('entOverlay').classList.add('open');
+  entShowMenu();
+}
+function closeEnt(){
+  entStopAll();
+  entCur = null;
+  document.getElementById('entOverlay').classList.remove('open');
+}
+function entStopAll(){
+  Object.keys(ENT_GAMES).forEach(k => ENT_GAMES[k].stop());
+}
+function entShowMenu(){
+  entStopAll();
+  entCur = null;
+  document.getElementById('entTitle').textContent = 'Entretenimiento';
+  document.getElementById('entSub').textContent = 'Elige un juego';
+  document.getElementById('entMenu').style.display = 'grid';
+  Object.keys(ENT_GAMES).forEach(k => { document.getElementById(ENT_GAMES[k].el).style.display = 'none'; });
+  document.getElementById('entBack').textContent = 'Cerrar';
+}
+function entBack(){
+  if(entCur) entShowMenu(); else closeEnt();
+}
+function entOpenGame(k){
+  const g = ENT_GAMES[k];
+  if(!g) return;
+  entCur = k;
+  document.getElementById('entTitle').textContent = g.title;
+  document.getElementById('entSub').textContent = g.sub;
+  document.getElementById('entMenu').style.display = 'none';
+  Object.keys(ENT_GAMES).forEach(x => { document.getElementById(ENT_GAMES[x].el).style.display = x === k ? 'block' : 'none'; });
+  document.getElementById('entBack').textContent = 'Volver a los juegos';
+  g.open();
+}
+function entBestLoad(key){
+  try{ return parseInt(localStorage.getItem(key), 10) || 0; }catch(e){ return 0; }
+}
+function entBestSave(key, v){
+  try{ localStorage.setItem(key, String(v)); }catch(e){}
+}
+// teclado (ordenador) y pausa al salir de la app
+document.addEventListener('keydown', e => {
+  if(!entCur || !document.getElementById('entOverlay').classList.contains('open')) return;
+  const k = e.key;
+  if(entCur === 'snake'){
+    const m = {ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0], w:[0,-1], s:[0,1], a:[-1,0], d:[1,0]};
+    if(m[k]){ e.preventDefault(); snDir(m[k][0], m[k][1]); }
+    else if(k === ' '){ e.preventDefault(); snMain(); }
+  } else if(entCur === 'g2048'){
+    const m = {ArrowLeft:0, ArrowRight:1, ArrowUp:2, ArrowDown:3, a:0, d:1, w:2, s:3};
+    if(m[k] !== undefined){ e.preventDefault(); g48Move(m[k]); }
+  } else if(entCur === 'stack'){
+    if(k === ' ' || k === 'Enter'){ e.preventDefault(); stTap(); }
+  }
+});
+document.addEventListener('visibilitychange', () => { if(document.hidden){ snPause(); stPause(); } });
+
+// ---- Serpiente ----
+const SN_N = 18, SN_PX = 20, SN_KEY = 'turnos_snake_best_v1';
+let sn = {body:[], dir:{x:1,y:0}, queue:[], food:null, foods:0, state:'idle', timer:null};
+let snBest = 0, snReady = false;
+
+function snOpen(){
+  if(!snReady) snSetup();
+  snBest = entBestLoad(SN_KEY);
+  snReset();
+}
+function snSetup(){
+  snReady = true;
+  const cv = document.getElementById('snCanvas');
+  let sx = 0, sy = 0;
+  cv.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; e.preventDefault(); }, {passive:false});
+  cv.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if(Math.abs(dx) < 18 && Math.abs(dy) < 18) return;
+    if(Math.abs(dx) > Math.abs(dy)) snDir(dx > 0 ? 1 : -1, 0); else snDir(0, dy > 0 ? 1 : -1);
+    sx = t.clientX; sy = t.clientY;
+  }, {passive:false});
+  cv.addEventListener('touchend', e => {
+    const t = e.changedTouches[0];
+    if(Math.abs(t.clientX - sx) < 18 && Math.abs(t.clientY - sy) < 18 && sn.state !== 'playing') snMain();
+    e.preventDefault();
+  }, {passive:false});
+  cv.addEventListener('click', () => { if(sn.state !== 'playing') snMain(); });
+}
+function snReset(){
+  clearTimeout(sn.timer);
+  sn.body = [{x:8,y:9},{x:7,y:9},{x:6,y:9}];
+  sn.dir = {x:1,y:0};
+  sn.queue = [];
+  sn.foods = 0;
+  sn.win = false;
+  sn.state = 'idle';
+  sn.food = snPlaceFood();
+  snUpdateUI();
+  snDraw();
+}
+function snPlaceFood(){
+  const occ = new Set(sn.body.map(p => p.x + ',' + p.y));
+  const free = [];
+  for(let y = 0; y < SN_N; y++) for(let x = 0; x < SN_N; x++) if(!occ.has(x + ',' + y)) free.push({x, y});
+  return free.length ? free[Math.floor(Math.random() * free.length)] : null;
+}
+function snStart(){
+  clearTimeout(sn.timer);
+  sn.state = 'playing';
+  snUpdateUI();
+  sn.timer = setTimeout(snLoop, 120);
+}
+function snPause(){
+  if(sn.state === 'playing'){
+    sn.state = 'paused';
+    clearTimeout(sn.timer);
+    snUpdateUI();
+  }
+}
+function snMain(){
+  if(sn.state === 'playing') snPause();
+  else if(sn.state === 'over'){ snReset(); snStart(); }
+  else snStart();
+}
+function snDir(dx, dy){
+  if(sn.state === 'over') return;
+  const last = sn.queue.length ? sn.queue[sn.queue.length - 1] : sn.dir;
+  if((last.x === dx && last.y === dy) || (last.x === -dx && last.y === -dy)) return;
+  if(sn.queue.length < 2) sn.queue.push({x:dx, y:dy});
+  if(sn.state === 'idle' || sn.state === 'paused') snStart();
+}
+function snLoop(){
+  if(sn.state !== 'playing') return;
+  snTick();
+  if(sn.state === 'playing'){
+    snDraw();
+    snUpdateUI();
+    sn.timer = setTimeout(snLoop, Math.max(70, 140 - sn.foods * 3));
+  }
+}
+function snTick(){
+  if(sn.queue.length) sn.dir = sn.queue.shift();
+  const h = sn.body[0], nx = h.x + sn.dir.x, ny = h.y + sn.dir.y;
+  if(nx < 0 || ny < 0 || nx >= SN_N || ny >= SN_N){ snEnd(false); return; }
+  const eating = !!sn.food && nx === sn.food.x && ny === sn.food.y;
+  // si no come, la cola se mueve: la casilla de la cola queda libre
+  const solid = eating ? sn.body : sn.body.slice(0, -1);
+  if(solid.some(p => p.x === nx && p.y === ny)){ snEnd(false); return; }
+  sn.body.unshift({x:nx, y:ny});
+  if(!eating){ sn.body.pop(); return; }
+  sn.foods++;
+  sn.food = snPlaceFood();
+  if(!sn.food) snEnd(true);
+}
+function snEnd(win){
+  clearTimeout(sn.timer);
+  sn.state = 'over';
+  sn.win = !!win;
+  const score = sn.foods * 10;
+  if(score > snBest){ snBest = score; entBestSave(SN_KEY, snBest); }
+  snUpdateUI();
+  snDraw();
+}
+function snUpdateUI(){
+  const score = sn.foods * 10;
+  document.getElementById('snScore').textContent = score;
+  document.getElementById('snBest').textContent = Math.max(snBest, score);
+  const msg = document.getElementById('snMsg');
+  const btn = document.getElementById('snBtn');
+  if(sn.state === 'playing'){ msg.style.display = 'none'; btn.textContent = 'Pausa'; }
+  else {
+    msg.style.display = 'flex';
+    if(sn.state === 'idle'){ msg.textContent = 'Toca para empezar'; btn.textContent = 'Jugar'; }
+    else if(sn.state === 'paused'){ msg.textContent = 'Pausa'; btn.textContent = 'Continuar'; }
+    else { msg.textContent = (sn.win ? '¡Tablero completo!' : 'Fin del juego') + ' · ' + score + ' puntos'; btn.textContent = 'Jugar de nuevo'; }
+  }
+}
+function snDraw(){
+  const cv = document.getElementById('snCanvas'), ctx = cv.getContext('2d');
+  const cs = getComputedStyle(document.documentElement);
+  const col = n => cs.getPropertyValue(n).trim() || '#888';
+  const P = SN_PX;
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = col('--surface2');
+  ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.strokeStyle = col('--border');
+  ctx.globalAlpha = 0.35;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for(let i = 1; i < SN_N; i++){
+    ctx.moveTo(i * P, 0); ctx.lineTo(i * P, cv.height);
+    ctx.moveTo(0, i * P); ctx.lineTo(cv.width, i * P);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  if(sn.food){
+    ctx.fillStyle = col('--amber');
+    ctx.beginPath();
+    ctx.arc((sn.food.x + 0.5) * P, (sn.food.y + 0.5) * P, P * 0.36, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = col('--teal');
+  sn.body.forEach((p, i) => {
+    ctx.globalAlpha = i === 0 ? 1 : 0.8;
+    ctx.fillRect(p.x * P + 1, p.y * P + 1, P - 2, P - 2);
+  });
+  ctx.globalAlpha = 1;
+  const h = sn.body[0];
+  if(h){
+    // ojos según la dirección
+    const cx = (h.x + 0.5) * P, cy = (h.y + 0.5) * P, d = sn.dir;
+    ctx.fillStyle = col('--surface2');
+    ctx.beginPath();
+    if(d.x !== 0){ ctx.arc(cx + d.x * 3, cy - 4, 2, 0, Math.PI * 2); ctx.arc(cx + d.x * 3, cy + 4, 2, 0, Math.PI * 2); }
+    else { ctx.arc(cx - 4, cy + d.y * 3, 2, 0, Math.PI * 2); ctx.arc(cx + 4, cy + d.y * 3, 2, 0, Math.PI * 2); }
+    ctx.fill();
+  }
+}
+
+// ---- 2048 ----
+const G48_KEY = 'turnos_2048_best_v1';
+const G48_COL = {2:['#2c3846','#e9eef3'], 4:['#35506a','#e9eef3'], 8:['#3fb6c2','#03272a'], 16:['#6c7ae0','#12123a'], 32:['#c15fd6','#2a0c30'],
+  64:['#ffb020','#221600'], 128:['#ffcc4d','#221600'], 256:['#ff9d3f','#221600'], 512:['#ff7a45','#221600'], 1024:['#e85d75','#ffffff'], 2048:['#7be0a1','#0b2a17']};
+let g48 = {grid:[], score:0, over:false, won:false, justWon:false}, g48Best = 0, g48Ready = false;
+
+function g48Open(){
+  if(!g48Ready) g48Setup();
+  g48Best = entBestLoad(G48_KEY);
+  g48New();
+}
+function g48Setup(){
+  g48Ready = true;
+  const b = document.getElementById('g48Board');
+  let sx = 0, sy = 0;
+  b.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; e.preventDefault(); }, {passive:false});
+  b.addEventListener('touchmove', e => { e.preventDefault(); }, {passive:false});
+  b.addEventListener('touchend', e => {
+    const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    e.preventDefault();
+    if(Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+    if(Math.abs(dx) > Math.abs(dy)) g48Move(dx > 0 ? 1 : 0); else g48Move(dy > 0 ? 3 : 2);
+  }, {passive:false});
+}
+function g48New(){
+  g48.grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+  g48.score = 0; g48.over = false; g48.won = false; g48.justWon = false;
+  g48Spawn(); g48Spawn();
+  g48Render();
+}
+function g48Spawn(){
+  const e = [];
+  g48.grid.forEach((r, y) => r.forEach((v, x) => { if(!v) e.push([x, y]); }));
+  if(!e.length) return;
+  const c = e[Math.floor(Math.random() * e.length)];
+  g48.grid[c[1]][c[0]] = Math.random() < 0.9 ? 2 : 4;
+}
+// desliza una línea hacia el índice 0 juntando fichas iguales una sola vez
+function g48Slide(line){
+  const nz = line.filter(v => v), out = [];
+  let gain = 0;
+  for(let i = 0; i < nz.length; i++){
+    if(i + 1 < nz.length && nz[i] === nz[i + 1]){ out.push(nz[i] * 2); gain += nz[i] * 2; i++; }
+    else out.push(nz[i]);
+  }
+  while(out.length < 4) out.push(0);
+  return {out, gain};
+}
+// dir: 0 izquierda, 1 derecha, 2 arriba, 3 abajo
+function g48Move(dir){
+  if(g48.over) return;
+  g48.justWon = false;
+  const g = g48.grid;
+  let moved = false, gain = 0;
+  for(let k = 0; k < 4; k++){
+    const orig = dir < 2 ? g[k].slice() : [g[0][k], g[1][k], g[2][k], g[3][k]];
+    const rev = (dir === 1 || dir === 3);
+    const r = g48Slide(rev ? orig.slice().reverse() : orig.slice());
+    const res = rev ? r.out.slice().reverse() : r.out;
+    if(res.some((v, i) => v !== orig[i])) moved = true;
+    gain += r.gain;
+    if(dir < 2) g[k] = res; else for(let i = 0; i < 4; i++) g[i][k] = res[i];
+  }
+  if(!moved) return;
+  g48.score += gain;
+  g48Spawn();
+  if(!g48.won && g.some(r => r.some(v => v >= 2048))){ g48.won = true; g48.justWon = true; }
+  if(!g48CanMove()) g48.over = true;
+  if(g48.score > g48Best){ g48Best = g48.score; entBestSave(G48_KEY, g48Best); }
+  g48Render();
+}
+function g48CanMove(){
+  const g = g48.grid;
+  for(let y = 0; y < 4; y++) for(let x = 0; x < 4; x++){
+    if(!g[y][x]) return true;
+    if(x < 3 && g[y][x] === g[y][x + 1]) return true;
+    if(y < 3 && g[y][x] === g[y + 1][x]) return true;
+  }
+  return false;
+}
+function g48Render(){
+  document.getElementById('g48Board').innerHTML = g48.grid.map(r => r.map(v => {
+    if(!v) return '<div></div>';
+    const c = G48_COL[v] || ['#ffffff', '#11161d'];
+    const fs = v >= 1024 ? 17 : (v >= 128 ? 20 : 24);
+    return '<div style="background:' + c[0] + ';color:' + c[1] + ';font-size:calc(' + fs + 'px*var(--fs,1));">' + v + '</div>';
+  }).join('')).join('');
+  document.getElementById('g48Score').textContent = g48.score;
+  document.getElementById('g48Best').textContent = Math.max(g48Best, g48.score);
+  const m = document.getElementById('g48Msg');
+  if(g48.over){ m.style.display = 'flex'; m.textContent = 'Sin movimientos · ' + g48.score + ' puntos'; }
+  else if(g48.justWon){ m.style.display = 'flex'; m.textContent = '¡Has llegado a 2048! Sigue jugando'; }
+  else m.style.display = 'none';
+}
+
+// ---- Memoria ----
+const MEM_ICONS = ['🚢','⚓','🏗️','📦','🛳️','🚛','🧭','🌊'];
+const MEM_KEY = 'turnos_mem_best_v1';
+let mem = {cards:[], up:[], lock:false, moves:0, found:0, timer:null}, memBest = 0;
+
+function memOpen(){
+  memBest = entBestLoad(MEM_KEY);
+  memNew();
+}
+function memStop(){
+  clearTimeout(mem.timer);
+}
+function memNew(){
+  clearTimeout(mem.timer);
+  const a = MEM_ICONS.concat(MEM_ICONS);
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  mem.cards = a.map(v => ({v, state:'down'}));
+  mem.up = []; mem.lock = false; mem.moves = 0; mem.found = 0;
+  document.getElementById('memMsg').textContent = '';
+  memRender();
+}
+function memTap(i){
+  const c = mem.cards[i];
+  if(mem.lock || !c || c.state !== 'down') return;
+  c.state = 'up';
+  mem.up.push(i);
+  if(mem.up.length === 2){
+    mem.moves++;
+    const a = mem.up[0], b = mem.up[1];
+    if(mem.cards[a].v === mem.cards[b].v){
+      mem.cards[a].state = 'done'; mem.cards[b].state = 'done';
+      mem.found++; mem.up = [];
+      if(mem.found === MEM_ICONS.length){
+        let msg = '¡Completado en ' + mem.moves + ' movimientos!';
+        if(!memBest || mem.moves < memBest){ memBest = mem.moves; entBestSave(MEM_KEY, memBest); msg += ' Nuevo mejor resultado.'; }
+        document.getElementById('memMsg').textContent = msg;
+      }
+    } else {
+      mem.lock = true;
+      memRender();
+      mem.timer = setTimeout(() => {
+        mem.cards[a].state = 'down'; mem.cards[b].state = 'down';
+        mem.up = []; mem.lock = false;
+        memRender();
+      }, 750);
+      return;
+    }
+  }
+  memRender();
+}
+function memRender(){
+  document.getElementById('memBoard').innerHTML = mem.cards.map((c, i) =>
+    '<button class="' + (c.state === 'down' ? '' : c.state) + '" onclick="memTap(' + i + ')" aria-label="Carta ' + (i + 1) + '">' + (c.state === 'down' ? '?' : c.v) + '</button>'
+  ).join('');
+  document.getElementById('memMoves').textContent = mem.moves;
+  document.getElementById('memBest').textContent = memBest || '—';
+}
+
+// ---- Apila contenedores ----
+const ST_W = 300, ST_H = 420, ST_B = 22, ST_KEY = 'turnos_stack_best_v1';
+const ST_COLORS = ['#d9534f', '#3b82c4', '#e0a526', '#4caf7a', '#3fb6c2', '#c15fd6'];
+let st = {blocks:[], cur:null, dir:1, state:'idle', cam:0, last:0, raf:0, score:0, overAt:0}, stBest = 0, stReady = false;
+
+function stOpen(){
+  if(!stReady) stSetup();
+  stBest = entBestLoad(ST_KEY);
+  stReset();
+}
+function stSetup(){
+  stReady = true;
+  const cv = document.getElementById('stCanvas');
+  cv.addEventListener('touchstart', e => { e.preventDefault(); stTap(); }, {passive:false});
+  cv.addEventListener('click', () => stTap());
+}
+function stReset(){
+  cancelAnimationFrame(st.raf);
+  st.blocks = [{x:(ST_W - 170) / 2, w:170, c:0}];
+  st.score = 0; st.cam = 0; st.state = 'idle';
+  stSpawn();
+  stUpdateUI();
+  stDraw();
+}
+function stSpawn(){
+  const top = st.blocks[st.blocks.length - 1];
+  const fromLeft = st.blocks.length % 2 === 0;
+  st.cur = {x: fromLeft ? 0 : ST_W - top.w, w: top.w, c: st.blocks.length % ST_COLORS.length};
+  st.dir = fromLeft ? 1 : -1;
+}
+function stSpeed(){ return Math.min(340, 130 + st.score * 7); }
+function stStart(){
+  cancelAnimationFrame(st.raf);
+  st.state = 'playing';
+  st.last = 0;
+  stUpdateUI();
+  st.raf = requestAnimationFrame(stFrame);
+}
+function stPause(){
+  if(st.state === 'playing'){
+    st.state = 'paused';
+    cancelAnimationFrame(st.raf);
+    stUpdateUI();
+  }
+}
+function stFrame(ts){
+  if(st.state !== 'playing') return;
+  if(!st.last) st.last = ts;
+  const dt = Math.min(0.05, (ts - st.last) / 1000);
+  st.last = ts;
+  stStep(dt);
+  stDraw();
+  if(st.state === 'playing') st.raf = requestAnimationFrame(stFrame);
+}
+function stStep(dt){
+  st.cur.x += st.dir * stSpeed() * dt;
+  const max = ST_W - st.cur.w;
+  if(st.cur.x >= max){ st.cur.x = max; st.dir = -1; }
+  else if(st.cur.x <= 0){ st.cur.x = 0; st.dir = 1; }
+  const target = Math.max(0, (st.blocks.length + 1) * ST_B - (ST_H - 40 - 150));
+  st.cam += (target - st.cam) * Math.min(1, dt * 6);
+}
+function stDrop(){
+  const top = st.blocks[st.blocks.length - 1], cur = st.cur;
+  const left = Math.max(top.x, cur.x), right = Math.min(top.x + top.w, cur.x + cur.w);
+  const ov = right - left;
+  if(ov <= 0){ stEnd(); return; }
+  // casi perfecto: se ajusta y no se pierde anchura
+  const nb = Math.abs(cur.x - top.x) <= 5 ? {x:top.x, w:top.w, c:cur.c} : {x:left, w:ov, c:cur.c};
+  st.blocks.push(nb);
+  st.score++;
+  stSpawn();
+  stUpdateUI();
+}
+function stTap(){
+  if(st.state === 'idle' || st.state === 'paused') stStart();
+  else if(st.state === 'playing') stDrop();
+}
+function stMain(){
+  if(st.state === 'playing') stPause();
+  else if(st.state === 'over'){ stReset(); stStart(); }
+  else stStart();
+}
+function stEnd(){
+  cancelAnimationFrame(st.raf);
+  st.state = 'over';
+  st.overAt = Date.now();
+  if(st.score > stBest){ stBest = st.score; entBestSave(ST_KEY, stBest); }
+  stUpdateUI();
+  stDraw();
+}
+function stUpdateUI(){
+  document.getElementById('stScore').textContent = st.score;
+  document.getElementById('stBest').textContent = Math.max(stBest, st.score);
+  const msg = document.getElementById('stMsg'), btn = document.getElementById('stBtn');
+  if(st.state === 'playing'){ msg.style.display = 'none'; btn.textContent = 'Pausa'; }
+  else {
+    msg.style.display = 'flex';
+    if(st.state === 'idle'){ msg.textContent = 'Toca para empezar y para soltar cada contenedor'; btn.textContent = 'Jugar'; }
+    else if(st.state === 'paused'){ msg.textContent = 'Pausa'; btn.textContent = 'Continuar'; }
+    else { msg.textContent = 'Torre de ' + st.score + ' contenedor' + (st.score === 1 ? '' : 'es'); btn.textContent = 'Jugar de nuevo'; }
+  }
+}
+function stContainer(ctx, x, y, w, h, c){
+  ctx.fillStyle = ST_COLORS[c];
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';
+  for(let k = x + 4; k < x + w - 2; k += 6) ctx.fillRect(k, y + 3, 1.5, h - 6);
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillRect(x, y, w, 2);
+}
+function stDraw(){
+  const cv = document.getElementById('stCanvas'), ctx = cv.getContext('2d');
+  const cs = getComputedStyle(document.documentElement);
+  const col = n => cs.getPropertyValue(n).trim() || '#888';
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = col('--surface2');
+  ctx.fillRect(0, 0, ST_W, ST_H);
+  const ground = ST_H - 40 + st.cam;
+  ctx.fillStyle = col('--border');
+  ctx.fillRect(0, ground, ST_W, ST_H - ground + 40);
+  st.blocks.forEach((b, i) => stContainer(ctx, b.x, ground - (i + 1) * ST_B, b.w, ST_B, b.c));
+  if(st.state !== 'over' && st.cur){
+    const y = ground - (st.blocks.length + 1) * ST_B;
+    ctx.fillStyle = col('--text-dim');
+    ctx.fillRect(0, 0, ST_W, 5);
+    ctx.fillRect(st.cur.x + st.cur.w / 2 - 1, 0, 2, Math.max(0, y));
+    stContainer(ctx, st.cur.x, y, st.cur.w, ST_B, st.cur.c);
+  }
+}
+
+// ===== Herramienta: Tiempo (Open-Meteo, sin clave) =====
+const WX_KEY = 'turnos_tiempo_v1';
+const WX_LAT = 28.14, WX_LON = -15.42;     // Puerto de La Luz
+const WX_MLAT = 28.17, WX_MLON = -15.38;   // punto de mar cercano para el oleaje
+let wxData = null;
+
+function wxIcon(c){
+  if(c===0) return '☀️';
+  if(c===1) return '🌤️';
+  if(c===2) return '⛅';
+  if(c===3) return '☁️';
+  if(c===45||c===48) return '🌫️';
+  if(c>=51&&c<=57) return '🌦️';
+  if(c>=61&&c<=67) return '🌧️';
+  if(c>=71&&c<=77) return '🌨️';
+  if(c>=80&&c<=82) return '🌦️';
+  if(c===85||c===86) return '🌨️';
+  if(c>=95) return '⛈️';
+  return '🌡️';
+}
+function wxDesc(c){
+  if(c===0) return 'Despejado';
+  if(c===1) return 'Mayormente despejado';
+  if(c===2) return 'Parcialmente nublado';
+  if(c===3) return 'Nublado';
+  if(c===45||c===48) return 'Niebla';
+  if(c>=51&&c<=57) return 'Llovizna';
+  if(c>=61&&c<=67) return 'Lluvia';
+  if(c>=71&&c<=77) return 'Nieve';
+  if(c>=80&&c<=82) return 'Chubascos';
+  if(c===85||c===86) return 'Chubascos de nieve';
+  if(c>=95) return 'Tormenta';
+  return '—';
+}
+function wxDir(deg){
+  if(deg==null) return '—';
+  return ['N','NE','E','SE','S','SO','O','NO'][Math.round(deg/45)%8];
+}
+function wxN(v, dec){ return (v==null || isNaN(v)) ? '—' : Number(v).toFixed(dec||0); }
+function wxHM(ts){ const d = new Date(ts); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+
+function openTiempo(){
+  if(!TOOLS_ON.tiempo) return;
+  try{ wxData = JSON.parse(localStorage.getItem(WX_KEY)); }catch(e){ wxData = null; }
+  document.getElementById('tiempoOverlay').classList.add('open');
+  if(wxData && wxData.f){ wxRender(''); }
+  // si los datos tienen menos de 10 minutos no se vuelve a pedir
+  if(!wxData || (Date.now() - wxData.t) > 10*60*1000) wxRefresh(false);
+}
+function closeTiempo(){
+  document.getElementById('tiempoOverlay').classList.remove('open');
+}
+
+async function wxRefresh(manual){
+  const btn = document.getElementById('wxBtn');
+  btn.disabled = true; btn.textContent = 'Actualizando…';
+  const fUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + WX_LAT + '&longitude=' + WX_LON
+    + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,visibility'
+    + '&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m'
+    + '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max'
+    + '&wind_speed_unit=kmh&timezone=Atlantic%2FCanary&forecast_days=4';
+  const mUrl = 'https://marine-api.open-meteo.com/v1/marine?latitude=' + WX_MLAT + '&longitude=' + WX_MLON
+    + '&current=wave_height,wave_period,wave_direction&hourly=wave_height&timezone=Atlantic%2FCanary&forecast_days=4';
+  try{
+    const get = u => fetch(u).then(r => { if(!r.ok) throw new Error('http'); return r.json(); });
+    const [rf, rm] = await Promise.allSettled([get(fUrl), get(mUrl)]);
+    if(rf.status !== 'fulfilled') throw new Error('forecast');
+    wxData = { t: Date.now(), f: rf.value, m: rm.status === 'fulfilled' ? rm.value : (wxData && wxData.m) || null };
+    try{ localStorage.setItem(WX_KEY, JSON.stringify(wxData)); }catch(e){}
+    wxRender('');
+  }catch(err){
+    if(wxData && wxData.f) wxRender('Sin conexión · se muestran los datos de las ' + wxHM(wxData.t));
+    else document.getElementById('tiempoBody').innerHTML = '<div class="dash-empty">No se han podido cargar los datos. Comprueba la conexión e inténtalo de nuevo.</div>';
+  }finally{
+    btn.disabled = false; btn.textContent = 'Actualizar';
+  }
+}
+
+function wxRender(statusMsg){
+  const f = wxData.f, m = wxData.m;
+  const c = f.current, h = f.hourly, d = f.daily;
+  const wave = (m && m.current) ? m.current : null;
+
+  const hero = `
+    <div class="wx-hero">
+      <div>
+        <div class="wx-big">${wxN(c.temperature_2m)}°</div>
+        <div class="wx-desc">${wxDesc(c.weather_code)} &middot; sensación ${wxN(c.apparent_temperature)}°</div>
+      </div>
+      <div class="wx-ico">${wxIcon(c.weather_code)}</div>
+    </div>
+    <div class="wx-grid">
+      <div class="stat"><div class="n">${wxN(c.wind_speed_10m)}<span class="wx-sub"> km/h</span></div><div class="l">VIENTO ${wxDir(c.wind_direction_10m)}</div></div>
+      <div class="stat"><div class="n">${wxN(c.wind_gusts_10m)}<span class="wx-sub"> km/h</span></div><div class="l">RACHAS</div></div>
+      <div class="stat"><div class="n">${wxN(c.precipitation,1)}<span class="wx-sub"> mm</span></div><div class="l">LLUVIA</div></div>
+      <div class="stat"><div class="n">${wave && wave.wave_height!=null ? wxN(wave.wave_height,1)+'<span class="wx-sub"> m</span>' : '—'}</div><div class="l">OLEAJE${wave && wave.wave_period!=null ? ' · ' + wxN(wave.wave_period) + ' s' : ''}</div></div>
+      <div class="stat"><div class="n">${c.visibility!=null ? wxN(c.visibility/1000,1)+'<span class="wx-sub"> km</span>' : '—'}</div><div class="l">VISIBILIDAD</div></div>
+      <div class="stat"><div class="n">${wxN(c.relative_humidity_2m)}<span class="wx-sub"> %</span></div><div class="l">HUMEDAD</div></div>
+    </div>`;
+
+  // próximas 24 horas desde la hora actual
+  const nowHour = String(c.time).slice(0,13) + ':00';
+  let start = h.time.findIndex(t => t >= nowHour);
+  if(start < 0) start = 0;
+  let strip = '';
+  for(let i = start; i < Math.min(start + 24, h.time.length); i++){
+    const mi = (m && m.hourly && m.hourly.time) ? m.hourly.time.indexOf(h.time[i]) : -1;
+    const wv = mi >= 0 ? m.hourly.wave_height[mi] : null;
+    strip += `<div class="wx-h">
+      <div class="hh">${h.time[i].slice(11,13)}h</div>
+      <div class="hi">${wxIcon(h.weather_code[i])}</div>
+      <div class="ht">${wxN(h.temperature_2m[i])}°</div>
+      <div class="hw"><span class="ei">💨</span>${wxN(h.wind_speed_10m[i])}/${wxN(h.wind_gusts_10m[i])}</div>
+      <div class="hv">km/h · ${wxDir(h.wind_direction_10m[i])}</div>
+      <div class="hw"><span class="ei">💧</span>${h.precipitation_probability && h.precipitation_probability[i]!=null ? wxN(h.precipitation_probability[i]) + '%' : '—'}</div>
+      <div class="hw"><span class="ei">🌊</span>${wv!=null ? wxN(wv,1) + ' m' : '—'}</div>
+    </div>`;
+  }
+
+  const days = d.time.map((t,i) => {
+    const nombre = i === 0 ? 'Hoy' : new Date(t + 'T12:00:00').toLocaleDateString('es-ES', {weekday:'short'}).replace('.','');
+    return `<div class="wx-day">
+      <span class="dn">${nombre}</span>
+      <span>${wxIcon(d.weather_code[i])}</span>
+      <span class="dt">${wxN(d.temperature_2m_min[i])}° / ${wxN(d.temperature_2m_max[i])}°</span>
+      <span class="dw">viento ${wxN(d.wind_speed_10m_max[i])} · rachas ${wxN(d.wind_gusts_10m_max[i])} km/h<br>lluvia ${wxN(d.precipitation_sum[i],1)} mm</span>
+    </div>`;
+  }).join('');
+
+  const status = statusMsg || ('Actualizado a las ' + wxHM(wxData.t));
+  document.getElementById('tiempoBody').innerHTML = `
+    ${hero}
+    <div class="dash-section" style="margin-top:16px;">
+      <h3>PRÓXIMAS 24 HORAS</h3>
+      <div class="wx-strip">${strip}</div>
+      <div class="wx-sub" style="margin-top:2px;">💨 viento / racha (km/h) y dirección &middot; 💧 prob. de lluvia &middot; 🌊 oleaje (m)</div>
+    </div>
+    <div class="dash-section">
+      <h3>PRÓXIMOS DÍAS</h3>
+      ${days}
+    </div>
+    <div class="wx-status">${status} &middot; datos de Open-Meteo</div>`;
+}
+
+// Herramientas en construcción: true = activa, false = visible pero desactivada
+const TOOLS_ON = {tiempo:true, ent:false};
+function applyToolFlags(){
+  [['toolTiempo','tiempo'],['toolEnt','ent']].forEach(([id,k]) => {
+    const b = document.getElementById(id);
+    if(!b) return;
+    b.disabled = !TOOLS_ON[k];
+    b.querySelector('.tool-soon').textContent = TOOLS_ON[k] ? '' : 'En construcción';
+  });
+}
+applyToolFlags();
 
 load();
 render();
