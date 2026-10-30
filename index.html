@@ -718,13 +718,6 @@
   .wx-day .dt{font-weight:700;font-variant-numeric:tabular-nums;}
   .wx-day .dw{font-size:calc(11px*var(--fs,1));color:var(--text-dim);text-align:right;}
   .wx-status{font-size:calc(11px*var(--fs,1));color:var(--text-dim);text-align:center;margin:10px 0 4px;}
-  .bqf-ais{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
-  .bqf-ais h3{margin:0 0 8px;font-size:calc(13px*var(--fs,1));font-weight:800;}
-  .bqf-ship{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-top:10px;font-size:calc(12.5px*var(--fs,1));line-height:1.6;}
-  .bqf-ship .sn{font-size:calc(14px*var(--fs,1));font-weight:800;}
-  .bqf-ship .sd{color:var(--text-dim);}
-  .bqf-ship a{color:var(--amber);font-weight:700;text-decoration:none;}
-  .bqf-mini{margin-top:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:calc(12px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
   .bqf-btn{width:100%;margin-top:8px;padding:11px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:calc(13px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
   .bqf-btn:disabled{opacity:.6;cursor:wait;}
 </style>
@@ -1061,12 +1054,9 @@
       <option value="La Luz">La Luz</option>
       <option value="Gesport">Gesport</option>
     </select>
-    <label>Buque</label>
-    <input type="text" id="dayBuque" class="field" placeholder="Nombre del buque">
-    <div class="field-row" style="margin-top:8px;">
-      <button type="button" onclick="searchBuque('capacidad')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 4px;font-size:calc(12.5px*var(--fs,1));font-weight:700;cursor:pointer;">Capacidad &#8599;</button>
-      <button type="button" onclick="searchBuque('posicion')" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 4px;font-size:calc(12.5px*var(--fs,1));font-weight:700;cursor:pointer;">Posición &#8599;</button>
-    </div>
+    <label>Buques</label>
+    <input type="text" id="dayBuque" class="field" placeholder="Buque 1">
+    <input type="text" id="dayBuque2" class="field" placeholder="Buque 2 (si trabajas en dos)" style="margin-top:8px;">
     <div class="field-row">
       <div>
         <label>Movimientos</label>
@@ -1212,13 +1202,6 @@
     <label>Notas</label>
     <textarea id="bqfNota" placeholder="Ej. grúas propias, escala habitual..."></textarea>
     <button class="bqf-btn" onclick="bqCapacidadWeb()">Buscar capacidad en Google &#8599;</button>
-
-    <div class="bqf-ais">
-      <h3>Posición en directo (AIS)</h3>
-      <div class="dsub" style="text-transform:none;margin-bottom:0;">Solo aparece si el buque emite señal dentro de la zona de Las Palmas.</div>
-      <button class="bqf-btn" id="bqAisBtn" onclick="bqAisQuery()">Consultar posición en directo</button>
-      <div id="bqAisOut"></div>
-    </div>
 
     <div class="row">
       <button class="btn-cancel" onclick="closeBqFicha()">Cerrar</button>
@@ -1734,7 +1717,7 @@ function render(){
       co.textContent = COMPANY_ABBR[entry.company];
       cell.appendChild(co);
     }
-    if(entry && (entry.note || entry.buque || entry.movimientos || entry.salario || entry.extra || (entry.companeros && entry.companeros.length))){
+    if(entry && (entry.note || entry.buque || entry.buque2 || entry.movimientos || entry.salario || entry.extra || (entry.companeros && entry.companeros.length))){
       const dot = document.createElement('span');
       dot.className = 'note-dot';
       cell.appendChild(dot);
@@ -1792,6 +1775,7 @@ function openDay(d){
   document.getElementById('dayNote').value = entry.note || '';
   document.getElementById('dayCompany').value = entry.company || '';
   document.getElementById('dayBuque').value = entry.buque || '';
+  document.getElementById('dayBuque2').value = entry.buque2 || '';
   document.getElementById('dayMovs').value = entry.movimientos || '';
   document.getElementById('daySalario').value = entry.salario || '';
   document.getElementById('dayExtra').value = entry.extra || '';
@@ -1912,18 +1896,23 @@ function closeDay(){
   document.getElementById('dayOverlay').classList.remove('open');
 }
 
+// buques de un turno (puede haber dos)
+function buquesDe(e){ return [e && e.buque, e && e.buque2].map(v => String(v || '').trim()).filter(Boolean); }
+function buquesTxt(e, sep){ return buquesDe(e).join(sep || ' / '); }
+
 function saveDay(){
   const key = monthKey(viewYear, viewMonth);
   if(!data[key]) data[key] = {};
   const note = document.getElementById('dayNote').value.trim();
   const company = document.getElementById('dayCompany').value;
   const buque = document.getElementById('dayBuque').value.trim();
+  const buque2 = document.getElementById('dayBuque2').value.trim();
   const movimientos = document.getElementById('dayMovs').value;
   const salario = document.getElementById('daySalario').value;
   const extra = document.getElementById('dayExtra').value;
   const companeros = collectCrew();
   crewSync(companeros);
-  const hasExtras = note || company || buque || movimientos || salario || extra || companeros.length;
+  const hasExtras = note || company || buque || buque2 || movimientos || salario || extra || companeros.length;
   if(!selectedShift && !hasExtras){
     delete data[key][selectedDay];
   } else {
@@ -1932,6 +1921,7 @@ function saveDay(){
       note: note,
       company: company,
       buque: buque,
+      buque2: buque2,
       movimientos: movimientos ? parseFloat(movimientos) : '',
       salario: salario ? parseFloat(salario) : '',
       extra: extra ? parseFloat(extra) : '',
@@ -1943,16 +1933,6 @@ function saveDay(){
   persist();
   closeDay();
   render();
-}
-
-function searchBuque(kind){
-  const name = document.getElementById('dayBuque').value.trim();
-  if(!name){
-    alert('Escribe primero el nombre del buque.');
-    return;
-  }
-  const suffix = kind === 'posicion' ? 'buque MarineTraffic posición actual' : 'buque capacidad TEU contenedores';
-  window.open('https://www.google.com/search?q=' + encodeURIComponent(name + ' ' + suffix), '_blank');
 }
 
 function loadScriptOnce(src){
@@ -1994,7 +1974,7 @@ async function exportExcel(){
         d,
         e.shift ? SHIFT_NAMES[e.shift] : '',
         e.company || '',
-        e.buque || '',
+        buquesTxt(e),
         e.movimientos ? parseFloat(e.movimientos) : '',
         e.salario ? parseFloat(e.salario) : '',
         e.extra ? parseFloat(e.extra) : '',
@@ -2044,7 +2024,7 @@ function exportPDF(){
   let horasTotal=0, movimientosTotal=0, salarioTotal=0, extraTotal=0, turnosTotal=0;
   const rows = days.map(d=>{
     const e = monthData[d];
-    if(!e.shift && !e.note && !e.buque && !e.movimientos && !e.salario && !e.extra) return '';
+    if(!e.shift && !e.note && !buquesDe(e).length && !e.movimientos && !e.salario && !e.extra) return '';
     if(e.shift && e.shift!=='L'){
       horasTotal += (settings[e.shift]?.horas || 0);
       turnosTotal++;
@@ -2056,7 +2036,7 @@ function exportPDF(){
       <td>${d}</td>
       <td>${e.shift ? SHIFT_NAMES[e.shift] : '—'}</td>
       <td>${esc(e.company) || '—'}</td>
-      <td>${esc(e.buque) || '—'}</td>
+      <td>${esc(buquesTxt(e)) || '—'}</td>
       <td>${e.movimientos || '—'}</td>
       <td>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : '—'}</td>
       <td>${e.extra ? parseFloat(e.extra).toFixed(2)+' €' : '—'}</td>
@@ -2337,7 +2317,7 @@ function openShiftInfo(shiftCode){
         <span>Día ${d}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;">
-        ${esc(e.company) || 'Sin empresa'}${e.buque ? ' &middot; ' + esc(e.buque) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+        ${esc(e.company) || 'Sin empresa'}${buquesDe(e).length ? ' &middot; ' + esc(buquesTxt(e)) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
       </div>
       ${e.note ? `<div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:3px;font-style:italic;">${esc(e.note)}</div>` : ''}
     </div>`;
@@ -2382,7 +2362,7 @@ function openTotalInfo(){
         <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;">
-        ${esc(e.company) || 'Sin empresa'}${e.buque ? ' &middot; ' + esc(e.buque) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+        ${esc(e.company) || 'Sin empresa'}${buquesDe(e).length ? ' &middot; ' + esc(buquesTxt(e)) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
       </div>
       ${e.note ? `<div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:3px;font-style:italic;">${esc(e.note)}</div>` : ''}
     </div>`;
@@ -2489,7 +2469,7 @@ function srRun(){
       if(srShifts.size && !srShifts.has(e.shift)) return;
       if(emp && e.company !== emp) return;
       if(pue && e.puesto !== pue) return;
-      if(buq && !srNorm(e.buque).includes(buq)) return;
+      if(buq && !buquesDe(e).some(n => srNorm(n).includes(buq))) return;
       const crew = e.companeros || [];
       if(com && !crew.some(c => srNorm(c.nombre).includes(com) || srNorm(c.censo).includes(com))) return;
       if(d1 && ymd < d1) return;
@@ -2505,11 +2485,11 @@ function srRun(){
       if(nota === 'con' && !hasNote) return;
       if(nota === 'sin' && hasNote) return;
       if(words.length){
-        const hay = srNorm([e.buque, e.note, e.company, e.shift ? SHIFT_NAMES[e.shift] : '']
+        const hay = srNorm([buquesTxt(e, ' '), e.note, e.company, e.shift ? SHIFT_NAMES[e.shift] : '']
           .concat(crew.map(c => (c.nombre || '') + ' ' + (c.censo || ''))).join(' '));
         if(!words.every(w => hay.includes(w))) return;
       }
-      res.push({key, d, ymd, e, mv, ing: sa + ex});
+      res.push({key, d, ymd, e, mv, sal: sa});
     });
   });
   res.sort((a, b) => a.ymd < b.ymd ? 1 : (a.ymd > b.ymd ? -1 : 0));
@@ -2518,17 +2498,19 @@ function srRun(){
   if(total === 0){ out.innerHTML = '<div class="dash-empty">Todavía no hay turnos guardados.</div>'; return; }
   if(res.length === 0){ out.innerHTML = '<div class="dash-empty">No hay turnos con esos criterios.</div>'; return; }
 
-  let movs = 0, ing = 0;
-  res.forEach(r => { movs += r.mv; ing += r.ing; });
+  // salario sin extras; la media se calcula solo sobre los resultados que tienen salario
+  let salTotal = 0, conSal = 0;
+  res.forEach(r => { salTotal += r.sal; if(r.sal > 0) conSal++; });
+  const media = conSal ? salTotal / conSal : 0;
   const showCrew = words.length > 0 || !!com;
   const items = res.slice(0, SR_LIMIT).map(r => {
     const y = r.key.split('-')[0], m = parseInt(r.key.split('-')[1], 10);
     const pu = PUESTOS.find(p => p.k === r.e.puesto);
-    const parts = [r.e.company ? esc(r.e.company) : '', r.e.buque ? esc(r.e.buque) : '', r.mv ? r.mv + ' mov.' : '', pu ? pu.label : ''].filter(Boolean);
+    const parts = [r.e.company ? esc(r.e.company) : '', buquesDe(r.e).length ? esc(buquesTxt(r.e)) : '', r.mv ? r.mv + ' mov.' : '', pu ? pu.label : ''].filter(Boolean);
     const crew = r.e.companeros || [];
     return '<div class="sr-item" onclick="srGo(\'' + r.key + '\',' + r.d + ')">' +
       '<div class="r1"><span>' + r.d + ' ' + MONTH_NAMES[m - 1].slice(0, 3) + ' ' + y + (r.e.shift ? ' &middot; ' + SHIFT_NAMES[r.e.shift] : '') + '</span>' +
-      '<span>' + (r.ing ? r.ing.toFixed(2) + ' €' : '') + '</span></div>' +
+      '<span>' + (r.sal ? r.sal.toFixed(2) + ' €' : '') + '</span></div>' +
       (parts.length ? '<div class="r2">' + parts.join(' &middot; ') + '</div>' : '') +
       (showCrew && crew.length ? '<div class="r2">' + crew.map(c => esc(c.nombre || c.censo)).join(', ') + '</div>' : '') +
       (r.e.note ? '<div class="r2" style="font-style:italic;">' + esc(r.e.note) + '</div>' : '') +
@@ -2538,8 +2520,8 @@ function srRun(){
   out.innerHTML =
     '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
       '<div class="stat" style="flex:1;"><div class="n">' + res.length + '</div><div class="l">RESULTADOS</div></div>' +
-      '<div class="stat" style="flex:1;"><div class="n">' + movs + '</div><div class="l">MOVIMIENTOS</div></div>' +
-      '<div class="stat" style="flex:1;"><div class="n">' + ing.toFixed(0) + ' €</div><div class="l">INGRESOS</div></div>' +
+      '<div class="stat" style="flex:1;"><div class="n">' + media.toFixed(2) + ' €</div><div class="l">MEDIA</div></div>' +
+      '<div class="stat" style="flex:1;"><div class="n">' + salTotal.toFixed(2) + ' €</div><div class="l">SALARIO (SIN EXTRAS)</div></div>' +
     '</div>' + items +
     (res.length > SR_LIMIT ? '<div class="sr-note">Mostrando los ' + SR_LIMIT + ' más recientes de ' + res.length + '. Afina con los filtros.</div>' : '');
 }
@@ -2555,9 +2537,8 @@ function srGo(key, d){
 }
 
 // ===== Herramienta: Buques (listado de los buques registrados en los turnos) =====
-// El botón Info abre la ficha del buque: datos manuales (TEU, tamaño, notas) y posición AIS en directo vía proxy.
+// El botón Info abre la ficha del buque: datos manuales (TEU, tamaño, notas).
 const BUQUE_INFO_ON = true;
-const AIS_PROXY = 'https://turnos-proxy.albyregistro1.workers.dev';
 const BQ_FICHAS_KEY = 'turnos_buques_fichas_v1';
 let bqFichas = {};   // { clave-normalizada: {teu, eslora, manga, nota} }
 try{ bqFichas = JSON.parse(localStorage.getItem(BQ_FICHAS_KEY)) || {}; }catch(e){ bqFichas = {}; }
@@ -2588,16 +2569,20 @@ function buquesCollect(){
     const md = data[key] || {};
     Object.keys(md).forEach(dk => {
       const e = md[dk];
-      const raw = String((e && e.buque) || '').trim().replace(/\s+/g, ' ');
-      if(!raw) return;
-      const k = srNorm(raw);
+      const names = buquesDe(e);
+      if(!names.length) return;
       const ymd = key + '-' + String(parseInt(dk, 10)).padStart(2, '0');
-      let b = map.get(k);
-      if(!b){ b = {k, names:{}, services:0, movs:0, last:'', lastName:raw}; map.set(k, b); }
-      b.names[raw] = (b.names[raw] || 0) + 1;
-      b.services++;
-      b.movs += parseFloat(e.movimientos) || 0;
-      if(ymd > b.last){ b.last = ymd; b.lastName = raw; }
+      names.forEach(nm => {
+        const raw = nm.replace(/\s+/g, ' ');
+        const k = srNorm(raw);
+        let b = map.get(k);
+        if(!b){ b = {k, names:{}, services:0, movs:0, last:'', lastName:raw}; map.set(k, b); }
+        b.names[raw] = (b.names[raw] || 0) + 1;
+        b.services++;
+        // los movimientos se apuntan por turno: solo se atribuyen al buque si el turno tiene uno solo
+        if(names.length === 1) b.movs += parseFloat(e.movimientos) || 0;
+        if(ymd > b.last){ b.last = ymd; b.lastName = raw; }
+      });
     });
   });
   return Array.from(map.values()).map(b => {
@@ -2621,7 +2606,7 @@ function renderBuques(){
   document.getElementById('bqSub').textContent = all.length
     ? all.length + (all.length === 1 ? ' buque registrado' : ' buques registrados') + ' en tus turnos'
     : 'Los que has registrado en tus turnos';
-  document.getElementById('bqNote').textContent = 'Toca un buque para ver todos sus servicios. El botón Info abre su ficha (capacidad, tamaño, notas y posición en directo).';
+  document.getElementById('bqNote').textContent = 'Toca un buque para ver todos sus servicios. El botón Info abre su ficha (capacidad, tamaño y notas).';
 
   const el = document.getElementById('bqList');
   if(all.length === 0){ el.innerHTML = '<div class="dash-empty">Todavía no has registrado ningún buque. Se añaden solos al escribir el nombre en el formulario de un turno.</div>'; return; }
@@ -2662,10 +2647,6 @@ function buquesInfo(i){
   document.getElementById('bqfEslora').value = f.eslora || '';
   document.getElementById('bqfManga').value = f.manga || '';
   document.getElementById('bqfNota').value = f.nota || '';
-  document.getElementById('bqAisOut').innerHTML = '';
-  const btn = document.getElementById('bqAisBtn');
-  btn.disabled = false;
-  btn.textContent = 'Consultar posición en directo';
   document.getElementById('bqFichaOverlay').classList.add('open');
 }
 function closeBqFicha(){
@@ -2692,60 +2673,6 @@ function bqCapacidadWeb(){
   if(!bqFichaCur) return;
   window.open('https://www.google.com/search?q=' + encodeURIComponent(bqFichaCur.name + ' buque capacidad TEU contenedores'), '_blank');
 }
-function bqUseSize(eslora, manga){
-  if(eslora) document.getElementById('bqfEslora').value = eslora;
-  if(manga) document.getElementById('bqfManga').value = manga;
-}
-function bqEtaText(eta){
-  if(!eta || !eta.Month || !eta.Day) return '';
-  const p = n => String(n || 0).padStart(2, '0');
-  return eta.Day + '/' + eta.Month + ' ' + p(eta.Hour) + ':' + p(eta.Minute) + ' UTC';
-}
-async function bqAisQuery(){
-  if(!bqFichaCur) return;
-  const btn = document.getElementById('bqAisBtn');
-  const out = document.getElementById('bqAisOut');
-  const nameQ = bqFichaCur.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  btn.disabled = true;
-  btn.textContent = 'Escuchando señal AIS...';
-  out.innerHTML = '<div class="dash-empty">Esperando señal del buque, unos 20 segundos.</div>';
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 45000);
-  try{
-    const r = await fetch(AIS_PROXY + '/ais?seconds=20&name=' + encodeURIComponent(nameQ), {signal: ctrl.signal});
-    const j = await r.json();
-    if(!r.ok || j.error) throw new Error(j.error || ('Error ' + r.status));
-    const ships = j.buques || [];
-    if(!ships.length){
-      out.innerHTML = '<div class="dash-empty">No se ha recibido señal de este buque en la zona de Las Palmas durante esos segundos. Puede que no esté en la zona o que no haya emitido todavía; prueba de nuevo en un rato.</div>';
-    } else {
-      out.innerHTML = ships.map(s => {
-        const pos = (s.lat != null && s.lon != null)
-          ? '<a href="https://www.google.com/maps?q=' + s.lat + ',' + s.lon + '" target="_blank" rel="noopener">Ver posición en el mapa &#8599;</a>'
-          : '<span class="sd">Sin posición todavía</span>';
-        const lines = [];
-        if(s.velocidad != null) lines.push('Velocidad: ' + s.velocidad + ' nudos' + (s.rumbo != null ? ' &middot; rumbo ' + Math.round(s.rumbo) + '°' : ''));
-        if(s.eslora) lines.push('Tamaño: ' + s.eslora + ' m de eslora' + (s.manga ? ' x ' + s.manga + ' m de manga' : ''));
-        if(s.destino) lines.push('Destino: ' + esc(s.destino));
-        const eta = bqEtaText(s.eta);
-        if(eta) lines.push('Llegada prevista: ' + eta);
-        if(s.hora) lines.push('<span class="sd">Último dato: ' + esc(String(s.hora).slice(0, 19)) + ' UTC</span>');
-        const useBtn = s.eslora ? '<button class="bqf-mini" onclick="bqUseSize(' + (Number(s.eslora) || 0) + ',' + (Number(s.manga) || 0) + ')">Copiar tamaño a la ficha</button>' : '';
-        return '<div class="bqf-ship"><div class="sn">' + esc(s.nombre || ('MMSI ' + s.mmsi)) + '</div>' +
-          '<div class="sd">MMSI ' + esc(s.mmsi) + (s.imo ? ' &middot; IMO ' + esc(s.imo) : '') + '</div>' +
-          lines.map(l => '<div>' + l + '</div>').join('') + '<div>' + pos + '</div>' + useBtn + '</div>';
-      }).join('');
-    }
-  }catch(e){
-    const msg = (e && e.name === 'AbortError') ? 'La consulta ha tardado demasiado.' : 'No se ha podido consultar el proxy (' + esc(e.message || e) + ').';
-    out.innerHTML = '<div class="dash-empty">' + msg + ' Comprueba la conexión e inténtalo de nuevo.</div>';
-  }finally{
-    clearTimeout(timer);
-    btn.disabled = false;
-    btn.textContent = 'Consultar posición en directo';
-  }
-}
-
 function openCompanyInfo(company){
   const key = monthKey(viewYear, viewMonth);
   const monthData = data[key] || {};
@@ -2772,7 +2699,7 @@ function openCompanyInfo(company){
         <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;">
-        ${e.buque ? esc(e.buque) : 'Sin buque'}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
+        ${buquesDe(e).length ? esc(buquesTxt(e)) : 'Sin buque'}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
       </div>
       ${e.note ? `<div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:3px;font-style:italic;">${esc(e.note)}</div>` : ''}
     </div>`;
@@ -3324,7 +3251,7 @@ function dashCifrasHtml(){
     if(b > bestV){ bestV = b; bestD = d; }
     if(esFestivoEfectivo(viewYear, viewMonth, d, e.shift)){ festN++; festEur += b; }
     if(porTurno.hasOwnProperty(e.shift)) porTurno[e.shift] += (parseFloat(e.salario)||0);
-    const nm = String(e.buque||'').trim();
+    const nm = String(e.buque||'').trim();   // solo el primer buque cuenta aquí: el segundo es solo registro
     if(nm){
       const k = nm.toLowerCase();
       if(!buq[k]) buq[k] = {name:nm, n:0, sal:0};
@@ -4525,12 +4452,14 @@ function wxRender(statusMsg){
     <div class="wx-status">${status} &middot; datos de Open-Meteo</div>`;
 }
 
-// Herramientas en construcción: true = activa, false = visible pero desactivada
+// Herramientas en construcción: TOOLS_SHOW false = botón escondido; TOOLS_ON true = activa, false = visible pero desactivada
 const TOOLS_ON = {tiempo:true, ent:false};
+const TOOLS_SHOW = {tiempo:true, ent:false};
 function applyToolFlags(){
   [['toolTiempo','tiempo'],['toolEnt','ent']].forEach(([id,k]) => {
     const b = document.getElementById(id);
     if(!b) return;
+    b.style.display = TOOLS_SHOW[k] ? '' : 'none';
     b.disabled = !TOOLS_ON[k];
     b.querySelector('.tool-soon').textContent = TOOLS_ON[k] ? '' : 'En construcción';
   });
