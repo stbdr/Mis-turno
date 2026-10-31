@@ -273,10 +273,6 @@
   .toolitem:disabled{opacity:.5;cursor:not-allowed;}
   .toolitem .tool-soon{font-size:calc(10.5px*var(--fs,1));font-weight:600;color:var(--text-dim);}
   /* ===== Buscador de turnos ===== */
-  .sr-top{display:flex;gap:8px;}
-  .sr-top .field{flex:1;min-width:0;}
-  .srbtn{flex:none;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);padding:0 14px;font-size:calc(13px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
-  .srbtn.on{border-color:var(--amber);color:var(--amber);}
   #srPanel{margin-top:4px;padding-bottom:4px;}
   #srPanel .shiftpick{margin-bottom:0;}
   .sr-clear{margin-top:12px;}
@@ -1123,13 +1119,13 @@
     <button class="closex" onclick="closeSearch()" aria-label="Cerrar">&#10005;</button>
     <h2>Buscar</h2>
     <div class="dsub" style="text-transform:none;">En todos los turnos guardados</div>
-    <div class="sr-top">
-      <input type="text" id="srText" class="field" placeholder="Buque, nota, compañero, empresa..." oninput="srRun()">
-      <button class="srbtn" id="srToggle" onclick="srTogglePanel()">Filtros</button>
-    </div>
-    <div id="srPanel" style="display:none;">
+    <input type="text" id="srText" class="field" placeholder="Buque, nota, compañero, empresa..." oninput="srRun()">
+    <div id="srStats" style="margin-top:12px;"></div>
+    <div id="srPanel">
       <label>Turno</label>
       <div class="shiftpick" id="srShiftPick"></div>
+      <label>Mes</label>
+      <select id="srMes" oninput="srRun()"></select>
       <div class="field-row">
         <div><label>Empresa</label><select id="srEmpresa" oninput="srRun()"></select></div>
         <div><label>Puesto</label><select id="srPuesto" oninput="srRun()"></select></div>
@@ -1137,10 +1133,6 @@
       <div class="field-row">
         <div><label>Buque</label><input type="text" id="srBuque" class="field" placeholder="Nombre" oninput="srRun()"></div>
         <div><label>Compañero</label><input type="text" id="srCompa" class="field" placeholder="Nombre o censo" oninput="srRun()"></div>
-      </div>
-      <div class="field-row">
-        <div><label>Desde</label><input type="date" id="srDesde" class="field" oninput="srRun()"></div>
-        <div><label>Hasta</label><input type="date" id="srHasta" class="field" oninput="srRun()"></div>
       </div>
       <div class="field-row">
         <div><label>Movimientos mín.</label><input type="number" inputmode="numeric" id="srMovMin" class="field" min="0" placeholder="0" oninput="srRun()"></div>
@@ -1728,12 +1720,9 @@ function render(){
     grid.appendChild(cell);
   }
 
-  const horasTotal = counts.M*(settings.M.horas||0) + counts.T*(settings.T.horas||0)
-    + counts.N*(settings.N.horas||0) + counts.MA*(settings.MA.horas||0);
   const turnosTotal = counts.M + counts.T + counts.N + counts.MA;
-  let movimientosTotal = 0, salarioTotal = 0, extraTotal = 0;
+  let salarioTotal = 0, extraTotal = 0;
   Object.values(monthData).forEach(e=>{
-    if(e.movimientos) movimientosTotal += parseFloat(e.movimientos)||0;
     if(e.salario) salarioTotal += parseFloat(e.salario)||0;
     if(e.extra) extraTotal += parseFloat(e.extra)||0;
   });
@@ -1745,13 +1734,11 @@ function render(){
     <div class="stat T" onclick="openShiftInfo('T')" style="cursor:pointer;"><div class="n">${counts.T}</div><div class="l">TARDE</div></div>
     <div class="stat N" onclick="openShiftInfo('N')" style="cursor:pointer;"><div class="n">${counts.N}</div><div class="l">NOCHE</div></div>
     <div class="stat MA" onclick="openShiftInfo('MA')" style="cursor:pointer;"><div class="n">${counts.MA}</div><div class="l">MADRUGADA</div></div>
-    <div class="stat wide" onclick="openTotalInfo()" style="cursor:pointer;"><div class="n">${turnosTotal}</div><div class="l">TURNOS TOTALES &middot; ${counts.L} libres</div></div>
-    <div class="stat wide"><div class="n">${horasTotal} h</div><div class="l">TOTAL HORAS DEL MES</div></div>
+    <div class="stat wide" onclick="openTotalInfo()" style="cursor:pointer;grid-column:1/-1;"><div class="n">${turnosTotal}</div><div class="l">TURNOS TOTALES &middot; ${counts.L} libres</div></div>
   `;
 
   const financeEl = document.getElementById('financestats');
   financeEl.innerHTML = `
-    <div class="stat" style="grid-column:1/-1;"><div class="n">${movimientosTotal}</div><div class="l">MOVIMIENTOS TOTALES</div></div>
     <div class="stat"><div class="n">${salarioTotal.toFixed(2)} €</div><div class="l">SALARIO</div></div>
     <div class="stat"><div class="n">${extraTotal.toFixed(2)} €</div><div class="l">EXTRAS</div></div>
     <div class="stat grand" style="grid-column:1/-1;"><div class="n">${ingresosTotal.toFixed(2)} €</div><div class="l">TOTAL INGRESOS DEL MES (BRUTO)</div></div>
@@ -2404,17 +2391,31 @@ function srInit(){
   document.getElementById('srPuesto').innerHTML = '<option value="">Todos</option>' + PUESTOS.map(p => '<option value="' + p.k + '">' + p.label + '</option>').join('');
   srRenderShiftPick();
 }
+// opciones del selector de mes: solo los meses que tienen turnos guardados, del más reciente al más antiguo
+function srFillMeses(){
+  const keys = Object.keys(data).filter(k => data[k] && Object.keys(data[k]).length).sort().reverse();
+  document.getElementById('srMes').innerHTML = '<option value="">Todos los meses</option>' + keys.map(k => {
+    const p = k.split('-');
+    return '<option value="' + k + '">' + MONTH_NAMES[parseInt(p[1], 10) - 1] + ' ' + p[0] + '</option>';
+  }).join('');
+}
+// deja el buscador vacío (texto y filtros)
+function srReset(){
+  document.getElementById('srText').value = '';
+  ['srEmpresa','srPuesto','srBuque','srCompa','srMes','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota']
+    .forEach(id => { document.getElementById(id).value = ''; });
+  srShifts = new Set();
+  srRenderShiftPick();
+}
 function openSearch(){
   if(!srReady) srInit();
+  srFillMeses();
+  srReset();
   document.getElementById('searchOverlay').classList.add('open');
   srRun();
 }
 function closeSearch(){
   document.getElementById('searchOverlay').classList.remove('open');
-}
-function srTogglePanel(){
-  const p = document.getElementById('srPanel');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
 }
 function srRenderShiftPick(){
   document.getElementById('srShiftPick').innerHTML = SHIFTS.map(s =>
@@ -2427,7 +2428,7 @@ function srToggleShift(s){
   srRun();
 }
 function srClear(){
-  ['srEmpresa','srPuesto','srBuque','srCompa','srDesde','srHasta','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota']
+  ['srEmpresa','srPuesto','srBuque','srCompa','srMes','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota']
     .forEach(id => { document.getElementById(id).value = ''; });
   srShifts = new Set();
   srRenderShiftPick();
@@ -2438,7 +2439,7 @@ function srActiveCount(){
   let n = 0;
   if(srShifts.size) n++;
   ['srEmpresa','srPuesto','srBuque','srCompa','srExtra','srNota'].forEach(id => { if(srVal(id)) n++; });
-  if(srVal('srDesde') || srVal('srHasta')) n++;
+  if(srVal('srMes')) n++;
   if(srVal('srMovMin') || srVal('srMovMax')) n++;
   if(srVal('srSalMin') || srVal('srSalMax')) n++;
   return n;
@@ -2447,14 +2448,18 @@ function srRun(){
   const words = srNorm(srVal('srText')).split(/\s+/).filter(Boolean);
   const emp = srVal('srEmpresa'), pue = srVal('srPuesto');
   const buq = srNorm(srVal('srBuque')), com = srNorm(srVal('srCompa'));
-  const d1 = srVal('srDesde'), d2 = srVal('srHasta');
+  const mes = srVal('srMes');
   const m1 = srNum('srMovMin'), m2 = srNum('srMovMax'), s1 = srNum('srSalMin'), s2 = srNum('srSalMax');
   const ext = srVal('srExtra'), nota = srVal('srNota');
 
-  const nf = srActiveCount();
-  const tg = document.getElementById('srToggle');
-  tg.textContent = nf ? 'Filtros (' + nf + ')' : 'Filtros';
-  tg.classList.toggle('on', nf > 0);
+  const stats = document.getElementById('srStats');
+  const out = document.getElementById('srResults');
+  // sin texto ni filtros no se muestra nada
+  if(!words.length && srActiveCount() === 0){
+    stats.innerHTML = '';
+    out.innerHTML = '<div class="dash-empty">Escribe en el buscador o elige un filtro para ver resultados.</div>';
+    return;
+  }
 
   const res = [];
   let total = 0;
@@ -2472,8 +2477,7 @@ function srRun(){
       if(buq && !buquesDe(e).some(n => srNorm(n).includes(buq))) return;
       const crew = e.companeros || [];
       if(com && !crew.some(c => srNorm(c.nombre).includes(com) || srNorm(c.censo).includes(com))) return;
-      if(d1 && ymd < d1) return;
-      if(d2 && ymd > d2) return;
+      if(mes && key !== mes) return;
       const mv = parseFloat(e.movimientos) || 0, sa = parseFloat(e.salario) || 0, ex = parseFloat(e.extra) || 0;
       if(m1 !== null && mv < m1) return;
       if(m2 !== null && mv > m2) return;
@@ -2494,9 +2498,8 @@ function srRun(){
   });
   res.sort((a, b) => a.ymd < b.ymd ? 1 : (a.ymd > b.ymd ? -1 : 0));
 
-  const out = document.getElementById('srResults');
-  if(total === 0){ out.innerHTML = '<div class="dash-empty">Todavía no hay turnos guardados.</div>'; return; }
-  if(res.length === 0){ out.innerHTML = '<div class="dash-empty">No hay turnos con esos criterios.</div>'; return; }
+  if(total === 0){ stats.innerHTML = ''; out.innerHTML = '<div class="dash-empty">Todavía no hay turnos guardados.</div>'; return; }
+  if(res.length === 0){ stats.innerHTML = ''; out.innerHTML = '<div class="dash-empty">No hay turnos con esos criterios.</div>'; return; }
 
   // salario sin extras; la media se calcula solo sobre los resultados que tienen salario
   let salTotal = 0, conSal = 0;
@@ -2517,12 +2520,14 @@ function srRun(){
       '</div>';
   }).join('');
 
-  out.innerHTML =
-    '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
+  // las cifras quedan arriba, junto al buscador, para verlas mientras se cambian los filtros
+  stats.innerHTML =
+    '<div style="display:flex;gap:8px;">' +
       '<div class="stat" style="flex:1;"><div class="n">' + res.length + '</div><div class="l">RESULTADOS</div></div>' +
       '<div class="stat" style="flex:1;"><div class="n">' + media.toFixed(2) + ' €</div><div class="l">MEDIA</div></div>' +
       '<div class="stat" style="flex:1;"><div class="n">' + salTotal.toFixed(2) + ' €</div><div class="l">SALARIO (SIN EXTRAS)</div></div>' +
-    '</div>' + items +
+    '</div>';
+  out.innerHTML = items +
     (res.length > SR_LIMIT ? '<div class="sr-note">Mostrando los ' + SR_LIMIT + ' más recientes de ' + res.length + '. Afina con los filtros.</div>' : '');
 }
 // al tocar un resultado se abre ese día en el calendario
@@ -2632,7 +2637,6 @@ function buquesSearch(i){
   srClear();
   document.getElementById('srText').value = '';
   document.getElementById('srBuque').value = b.name;
-  document.getElementById('srPanel').style.display = 'block';
   srRun();
 }
 function buquesInfo(i){
