@@ -148,6 +148,7 @@
     position:absolute;top:4px;right:5px;width:5px;height:5px;border-radius:50%;
     background:var(--text-dim);
   }
+  .day .liq{position:absolute;bottom:2px;right:3px;font-size:9px;font-weight:800;line-height:1;color:#4cd08a;}
 
   .legend{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
   .legend span{font-size:calc(11px*var(--fs,1));color:var(--text-dim);display:flex;align-items:center;gap:5px;}
@@ -157,6 +158,7 @@
   .legend i.N{background:var(--indigo);}
   .legend i.MA{background:var(--violet);}
   .legend i.L{background:var(--grey);}
+  .legend b.legchk{color:#4cd08a;font-size:12px;line-height:1;}
   .legend i.F{background:var(--fest,#ff6b6b);width:12px;height:3px;border-radius:2px;}
   .day.fest::after{
     content:"";position:absolute;left:28%;right:28%;bottom:4px;height:3px;border-radius:2px;
@@ -216,6 +218,11 @@
     border-radius:9px;padding:10px 9px;font-size:calc(14px*var(--fs,1));font-family:inherit;
   }
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .field-row3{display:grid;grid-template-columns:84px 1fr 78px;gap:8px;}
+  .field-row3 > div{min-width:0;}
+  .liqcol{display:flex;flex-direction:column;}
+  .liqbox{flex:1;min-height:38px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);border-radius:9px;cursor:pointer;margin:0;}
+  .liqbox input{width:22px;height:22px;accent-color:#4cd08a;margin:0;cursor:pointer;}
   .sheet .row{display:flex;gap:8px;margin-top:16px;}
   .sheet .row button{
     flex:1;padding:12px;border-radius:9px;border:none;font-size:calc(14px*var(--fs,1));font-weight:700;cursor:pointer;
@@ -777,6 +784,7 @@
       <span><i class="MA"></i>Madrugada</span>
       <span><i class="L"></i>Libre</span>
       <span><i class="F"></i>Festivo</span>
+      <span><b class="legchk">&#10003;</b>Liquidado</span>
     </div>
 
     <div class="hint">Toca un día para abrir su ficha y elegir turno, empresa, buque y más.</div>
@@ -917,10 +925,8 @@
     <h2>Compañeros</h2>
     <div class="dsub" style="text-transform:none;">Registro único: el formulario del turno usa estos datos</div>
     <div class="crewbox">
-      <label>Categoría</label>
-      <select id="crewRegCat">
-        <option>Capataz</option><option>Apuntador</option><option>Gruero</option><option>Transtainero</option><option>Mafista</option><option>Especialista</option>
-      </select>
+      <label>Especialidades (puede tener varias)</label>
+      <div class="puestopick" id="crewRegCats" style="margin:4px 0 8px;"></div>
       <div class="field-row">
         <div><label>Nº censo</label><input type="text" inputmode="numeric" id="crewRegCenso" class="field" placeholder="Nº censo"></div>
         <div><label>Nombre</label><input type="text" id="crewRegNombre" class="field" placeholder="Nombre"></div>
@@ -1053,7 +1059,7 @@
     <label>Buques</label>
     <input type="text" id="dayBuque" class="field" placeholder="Buque 1">
     <input type="text" id="dayBuque2" class="field" placeholder="Buque 2 (si trabajas en dos)" style="margin-top:8px;">
-    <div class="field-row">
+    <div class="field-row3">
       <div>
         <label>Movimientos</label>
         <input type="number" id="dayMovs" class="field" min="0" step="1" placeholder="0">
@@ -1061,6 +1067,10 @@
       <div>
         <label>Salario del día (€)</label>
         <input type="number" id="daySalario" class="field" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="liqcol">
+        <label>Liquidado</label>
+        <label class="liqbox"><input type="checkbox" id="dayLiq" onchange="dayLiqChange()" aria-label="Turno liquidado por la empresa"></label>
       </div>
     </div>
     <label>Extra (€)</label>
@@ -1124,32 +1134,38 @@
     <div id="srPanel">
       <label>Turno</label>
       <div class="shiftpick" id="srShiftPick"></div>
-      <label>Mes</label>
-      <select id="srMes" oninput="srRun()"></select>
       <div class="field-row">
         <div><label>Empresa</label><select id="srEmpresa" oninput="srRun()"></select></div>
-        <div><label>Puesto</label><select id="srPuesto" oninput="srRun()"></select></div>
-      </div>
-      <div class="field-row">
-        <div><label>Buque</label><input type="text" id="srBuque" class="field" placeholder="Nombre" oninput="srRun()"></div>
-        <div><label>Compañero</label><input type="text" id="srCompa" class="field" placeholder="Nombre o censo" oninput="srRun()"></div>
-      </div>
-      <div class="field-row">
-        <div><label>Movimientos mín.</label><input type="number" inputmode="numeric" id="srMovMin" class="field" min="0" placeholder="0" oninput="srRun()"></div>
-        <div><label>Movimientos máx.</label><input type="number" inputmode="numeric" id="srMovMax" class="field" min="0" placeholder="Sin límite" oninput="srRun()"></div>
-      </div>
-      <div class="field-row">
-        <div><label>Salario mín. (€)</label><input type="number" inputmode="decimal" id="srSalMin" class="field" min="0" step="0.01" placeholder="0" oninput="srRun()"></div>
-        <div><label>Salario máx. (€)</label><input type="number" inputmode="decimal" id="srSalMax" class="field" min="0" step="0.01" placeholder="Sin límite" oninput="srRun()"></div>
-      </div>
-      <div class="field-row">
-        <div><label>Extra</label>
-          <select id="srExtra" oninput="srRun()"><option value="">Todos</option><option value="con">Con extra</option><option value="sin">Sin extra</option></select></div>
-        <div><label>Nota</label>
-          <select id="srNota" oninput="srRun()"><option value="">Todas</option><option value="con">Con nota</option><option value="sin">Sin nota</option></select></div>
+        <div><label>Mes</label><select id="srMes" oninput="srRun()"></select></div>
       </div>
       <div class="settings-actions sr-clear">
+        <button id="srMoreBtn" onclick="srToggleMore()">Más filtros</button>
         <button onclick="srClear()">Limpiar filtros</button>
+      </div>
+      <div id="srMore" style="display:none;">
+        <div class="field-row">
+          <div><label>Buque</label><input type="text" id="srBuque" class="field" placeholder="Nombre" oninput="srRun()"></div>
+          <div><label>Compañero</label><input type="text" id="srCompa" class="field" placeholder="Nombre o censo" oninput="srRun()"></div>
+        </div>
+        <div class="field-row">
+          <div><label>Puesto</label><select id="srPuesto" oninput="srRun()"></select></div>
+          <div><label>Extra</label>
+            <select id="srExtra" oninput="srRun()"><option value="">Todos</option><option value="con">Con extra</option><option value="sin">Sin extra</option></select></div>
+        </div>
+        <div class="field-row">
+          <div><label>Movimientos mín.</label><input type="number" inputmode="numeric" id="srMovMin" class="field" min="0" placeholder="0" oninput="srRun()"></div>
+          <div><label>Movimientos máx.</label><input type="number" inputmode="numeric" id="srMovMax" class="field" min="0" placeholder="Sin límite" oninput="srRun()"></div>
+        </div>
+        <div class="field-row">
+          <div><label>Salario mín. (€)</label><input type="number" inputmode="decimal" id="srSalMin" class="field" min="0" step="0.01" placeholder="0" oninput="srRun()"></div>
+          <div><label>Salario máx. (€)</label><input type="number" inputmode="decimal" id="srSalMax" class="field" min="0" step="0.01" placeholder="Sin límite" oninput="srRun()"></div>
+        </div>
+        <div class="field-row">
+          <div><label>Nota</label>
+            <select id="srNota" oninput="srRun()"><option value="">Todas</option><option value="con">Con nota</option><option value="sin">Sin nota</option></select></div>
+          <div><label>Liquidación</label>
+            <select id="srLiq" oninput="srRun()"><option value="">Todos</option><option value="si">Liquidados</option><option value="no">Sin liquidar</option></select></div>
+        </div>
       </div>
     </div>
     <div id="srResults" style="margin-top:14px;"></div>
@@ -1408,7 +1424,28 @@ const CREW_KEY = 'turnos_crew_v1';
 const CREW_CATS = ['Capataz','Apuntador','Gruero','Transtainero','Mafista','Especialista'];
 const CREW_LABELS = {Capataz:'Capataces', Apuntador:'Apuntadores', Gruero:'Grueros', Transtainero:'Transtaineros', Mafista:'Mafistas', Especialista:'Especialistas'};
 let crewOpen = {};   // categorías desplegadas en la lista
-let crewReg = [];   // [{censo, nombre, categoria}]  registro único de compañeros
+let crewReg = [];   // [{censo, nombre, categorias:[...], categoria (la primera), empresa, nota}]  registro único de compañeros
+let crewRegSel = new Set();   // especialidades marcadas en el formulario del registro
+
+// una persona puede tener varias especialidades; 'categoria' se mantiene (la primera) por compatibilidad con copias antiguas
+function crewCats(p){
+  if(Array.isArray(p.categorias) && p.categorias.length) return p.categorias;
+  return p.categoria ? [p.categoria] : [];
+}
+function crewHasCat(p, cat){ return crewCats(p).indexOf(cat) !== -1; }
+function crewNew(censo, nombre, cat){ return {censo:censo, nombre:nombre, categorias:[cat], categoria:cat}; }
+function crewNormalize(){
+  crewReg.forEach(p => { const c = crewCats(p).slice(); p.categorias = c; p.categoria = c[0] || ''; });
+}
+function renderCrewRegCats(){
+  document.getElementById('crewRegCats').innerHTML = CREW_CATS.map(c =>
+    `<button class="${crewRegSel.has(c)?'active':''}" onclick="crewRegToggleCat('${c}')">${c}</button>`
+  ).join('');
+}
+function crewRegToggleCat(c){
+  if(crewRegSel.has(c)) crewRegSel.delete(c); else crewRegSel.add(c);
+  renderCrewRegCats();
+}
 let crewEditIdx = null;
 
 function persistCrew(){
@@ -1434,7 +1471,7 @@ function renderCrewFields(list){
   document.getElementById('crewFields').innerHTML = CREW_SLOTS.map((cat,i)=>{
     const c = list.find(x=>x.slot===i) || {};
     const label = cat==='Gruero' ? 'Gruero ' + (CREW_SLOTS.slice(0,i+1).filter(x=>x==='Gruero').length) : cat;
-    const people = crewReg.filter(p => p.categoria === cat);
+    const people = crewReg.filter(p => crewHasCat(p, cat));
     const dlC = people.filter(p=>p.censo).map(p=>`<option value="${esc(p.censo)}">${esc(p.nombre)}</option>`).join('');
     const dlN = people.map(p=>`<option value="${esc(p.nombre)}">${esc(p.censo)}</option>`).join('');
     return `<div class="crew-row">
@@ -1475,14 +1512,20 @@ function crewSync(list){
   list.forEach(c=>{
     let exists = c.censo
       ? crewFindByCenso(c.censo)
-      : crewReg.find(p => !p.censo && p.categoria===c.categoria && String(p.nombre).trim().toLowerCase()===c.nombre.toLowerCase());
+      : crewReg.find(p => !p.censo && crewHasCat(p, c.categoria) && String(p.nombre).trim().toLowerCase()===c.nombre.toLowerCase());
     if(!exists && c.censo && c.nombre){
       // estaba registrado solo con el nombre: se le añade el censo en vez de duplicarlo
-      const solo = crewReg.find(p => !String(p.censo||'').trim() && p.categoria===c.categoria && String(p.nombre||'').trim().toLowerCase()===c.nombre.toLowerCase());
+      const solo = crewReg.find(p => !String(p.censo||'').trim() && crewHasCat(p, c.categoria) && String(p.nombre||'').trim().toLowerCase()===c.nombre.toLowerCase());
       if(solo){ solo.censo = c.censo; exists = solo; changed = true; }
     }
+    if(exists && !crewHasCat(exists, c.categoria)){
+      // ya estaba registrado con otra especialidad: se le añade esta
+      exists.categorias = crewCats(exists).concat(c.categoria);
+      exists.categoria = exists.categorias[0];
+      changed = true;
+    }
     if(!exists){
-      crewReg.push({censo:c.censo, nombre:c.nombre, categoria:c.categoria});
+      crewReg.push(crewNew(c.censo, c.nombre, c.categoria));
       changed = true;
     } else if(c.censo && c.nombre && !String(exists.nombre||'').trim()){
       // estaba registrado solo con el censo: se le añade el nombre, también en los turnos ya guardados
@@ -1541,7 +1584,7 @@ function renderCrewList(){
   let html = '';
   CREW_CATS.forEach(cat=>{
     const items = crewReg.map((p,idx)=>({p,idx}))
-      .filter(({p}) => p.categoria===cat && (!q || String(p.nombre).toLowerCase().includes(q) || String(p.censo).toLowerCase().includes(q) || String(p.empresa||'').toLowerCase().includes(q) || String(p.nota||'').toLowerCase().includes(q)))
+      .filter(({p}) => crewHasCat(p, cat) && (!q || String(p.nombre).toLowerCase().includes(q) || crewCats(p).join(' ').toLowerCase().includes(q) || String(p.censo).toLowerCase().includes(q) || String(p.empresa||'').toLowerCase().includes(q) || String(p.nota||'').toLowerCase().includes(q)))
       .sort((a,b)=>String(a.p.nombre).localeCompare(String(b.p.nombre),'es'));
     if(q && items.length === 0) return;      // buscando: solo las categorías con resultados
     const abierta = q ? true : !!crewOpen[cat];
@@ -1556,6 +1599,7 @@ function renderCrewList(){
           <div class="cinfo">
             <div class="cname">${esc(p.nombre) || '(sin nombre)'}</div>
             <div class="cmeta">Censo ${esc(p.censo) || '—'}${p.empresa ? ' &middot; ' + esc(p.empresa) : ''} &middot; ${n} turno${n===1?'':'s'} juntos</div>
+            ${crewCats(p).length > 1 ? `<div class="cmeta" style="white-space:normal;">También: ${crewCats(p).filter(x => x !== cat).map(esc).join(', ')}</div>` : ''}
             ${p.nota ? `<div class="cmeta" style="font-style:italic;white-space:normal;">${esc(p.nota)}</div>` : ''}
           </div>
           <button onclick="crewEdit(${idx})">&#9998;</button>
@@ -1571,7 +1615,8 @@ function crewRegCancel(){
   crewEditIdx = null;
   document.getElementById('crewRegCenso').value = '';
   document.getElementById('crewRegNombre').value = '';
-  document.getElementById('crewRegCat').value = CREW_CATS[0];
+  crewRegSel = new Set();
+  renderCrewRegCats();
   document.getElementById('crewRegEmpresa').value = '';
   document.getElementById('crewRegNota').value = '';
   document.getElementById('crewRegSave').textContent = 'Añadir';
@@ -1581,7 +1626,8 @@ function crewEdit(idx){
   const p = crewReg[idx];
   if(!p) return;
   crewEditIdx = idx;
-  document.getElementById('crewRegCat').value = p.categoria;
+  crewRegSel = new Set(crewCats(p));
+  renderCrewRegCats();
   document.getElementById('crewRegCenso').value = p.censo || '';
   document.getElementById('crewRegNombre').value = p.nombre || '';
   document.getElementById('crewRegEmpresa').value = p.empresa || '';
@@ -1591,13 +1637,17 @@ function crewEdit(idx){
   document.querySelector('#crewOverlay .sheet').scrollTop = 0;
 }
 function crewRegSave(){
-  const categoria = document.getElementById('crewRegCat').value;
+  const cats = Array.from(crewRegSel).sort((a,b) => { const x = CREW_CATS.indexOf(a), y = CREW_CATS.indexOf(b); return (x<0?99:x) - (y<0?99:y); });
   const censo = document.getElementById('crewRegCenso').value.trim();
   const nombre = document.getElementById('crewRegNombre').value.trim();
   const empresa = document.getElementById('crewRegEmpresa').value;
   const nota = document.getElementById('crewRegNota').value.trim();
   if(!censo || !nombre){
     alert('Escribe el número de censo y el nombre.');
+    return;
+  }
+  if(!cats.length){
+    alert('Elige al menos una especialidad.');
     return;
   }
   const dup = crewReg.findIndex((p,i) => i!==crewEditIdx && String(p.censo).trim()===censo);
@@ -1615,12 +1665,12 @@ function crewRegSave(){
         });
       });
     });
-    crewReg[crewEditIdx] = {censo, nombre, categoria, empresa, nota};
+    crewReg[crewEditIdx] = {censo, nombre, categorias:cats, categoria:cats[0], empresa, nota};
     persist();
   } else {
-    crewReg.push({censo, nombre, categoria, empresa, nota});
+    crewReg.push({censo, nombre, categorias:cats, categoria:cats[0], empresa, nota});
   }
-  crewOpen[categoria] = true;
+  cats.forEach(c => { crewOpen[c] = true; });
   persistCrew();
   crewRegCancel();
   renderCrewList();
@@ -1646,6 +1696,7 @@ function load(){
     if(s) settings = s;
   }catch(e){}
   try{ crewReg = JSON.parse(localStorage.getItem(CREW_KEY)) || []; }catch(e){ crewReg = []; }
+  crewNormalize();
   try{ nominaData = JSON.parse(localStorage.getItem(NOMINA_KEY)) || {}; }catch(e){ nominaData = {}; }
   try{ const pn = JSON.parse(localStorage.getItem(PANEL_KEY)); panelSel = Array.isArray(pn) ? pn.filter(k => PANEL_ITEMS.some(x => x.k === k)) : []; }catch(e){ panelSel = []; }
   loadTarifas();
@@ -1715,12 +1766,20 @@ function render(){
       cell.appendChild(dot);
     }
 
+    if(entry && entry.liquidado){
+      const lq = document.createElement('span');
+      lq.className = 'liq';
+      lq.textContent = '\u2713';
+      cell.appendChild(lq);
+    }
+
     cell.addEventListener('click', ()=>{ openDay(d); });
 
     grid.appendChild(cell);
   }
 
   const turnosTotal = counts.M + counts.T + counts.N + counts.MA;
+  const turnosLiq = Object.values(monthData).filter(e => e && e.shift && e.shift !== 'L' && e.liquidado).length;
   let salarioTotal = 0, extraTotal = 0;
   Object.values(monthData).forEach(e=>{
     if(e.salario) salarioTotal += parseFloat(e.salario)||0;
@@ -1734,7 +1793,7 @@ function render(){
     <div class="stat T" onclick="openShiftInfo('T')" style="cursor:pointer;"><div class="n">${counts.T}</div><div class="l">TARDE</div></div>
     <div class="stat N" onclick="openShiftInfo('N')" style="cursor:pointer;"><div class="n">${counts.N}</div><div class="l">NOCHE</div></div>
     <div class="stat MA" onclick="openShiftInfo('MA')" style="cursor:pointer;"><div class="n">${counts.MA}</div><div class="l">MADRUGADA</div></div>
-    <div class="stat wide" onclick="openTotalInfo()" style="cursor:pointer;grid-column:1/-1;"><div class="n">${turnosTotal}</div><div class="l">TURNOS TOTALES &middot; ${counts.L} libres</div></div>
+    <div class="stat wide" onclick="openTotalInfo()" style="cursor:pointer;grid-column:1/-1;"><div class="n">${turnosTotal}/${turnosLiq}</div><div class="l">TURNOS TOTALES / LIQUIDADOS &middot; ${counts.L} libres</div></div>
   `;
 
   const financeEl = document.getElementById('financestats');
@@ -1763,6 +1822,7 @@ function openDay(d){
   document.getElementById('dayCompany').value = entry.company || '';
   document.getElementById('dayBuque').value = entry.buque || '';
   document.getElementById('dayBuque2').value = entry.buque2 || '';
+  document.getElementById('dayLiq').checked = !!entry.liquidado;
   document.getElementById('dayMovs').value = entry.movimientos || '';
   document.getElementById('daySalario').value = entry.salario || '';
   document.getElementById('dayExtra').value = entry.extra || '';
@@ -1800,12 +1860,22 @@ let dayLocked = false;
 const LOCK_OPEN = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
 const LOCK_CLOSED = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 function applyDayLock(){
-  document.querySelectorAll('#dayOverlay input, #dayOverlay select, #dayOverlay textarea, #dayOverlay .shiftpick button, #dayOverlay .puestopick button, #dayOverlay .btn-save')
+  document.querySelectorAll('#dayOverlay input:not(#dayLiq), #dayOverlay select, #dayOverlay textarea, #dayOverlay .shiftpick button, #dayOverlay .puestopick button, #dayOverlay .btn-save')
     .forEach(el => { el.disabled = dayLocked; });
   const b = document.getElementById('dayLock');
   b.innerHTML = dayLocked ? LOCK_CLOSED : LOCK_OPEN;
   b.classList.toggle('on', dayLocked);
   b.setAttribute('aria-label', dayLocked ? 'Desbloquear día' : 'Bloquear día');
+}
+// La marca de liquidado sigue activa con el día bloqueado: se guarda al momento (Guardar está desactivado)
+function dayLiqChange(){
+  if(!dayLocked) return;
+  const key = monthKey(viewYear, viewMonth);
+  if(data[key] && data[key][selectedDay]){
+    data[key][selectedDay].liquidado = document.getElementById('dayLiq').checked;
+    persist();
+    render();
+  }
 }
 function dayLockToggle(){
   dayLocked = !dayLocked;
@@ -1914,6 +1984,7 @@ function saveDay(){
       extra: extra ? parseFloat(extra) : '',
       puesto: dayPuesto,
       companeros: companeros,
+      liquidado: document.getElementById('dayLiq').checked,
       bloqueado: true   // al guardar, el día queda bloqueado (solo consulta) hasta que se desbloquee
     };
   }
@@ -2346,7 +2417,7 @@ function openTotalInfo(){
     ingresosTotal += (parseFloat(e.salario)||0);
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;font-size:calc(13.5px*var(--fs,1));font-weight:700;">
-        <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
+        <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}${e.liquidado ? ' <span style="color:#4cd08a;">&#10003;</span>' : ''}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;">
         ${esc(e.company) || 'Sin empresa'}${buquesDe(e).length ? ' &middot; ' + esc(buquesTxt(e)) : ''}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
@@ -2402,15 +2473,36 @@ function srFillMeses(){
 // deja el buscador vacío (texto y filtros)
 function srReset(){
   document.getElementById('srText').value = '';
-  ['srEmpresa','srPuesto','srBuque','srCompa','srMes','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota']
+  ['srEmpresa','srPuesto','srBuque','srCompa','srMes','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota','srLiq']
     .forEach(id => { document.getElementById(id).value = ''; });
   srShifts = new Set();
   srRenderShiftPick();
+}
+// filtros secundarios: ocultos tras el botón «Más filtros»
+function srSetMore(open){
+  document.getElementById('srMore').style.display = open ? 'block' : 'none';
+  srUpdateMoreBtn();
+}
+function srToggleMore(){
+  srSetMore(document.getElementById('srMore').style.display === 'none');
+}
+function srMoreCount(){
+  let n = 0;
+  ['srPuesto','srBuque','srCompa','srExtra','srNota','srLiq'].forEach(id => { if(srVal(id)) n++; });
+  if(srVal('srMovMin') || srVal('srMovMax')) n++;
+  if(srVal('srSalMin') || srVal('srSalMax')) n++;
+  return n;
+}
+function srUpdateMoreBtn(){
+  const open = document.getElementById('srMore').style.display !== 'none';
+  const n = srMoreCount();
+  document.getElementById('srMoreBtn').textContent = (open ? 'Menos filtros' : 'Más filtros') + (n ? ' (' + n + ')' : '');
 }
 function openSearch(){
   if(!srReady) srInit();
   srFillMeses();
   srReset();
+  srSetMore(false);
   document.getElementById('searchOverlay').classList.add('open');
   srRun();
 }
@@ -2428,7 +2520,7 @@ function srToggleShift(s){
   srRun();
 }
 function srClear(){
-  ['srEmpresa','srPuesto','srBuque','srCompa','srMes','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota']
+  ['srEmpresa','srPuesto','srBuque','srCompa','srMes','srMovMin','srMovMax','srSalMin','srSalMax','srExtra','srNota','srLiq']
     .forEach(id => { document.getElementById(id).value = ''; });
   srShifts = new Set();
   srRenderShiftPick();
@@ -2438,7 +2530,7 @@ function srClear(){
 function srActiveCount(){
   let n = 0;
   if(srShifts.size) n++;
-  ['srEmpresa','srPuesto','srBuque','srCompa','srExtra','srNota'].forEach(id => { if(srVal(id)) n++; });
+  ['srEmpresa','srPuesto','srBuque','srCompa','srExtra','srNota','srLiq'].forEach(id => { if(srVal(id)) n++; });
   if(srVal('srMes')) n++;
   if(srVal('srMovMin') || srVal('srMovMax')) n++;
   if(srVal('srSalMin') || srVal('srSalMax')) n++;
@@ -2450,8 +2542,9 @@ function srRun(){
   const buq = srNorm(srVal('srBuque')), com = srNorm(srVal('srCompa'));
   const mes = srVal('srMes');
   const m1 = srNum('srMovMin'), m2 = srNum('srMovMax'), s1 = srNum('srSalMin'), s2 = srNum('srSalMax');
-  const ext = srVal('srExtra'), nota = srVal('srNota');
+  const ext = srVal('srExtra'), nota = srVal('srNota'), liq = srVal('srLiq');
 
+  srUpdateMoreBtn();
   const stats = document.getElementById('srStats');
   const out = document.getElementById('srResults');
   // sin texto ni filtros no se muestra nada
@@ -2488,6 +2581,8 @@ function srRun(){
       const hasNote = !!String(e.note || '').trim();
       if(nota === 'con' && !hasNote) return;
       if(nota === 'sin' && hasNote) return;
+      if(liq === 'si' && !e.liquidado) return;
+      if(liq === 'no' && (!e.shift || e.shift === 'L' || e.liquidado)) return;   // sin liquidar: solo turnos trabajados
       if(words.length){
         const hay = srNorm([buquesTxt(e, ' '), e.note, e.company, e.shift ? SHIFT_NAMES[e.shift] : '']
           .concat(crew.map(c => (c.nombre || '') + ' ' + (c.censo || ''))).join(' '));
@@ -2512,7 +2607,7 @@ function srRun(){
     const parts = [r.e.company ? esc(r.e.company) : '', buquesDe(r.e).length ? esc(buquesTxt(r.e)) : '', r.mv ? r.mv + ' mov.' : '', pu ? pu.label : ''].filter(Boolean);
     const crew = r.e.companeros || [];
     return '<div class="sr-item" onclick="srGo(\'' + r.key + '\',' + r.d + ')">' +
-      '<div class="r1"><span>' + r.d + ' ' + MONTH_NAMES[m - 1].slice(0, 3) + ' ' + y + (r.e.shift ? ' &middot; ' + SHIFT_NAMES[r.e.shift] : '') + '</span>' +
+      '<div class="r1"><span>' + r.d + ' ' + MONTH_NAMES[m - 1].slice(0, 3) + ' ' + y + (r.e.shift ? ' &middot; ' + SHIFT_NAMES[r.e.shift] : '') + (r.e.liquidado ? ' <span style="color:#4cd08a;">&#10003;</span>' : '') + '</span>' +
       '<span>' + (r.sal ? r.sal.toFixed(2) + ' €' : '') + '</span></div>' +
       (parts.length ? '<div class="r2">' + parts.join(' &middot; ') + '</div>' : '') +
       (showCrew && crew.length ? '<div class="r2">' + crew.map(c => esc(c.nombre || c.censo)).join(', ') + '</div>' : '') +
@@ -2637,6 +2732,7 @@ function buquesSearch(i){
   srClear();
   document.getElementById('srText').value = '';
   document.getElementById('srBuque').value = b.name;
+  srSetMore(true);
   srRun();
 }
 function buquesInfo(i){
@@ -2700,7 +2796,7 @@ function openCompanyInfo(company){
     ingresosTotal += (parseFloat(e.salario)||0);
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;font-size:calc(13.5px*var(--fs,1));font-weight:700;">
-        <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
+        <span>Día ${d} &middot; ${SHIFT_NAMES[e.shift]}${e.liquidado ? ' <span style="color:#4cd08a;">&#10003;</span>' : ''}</span><span>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : ''}</span>
       </div>
       <div style="font-size:calc(11.5px*var(--fs,1));color:var(--text-dim);margin-top:2px;">
         ${buquesDe(e).length ? esc(buquesTxt(e)) : 'Sin buque'}${e.movimientos ? ' &middot; ' + e.movimientos + ' mov.' : ''}
@@ -3667,7 +3763,9 @@ function importData(evt){
       if(parsed.data) data = parsed.data;
       if(parsed.settings) settings = parsed.settings;
       convertirCopiaAntigua(parsed);
-      if(parsed.crew){ crewReg = parsed.crew; persistCrew(); }
+      if(parsed.crew){ crewReg = parsed.crew; }
+      crewNormalize();
+      persistCrew();
       if(parsed.nomina){ nominaData = parsed.nomina; persistNomina(); }
       if(parsed.buquesFichas && typeof parsed.buquesFichas === 'object' && !Array.isArray(parsed.buquesFichas)){ bqFichas = parsed.buquesFichas; persistBqFichas(); }
       if(Array.isArray(parsed.panel)){ panelSel = parsed.panel.filter(k => PANEL_ITEMS.some(x => x.k === k)); persistPanel(); }
