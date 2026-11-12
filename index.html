@@ -60,6 +60,9 @@
   .monthbar .label{
     font-weight:700;font-size:calc(16px*var(--fs,1));text-transform:capitalize;
   }
+  .monthbar .mcenter{display:flex;align-items:center;gap:10px;}
+  .monthbar button.todaybtn{width:auto;height:28px;padding:0 11px;font-size:calc(12px*var(--fs,1));font-weight:700;}
+  #grid{touch-action:pan-y;}
 
   .viewtoggle{display:flex;gap:8px;margin-bottom:14px;}
   .viewtoggle button{
@@ -218,6 +221,25 @@
     border-radius:9px;padding:10px 9px;font-size:calc(14px*var(--fs,1));font-family:inherit;
   }
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .daytabs{display:flex;gap:8px;margin-bottom:14px;}
+  .daytabs button{flex:1;padding:9px 4px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-size:calc(13px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
+  .daytabs button.active{background:var(--surface);color:var(--text);border-color:var(--amber);}
+  .daytabs button.addt2{border-style:dashed;}
+  .daytabs button:disabled{opacity:.5;cursor:not-allowed;}
+  .deltr{width:100%;padding:9px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:calc(12.5px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;margin:-4px 0 12px;}
+  .appver{text-align:center;color:var(--text-dim);font-size:calc(11.5px*var(--fs,1));line-height:1.6;margin-top:16px;}
+  .undotoast{display:none;position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:300;max-width:456px;margin:0 auto;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;align-items:center;gap:10px;box-shadow:0 6px 24px rgba(0,0,0,.45);}
+  .undotoast.show{display:flex;}
+  .undotoast .ut{flex:1;font-size:calc(13px*var(--fs,1));line-height:1.35;}
+  .undotoast button{flex:none;padding:9px 14px;border-radius:9px;border:none;background:var(--amber);color:#221600;font-weight:800;font-size:calc(13px*var(--fs,1));cursor:pointer;font-family:inherit;}
+  .undobox{display:none;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:10px 0;}
+  .undobox .ut{flex:1;font-size:calc(12.5px*var(--fs,1));line-height:1.4;}
+  .undobox button{flex:none;padding:9px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;font-size:calc(12.5px*var(--fs,1));cursor:pointer;font-family:inherit;}
+  .bkbanner{background:rgba(255,176,32,0.10);border:1px solid rgba(255,176,32,0.5);border-radius:var(--radius);padding:12px;margin-bottom:14px;}
+  .bkbanner .bktxt{font-size:calc(12.5px*var(--fs,1));line-height:1.4;margin-bottom:10px;}
+  .bkbanner .bkbtns{display:flex;gap:8px;}
+  .bkbanner .bkb{flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:calc(12.5px*var(--fs,1));font-weight:700;cursor:pointer;font-family:inherit;}
+  .bkbanner .bkb.main{background:var(--amber);color:#221600;border-color:var(--amber);}
   .field-row3{display:grid;grid-template-columns:84px 1fr 78px;gap:8px;}
   .field-row3 > div{min-width:0;}
   .liqcol{display:flex;flex-direction:column;}
@@ -744,6 +766,8 @@
     <button class="lock-link" id="lockForgot" onclick="pinForgot()">¿Olvidaste el PIN?</button>
   </div>
 </div>
+<div class="undotoast" id="undoToast"><div class="ut" id="undoToastText"></div><button onclick="undoRestore()">Deshacer</button></div>
+
 <script>try{ if(localStorage.getItem('turnos_pin_v1')) document.getElementById('lockOverlay').style.display='flex'; }catch(e){}</script>
 <div class="wrap">
 
@@ -755,6 +779,14 @@
     <button class="toolsbtn" onclick="openTools()">&#129520; Herramientas</button>
   </header>
 
+  <div class="bkbanner" id="backupBanner" style="display:none;">
+    <div class="bktxt" id="bkText"></div>
+    <div class="bkbtns">
+      <button class="bkb main" onclick="backupNow()">Hacer copia</button>
+      <button class="bkb" onclick="backupLater()">Más tarde</button>
+    </div>
+  </div>
+
   <div class="viewtoggle">
     <button id="vtMes" onclick="switchView('mes')" class="active">Mes</button>
     <button id="vtAno" onclick="switchView('ano')">Año</button>
@@ -763,7 +795,7 @@
   <div id="mesView">
     <div class="monthbar">
       <button onclick="changeMonth(-1)">&larr;</button>
-      <div class="label" id="monthLabel">—</div>
+      <div class="mcenter"><div class="label" id="monthLabel">—</div><button class="todaybtn" id="todayBtn" onclick="goToday()" style="display:none;">Hoy</button></div>
       <button onclick="changeMonth(1)">&rarr;</button>
     </div>
 
@@ -785,6 +817,7 @@
       <span><i class="L"></i>Libre</span>
       <span><i class="F"></i>Festivo</span>
       <span><b class="legchk">&#10003;</b>Liquidado</span>
+      <span><b class="legchk">&frac12;</b>Uno de dos turnos</span>
     </div>
 
     <div class="hint">Toca un día para abrir su ficha y elegir turno, empresa, buque y más.</div>
@@ -801,7 +834,7 @@
   <div id="anoView" style="display:none;">
     <div class="monthbar">
       <button onclick="changeAnnualYear(-1)">&larr;</button>
-      <div class="label" id="yearLabel">—</div>
+      <div class="mcenter"><div class="label" id="yearLabel">—</div><button class="todaybtn" id="todayYearBtn" onclick="goTodayYear()" style="display:none;">Hoy</button></div>
       <button onclick="changeAnnualYear(1)">&rarr;</button>
     </div>
 
@@ -1046,6 +1079,12 @@
     <button class="closex lockx" id="dayLock" onclick="dayLockToggle()" aria-label="Bloquear día"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></button>
     <h2 id="dayTitle">Día</h2>
     <div class="dsub" id="daySub"></div>
+    <div class="daytabs" id="dayTabs">
+      <button id="dayTab0" class="active" onclick="dayTabGo(0)" style="display:none;">Turno 1</button>
+      <button id="dayTab1" onclick="dayTabGo(1)" style="display:none;">Turno 2</button>
+      <button id="dayAddT2" class="addt2" onclick="dayAddTurno2()">+ Segundo turno</button>
+    </div>
+    <div id="dayDelRow" style="display:none;"><button class="deltr" onclick="dayDelTurno2()">Quitar el segundo turno</button></div>
     <div class="shiftpick" id="shiftPick"></div>
     <label style="margin-top:0;">Puesto</label>
     <div class="puestopick" id="dayPuestoPick" style="margin-bottom:6px;"></div>
@@ -1236,6 +1275,8 @@
     <button class="closex" onclick="closeSettings()" aria-label="Cerrar">&#10005;</button>
     <h2>Copia de seguridad</h2>
     <div class="dsub" style="text-transform:none;">Tus datos solo están en este dispositivo. Haz una copia de vez en cuando.</div>
+    <div class="dsub" id="bkStatus" style="text-transform:none;line-height:1.45;"></div>
+    <div class="undobox" id="undoBox"><div class="ut" id="undoText"></div><button onclick="undoRestore()">Restaurar</button></div>
 
     <div class="bighead">Tus datos</div>
     <div class="biggrid">
@@ -1254,6 +1295,7 @@
       <button class="bigact wide danger" onclick="clearMonth()"><span class="bi">&#128465;</span><span class="bt">Vaciar turnos de este mes</span><span class="bd">Borra los turnos de <span class="mlabel"></span></span></button>
     </div>
     <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
+    <div class="appver" id="appVersion"></div>
     <div class="row">
       <button class="btn-cancel" onclick="closeSettings()" style="flex:none;width:100%;">Cerrar</button>
     </div>
@@ -1330,7 +1372,7 @@ function nominaDefaults(){
 function nominaMonthIngresos(){
   const monthData = data[monthKey(nomYear, nomMonth)] || {};
   let t = 0;
-  Object.values(monthData).forEach(e=>{ t += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0); });
+  Object.values(monthData).forEach(e => turnosDe(e).forEach(x => { t += (parseFloat(x.salario)||0) + (parseFloat(x.extra)||0); }));
   return nomRound(t);
 }
 
@@ -1533,11 +1575,13 @@ function crewSync(list){
       changed = true;
       Object.values(data).forEach(month=>{
         Object.values(month).forEach(e=>{
-          (e.companeros||[]).forEach(x=>{
-            if(String(x.censo||'').trim() === String(c.censo).trim() && !String(x.nombre||'').trim()){
-              x.nombre = c.nombre;
-              dataChanged = true;
-            }
+          turnosDe(e).forEach(tt => {
+            (tt.companeros||[]).forEach(x=>{
+              if(String(x.censo||'').trim() === String(c.censo).trim() && !String(x.nombre||'').trim()){
+                x.nombre = c.nombre;
+                dataChanged = true;
+              }
+            });
           });
         });
       });
@@ -1555,7 +1599,10 @@ function crewCount(p){
   let n = 0;
   Object.values(data).forEach(month=>{
     Object.values(month).forEach(e=>{
-      if(e.companeros && e.companeros.some(c => crewSameAs(c,p))) n++;
+      // cuenta cada turno (un día con dos turnos puede sumar dos)
+      turnosDe(e).forEach(tt => {
+        if(tt.companeros && tt.companeros.some(c => crewSameAs(c,p))) n++;
+      });
     });
   });
   return n;
@@ -1660,8 +1707,10 @@ function crewRegSave(){
     // mantiene coherentes los turnos ya guardados
     Object.values(data).forEach(month=>{
       Object.values(month).forEach(e=>{
-        (e.companeros||[]).forEach(c=>{
-          if(crewSameAs(c, old)){ c.censo = censo; c.nombre = nombre; }
+        turnosDe(e).forEach(tt => {
+          (tt.companeros||[]).forEach(c=>{
+            if(crewSameAs(c, old)){ c.censo = censo; c.nombre = nombre; }
+          });
         });
       });
     });
@@ -1709,6 +1758,25 @@ function persistSettings(){
 }
 function monthKey(y,m){ return y + '-' + String(m+1).padStart(2,'0'); }
 
+// botón «Hoy»: solo se ve cuando no estás en el mes (o año) actual
+function updateTodayBtns(){
+  const n = new Date();
+  const b1 = document.getElementById('todayBtn');
+  if(b1) b1.style.display = (viewYear === n.getFullYear() && viewMonth === n.getMonth()) ? 'none' : '';
+  const b2 = document.getElementById('todayYearBtn');
+  if(b2) b2.style.display = (annualYear === n.getFullYear()) ? 'none' : '';
+}
+function goToday(){
+  today = new Date();
+  viewYear = today.getFullYear();
+  viewMonth = today.getMonth();
+  render();
+}
+function goTodayYear(){
+  annualYear = new Date().getFullYear();
+  renderYear();
+}
+
 function changeMonth(delta){
   viewMonth += delta;
   if(viewMonth < 0){ viewMonth = 11; viewYear--; }
@@ -1717,10 +1785,13 @@ function changeMonth(delta){
 }
 
 const MONTH_NAMES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+// colores de cada turno para las celdas con dos turnos
+const SHIFT_TINT = {M:'rgba(255,176,32,0.34)', T:'rgba(63,182,194,0.34)', N:'rgba(108,122,224,0.36)', MA:'rgba(193,95,214,0.36)'};
 const COMPANY_ABBR = {OPCSA:'OP', 'La Luz':'LL', Gesport:'GS'};
 
 function render(){
   document.getElementById('monthLabel').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+  updateTodayBtns();
 
   const key = monthKey(viewYear, viewMonth);
   const monthData = data[key] || {};
@@ -1746,30 +1817,45 @@ function render(){
   for(let d=1; d<=daysInMonth; d++){
     const entry = monthData[d];
     const shift = entry ? entry.shift : '';
-    if(shift) counts[shift]++;
-    if(entry && entry.company && shift && shift!=='L' && companyCounts.hasOwnProperty(entry.company)){
-      companyCounts[entry.company]++;
-    }
+    const turnos = turnosDe(entry);
+    const dos = turnos.length === 2;
+    turnos.forEach(t => {
+      if(t.shift) counts[t.shift]++;
+      if(t.company && t.shift && t.shift!=='L' && companyCounts.hasOwnProperty(t.company)) companyCounts[t.company]++;
+    });
 
     const cell = document.createElement('div');
     cell.className = 'day' + (shift ? ' '+shift : '') + (isToday(d) ? ' today' : '') + (esFestivoMarcado(viewYear, viewMonth, d) ? ' fest' : '');
-    cell.innerHTML = '<span class="num">'+d+'</span>' + (shift ? '<span class="tag">'+shift+'</span>' : '');
-    if(entry && entry.company && COMPANY_ABBR[entry.company]){
+    cell.innerHTML = '<span class="num">'+d+'</span>' + (shift ? '<span class="tag">'+(dos ? shift+'·'+entry.t2.shift : shift)+'</span>' : '');
+    if(dos){
+      // día con dos turnos: el fondo se parte en los dos colores
+      cell.style.backgroundImage = 'linear-gradient(135deg, ' + SHIFT_TINT[entry.shift] + ' 50%, ' + SHIFT_TINT[entry.t2.shift] + ' 50%)';
+    }
+    const abbrs = [];
+    turnos.forEach(t => { const a = t.company && COMPANY_ABBR[t.company]; if(a && abbrs.indexOf(a) === -1) abbrs.push(a); });
+    if(abbrs.length){
       const co = document.createElement('span');
       co.className = 'co';
-      co.textContent = COMPANY_ABBR[entry.company];
+      co.textContent = abbrs.join('/');
       cell.appendChild(co);
     }
-    if(entry && (entry.note || entry.buque || entry.buque2 || entry.movimientos || entry.salario || entry.extra || (entry.companeros && entry.companeros.length))){
+    if(entry && (entry.note || entry.buque || entry.buque2 || entry.movimientos || entry.salario || entry.extra || entry.t2 || (entry.companeros && entry.companeros.length))){
       const dot = document.createElement('span');
       dot.className = 'note-dot';
       cell.appendChild(dot);
     }
 
-    if(entry && entry.liquidado){
+    // marca de liquidado: ✓ si están liquidados todos los turnos del día, ½ si solo uno de dos
+    let liqMark = '';
+    const trabajados = turnos.filter(t => t.shift && t.shift !== 'L');
+    if(trabajados.length){
+      const nl = trabajados.filter(t => t.liquidado).length;
+      liqMark = nl === trabajados.length ? '\u2713' : (nl > 0 ? '\u00bd' : '');
+    } else if(entry && entry.liquidado) liqMark = '\u2713';
+    if(liqMark){
       const lq = document.createElement('span');
       lq.className = 'liq';
-      lq.textContent = '\u2713';
+      lq.textContent = liqMark;
       cell.appendChild(lq);
     }
 
@@ -1779,12 +1865,12 @@ function render(){
   }
 
   const turnosTotal = counts.M + counts.T + counts.N + counts.MA;
-  const turnosLiq = Object.values(monthData).filter(e => e && e.shift && e.shift !== 'L' && e.liquidado).length;
-  let salarioTotal = 0, extraTotal = 0;
-  Object.values(monthData).forEach(e=>{
-    if(e.salario) salarioTotal += parseFloat(e.salario)||0;
-    if(e.extra) extraTotal += parseFloat(e.extra)||0;
-  });
+  let turnosLiq = 0, salarioTotal = 0, extraTotal = 0;
+  Object.values(monthData).forEach(e => turnosDe(e).forEach(t => {
+    if(t.shift && t.shift !== 'L' && t.liquidado) turnosLiq++;
+    if(t.salario) salarioTotal += parseFloat(t.salario)||0;
+    if(t.extra) extraTotal += parseFloat(t.extra)||0;
+  }));
   const ingresosTotal = salarioTotal + extraTotal;
 
   const statsEl = document.getElementById('stats');
@@ -1810,27 +1896,75 @@ function render(){
   renderPanel();
 }
 
-function openDay(d){
-  selectedDay = d;
-  const key = monthKey(viewYear, viewMonth);
-  const entry = (data[key] && data[key][d]) || {shift:'', note:'', company:''};
-  selectedShift = entry.shift || '';
+// ---- Formulario del día con uno o dos turnos ----
+let dayT = [null, null];   // estado del formulario de cada turno (se actualiza al cambiar de pestaña)
+let dayTab = 0;            // pestaña visible: 0 = turno 1, 1 = turno 2
+let dayHasT2 = false;
 
-  document.getElementById('dayTitle').textContent = 'Día ' + d;
-  document.getElementById('daySub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
-  document.getElementById('dayNote').value = entry.note || '';
-  document.getElementById('dayCompany').value = entry.company || '';
-  document.getElementById('dayBuque').value = entry.buque || '';
-  document.getElementById('dayBuque2').value = entry.buque2 || '';
-  document.getElementById('dayLiq').checked = !!entry.liquidado;
-  document.getElementById('dayMovs').value = entry.movimientos || '';
-  document.getElementById('daySalario').value = entry.salario || '';
-  document.getElementById('dayExtra').value = entry.extra || '';
-  renderCrewFields(entry.companeros);
-
+// registro guardado -> estado del formulario
+function dayFromRecord(rec){
+  rec = rec || {};
+  const sh = rec.shift || '';
+  const pu = (rec.puesto && PUESTOS.some(x=>x.k===rec.puesto)) ? rec.puesto : ajustePuesto;
+  // si el salario guardado coincide con la tarifa, se sigue considerando automático
+  const tAuto = (sh && sh!=='L') ? tarifaInfo(selectedDay, sh, pu) : null;
+  return {
+    shift: sh, puesto: pu,
+    company: rec.company || '', buque: rec.buque || '', buque2: rec.buque2 || '',
+    movimientos: rec.movimientos || '', salario: rec.salario || '', extra: rec.extra || '',
+    liquidado: !!rec.liquidado, companeros: rec.companeros || [],
+    salarioAuto: (tAuto && rec.salario !== '' && rec.salario !== undefined && parseFloat(rec.salario) === tAuto.importe) ? tAuto.importe : null,
+    extraAuto: (sh && sh!=='L' && rec.extra !== '' && rec.extra !== undefined && parseFloat(rec.extra) === EXTRA_DEFAULT) ? EXTRA_DEFAULT : null
+  };
+}
+// formulario -> estado
+function dayReadForm(){
+  return {
+    shift: selectedShift, puesto: dayPuesto,
+    company: document.getElementById('dayCompany').value,
+    buque: document.getElementById('dayBuque').value.trim(),
+    buque2: document.getElementById('dayBuque2').value.trim(),
+    movimientos: document.getElementById('dayMovs').value,
+    salario: document.getElementById('daySalario').value,
+    extra: document.getElementById('dayExtra').value,
+    liquidado: document.getElementById('dayLiq').checked,
+    companeros: collectCrew(),
+    salarioAuto: salarioAutoVal, extraAuto: extraAutoVal
+  };
+}
+// estado -> registro que se guarda
+function dayToRecord(st){
+  return {
+    shift: st.shift, company: st.company, buque: st.buque, buque2: st.buque2,
+    movimientos: st.movimientos ? parseFloat(st.movimientos) : '',
+    salario: st.salario ? parseFloat(st.salario) : '',
+    extra: st.extra ? parseFloat(st.extra) : '',
+    puesto: st.puesto, companeros: st.companeros, liquidado: st.liquidado
+  };
+}
+// estado -> formulario
+function dayWriteForm(st){
+  selectedShift = st.shift || '';
+  dayPuesto = st.puesto;
+  salarioAutoVal = st.salarioAuto;
+  extraAutoVal = st.extraAuto;
+  document.getElementById('dayCompany').value = st.company || '';
+  document.getElementById('dayBuque').value = st.buque || '';
+  document.getElementById('dayBuque2').value = st.buque2 || '';
+  document.getElementById('dayLiq').checked = !!st.liquidado;
+  document.getElementById('dayMovs').value = st.movimientos || '';
+  document.getElementById('daySalario').value = st.salario || '';
+  document.getElementById('dayExtra').value = st.extra || '';
+  renderCrewFields(st.companeros);
+  renderShiftPick();
+  renderDayPuesto();
+}
+function renderShiftPick(){
   const pick = document.getElementById('shiftPick');
   pick.innerHTML = '';
-  SHIFTS.forEach(s=>{
+  // con dos turnos ninguno puede ser «Libre»
+  const list = (dayHasT2 || dayTab === 1) ? SHIFTS.filter(s => s !== 'L') : SHIFTS;
+  list.forEach(s=>{
     const btn = document.createElement('button');
     btn.textContent = SHIFT_NAMES[s];
     btn.className = (s===selectedShift ? 'active '+s : '');
@@ -1842,17 +1976,70 @@ function openDay(d){
     };
     pick.appendChild(btn);
   });
+}
+function dayTabsRender(){
+  const t0 = document.getElementById('dayTab0'), t1 = document.getElementById('dayTab1');
+  const add = document.getElementById('dayAddT2'), del = document.getElementById('dayDelRow');
+  if(dayHasT2){
+    t0.style.display = ''; t1.style.display = ''; add.style.display = 'none';
+    t0.className = dayTab === 0 ? 'active' : '';
+    t1.className = dayTab === 1 ? 'active' : '';
+    del.style.display = (dayTab === 1 && !dayLocked) ? 'block' : 'none';
+  } else {
+    t0.style.display = 'none'; t1.style.display = 'none'; add.style.display = ''; del.style.display = 'none';
+  }
+}
+function dayTabGo(i){
+  if(!dayHasT2 || i === dayTab) return;
+  dayT[dayTab] = dayReadForm();
+  dayTab = i;
+  dayWriteForm(dayT[i]);
+  applyDayLock();
+  document.querySelector('#dayOverlay .sheet').scrollTop = 0;
+}
+function dayAddTurno2(){
+  if(dayLocked) return;
+  const cur = dayReadForm();
+  if(!cur.shift || cur.shift === 'L'){
+    alert('Primero elige el turno 1 (mañana, tarde, noche o madrugada).');
+    return;
+  }
+  dayT[0] = cur;
+  dayHasT2 = true;
+  dayT[1] = dayFromRecord({puesto: cur.puesto});
+  dayTab = 1;
+  dayWriteForm(dayT[1]);
+  applyDayLock();
+  document.querySelector('#dayOverlay .sheet').scrollTop = 0;
+}
+function dayDelTurno2(){
+  if(dayLocked || !dayHasT2) return;
+  if(!confirm('¿Quitar el segundo turno de este día?')) return;
+  dayHasT2 = false;
+  dayT[1] = null;
+  dayTab = 0;
+  dayWriteForm(dayT[0]);
+  applyDayLock();
+}
 
-  dayPuesto = (entry.puesto && PUESTOS.some(x=>x.k===entry.puesto)) ? entry.puesto : ajustePuesto;
-  renderDayPuesto();
-  // si el salario guardado coincide con la tarifa, se sigue considerando automático
-  const tAuto = (selectedShift && selectedShift!=='L') ? tarifaInfo(d, selectedShift) : null;
-  extraAutoVal = (selectedShift && selectedShift!=='L' && entry.extra !== '' && entry.extra !== undefined && parseFloat(entry.extra) === EXTRA_DEFAULT) ? EXTRA_DEFAULT : null;
-  salarioAutoVal = (tAuto && entry.salario !== '' && entry.salario !== undefined && parseFloat(entry.salario) === tAuto.importe) ? tAuto.importe : null;
+function openDay(d){
+  selectedDay = d;
+  const key = monthKey(viewYear, viewMonth);
+  const entry = (data[key] && data[key][d]) || {shift:'', note:'', company:''};
+
+  document.getElementById('dayTitle').textContent = 'Día ' + d;
+  document.getElementById('daySub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+  document.getElementById('dayNote').value = entry.note || '';
+
+  dayHasT2 = !!(entry.t2 && entry.t2.shift);
+  dayTab = 0;
+  dayT = [dayFromRecord(entry), dayHasT2 ? dayFromRecord(entry.t2) : null];
+  dayWriteForm(dayT[0]);
 
   dayLocked = !!entry.bloqueado;
   applyDayLock();
   document.getElementById('dayOverlay').classList.add('open');
+  document.querySelector('#dayOverlay .sheet').scrollTop = 0;   // el formulario siempre empieza desde arriba
 }
 
 // ---- Bloqueo del día (candado junto a la X) ----
@@ -1866,16 +2053,20 @@ function applyDayLock(){
   b.innerHTML = dayLocked ? LOCK_CLOSED : LOCK_OPEN;
   b.classList.toggle('on', dayLocked);
   b.setAttribute('aria-label', dayLocked ? 'Desbloquear día' : 'Bloquear día');
+  document.getElementById('dayAddT2').disabled = dayLocked;
+  dayTabsRender();
 }
 // La marca de liquidado sigue activa con el día bloqueado: se guarda al momento (Guardar está desactivado)
 function dayLiqChange(){
   if(!dayLocked) return;
   const key = monthKey(viewYear, viewMonth);
-  if(data[key] && data[key][selectedDay]){
-    data[key][selectedDay].liquidado = document.getElementById('dayLiq').checked;
-    persist();
-    render();
-  }
+  const e = data[key] && data[key][selectedDay];
+  if(!e) return;
+  const rec = dayTab === 0 ? e : e.t2;     // la marca es del turno que se está viendo
+  if(!rec) return;
+  rec.liquidado = document.getElementById('dayLiq').checked;
+  persist();
+  render();
 }
 function dayLockToggle(){
   dayLocked = !dayLocked;
@@ -1957,36 +2148,59 @@ function closeDay(){
 function buquesDe(e){ return [e && e.buque, e && e.buque2].map(v => String(v || '').trim()).filter(Boolean); }
 function buquesTxt(e, sep){ return buquesDe(e).join(sep || ' / '); }
 
+// turnos de un día: el primero es el propio registro y, si existe, el segundo está en e.t2
+function turnosDe(e){
+  if(!e) return [];
+  return (e.t2 && e.t2.shift) ? [e, e.t2] : [e];
+}
+// salario del día: suma de sus turnos trabajados (sin extras)
+function salarioDia(e){
+  let v = 0;
+  turnosDe(e).forEach(t => { if(t.shift && t.shift !== 'L') v += parseFloat(t.salario) || 0; });
+  return v;
+}
+// «Mañana» o «Mañana + Noche»
+function nombresTurnos(e){
+  return turnosDe(e).filter(t => t.shift && t.shift !== 'L').map(t => SHIFT_NAMES[t.shift]).join(' + ');
+}
+// lista de {d, t} (día y turno) de un mes que cumplen una condición, ordenada por día
+function diasTurnos(monthData, pred){
+  const out = [];
+  Object.keys(monthData).map(n => parseInt(n, 10)).sort((a, b) => a - b).forEach(d => {
+    turnosDe(monthData[d]).forEach(t => { if(pred(t)) out.push({d: d, t: t}); });
+  });
+  return out;
+}
+
 function saveDay(){
   const key = monthKey(viewYear, viewMonth);
-  if(!data[key]) data[key] = {};
   const note = document.getElementById('dayNote').value.trim();
-  const company = document.getElementById('dayCompany').value;
-  const buque = document.getElementById('dayBuque').value.trim();
-  const buque2 = document.getElementById('dayBuque2').value.trim();
-  const movimientos = document.getElementById('dayMovs').value;
-  const salario = document.getElementById('daySalario').value;
-  const extra = document.getElementById('dayExtra').value;
-  const companeros = collectCrew();
-  crewSync(companeros);
-  const hasExtras = note || company || buque || buque2 || movimientos || salario || extra || companeros.length;
-  if(!selectedShift && !hasExtras){
+  dayT[dayTab] = dayReadForm();
+  const t1 = dayT[0], t2 = dayHasT2 ? dayT[1] : null;
+  if(t2){
+    if(!t1.shift || t1.shift === 'L'){
+      alert('Con dos turnos, el turno 1 tiene que ser mañana, tarde, noche o madrugada.');
+      dayTabGo(0);
+      return;
+    }
+    if(!t2.shift || t2.shift === 'L'){
+      alert('Elige el turno del segundo turno o quítalo.');
+      dayTabGo(1);
+      return;
+    }
+  }
+  if(!data[key]) data[key] = {};
+  crewSync(t1.companeros);
+  if(t2) crewSync(t2.companeros);
+  const hasExtras = note || t1.company || t1.buque || t1.buque2 || t1.movimientos || t1.salario || t1.extra || t1.companeros.length;
+  if(!t1.shift && !hasExtras){
     delete data[key][selectedDay];
   } else {
-    data[key][selectedDay] = {
-      shift: selectedShift,
-      note: note,
-      company: company,
-      buque: buque,
-      buque2: buque2,
-      movimientos: movimientos ? parseFloat(movimientos) : '',
-      salario: salario ? parseFloat(salario) : '',
-      extra: extra ? parseFloat(extra) : '',
-      puesto: dayPuesto,
-      companeros: companeros,
-      liquidado: document.getElementById('dayLiq').checked,
-      bloqueado: true   // al guardar, el día queda bloqueado (solo consulta) hasta que se desbloquee
-    };
+    const entry = dayToRecord(t1);
+    entry.note = note;
+    entry.bloqueado = true;   // al guardar, el día queda bloqueado (solo consulta) hasta que se desbloquee
+    if(t2) entry.t2 = dayToRecord(t2);
+    data[key][selectedDay] = entry;
   }
   persist();
   closeDay();
@@ -2026,18 +2240,22 @@ async function exportExcel(){
     }
 
     const header = ['Dia','Turno','Empresa','Buque','Movimientos','Salario','Extra','Nota'];
-    const rows = days.map(d=>{
-      const e = monthData[d];
-      return [
-        d,
-        e.shift ? SHIFT_NAMES[e.shift] : '',
-        e.company || '',
-        buquesTxt(e),
-        e.movimientos ? parseFloat(e.movimientos) : '',
-        e.salario ? parseFloat(e.salario) : '',
-        e.extra ? parseFloat(e.extra) : '',
-        e.note || ''
-      ];
+    // una fila por turno: un día con dos turnos aparece dos veces (la nota solo en la primera)
+    const rows = [];
+    days.forEach(d=>{
+      const dia = monthData[d];
+      turnosDe(dia).forEach((e, idx) => {
+        rows.push([
+          d,
+          e.shift ? SHIFT_NAMES[e.shift] : '',
+          e.company || '',
+          buquesTxt(e),
+          e.movimientos ? parseFloat(e.movimientos) : '',
+          e.salario ? parseFloat(e.salario) : '',
+          e.extra ? parseFloat(e.extra) : '',
+          idx === 0 ? (dia.note || '') : ''
+        ]);
+      });
     });
 
     const workbook = await XlsxPopulate.fromBlankAsync();
@@ -2081,16 +2299,18 @@ function exportPDF(){
 
   let horasTotal=0, movimientosTotal=0, salarioTotal=0, extraTotal=0, turnosTotal=0;
   const rows = days.map(d=>{
-    const e = monthData[d];
-    if(!e.shift && !e.note && !buquesDe(e).length && !e.movimientos && !e.salario && !e.extra) return '';
-    if(e.shift && e.shift!=='L'){
-      horasTotal += (settings[e.shift]?.horas || 0);
-      turnosTotal++;
-    }
-    if(e.movimientos) movimientosTotal += parseFloat(e.movimientos)||0;
-    if(e.salario) salarioTotal += parseFloat(e.salario)||0;
-    if(e.extra) extraTotal += parseFloat(e.extra)||0;
-    return `<tr>
+    const dia = monthData[d];
+    if(!dia.shift && !dia.note && !buquesDe(dia).length && !dia.movimientos && !dia.salario && !dia.extra) return '';
+    // una fila por turno: un día con dos turnos aparece dos veces (la nota solo en la primera)
+    return turnosDe(dia).map((e, idx) => {
+      if(e.shift && e.shift!=='L'){
+        horasTotal += (settings[e.shift]?.horas || 0);
+        turnosTotal++;
+      }
+      if(e.movimientos) movimientosTotal += parseFloat(e.movimientos)||0;
+      if(e.salario) salarioTotal += parseFloat(e.salario)||0;
+      if(e.extra) extraTotal += parseFloat(e.extra)||0;
+      return `<tr>
       <td>${d}</td>
       <td>${e.shift ? SHIFT_NAMES[e.shift] : '—'}</td>
       <td>${esc(e.company) || '—'}</td>
@@ -2098,8 +2318,9 @@ function exportPDF(){
       <td>${e.movimientos || '—'}</td>
       <td>${e.salario ? parseFloat(e.salario).toFixed(2)+' €' : '—'}</td>
       <td>${e.extra ? parseFloat(e.extra).toFixed(2)+' €' : '—'}</td>
-      <td>${esc(e.note)}</td>
+      <td>${idx === 0 ? esc(dia.note) : ''}</td>
     </tr>`;
+    }).join('');
   }).join('');
 
   if(!rows){
@@ -2111,11 +2332,12 @@ function exportPDF(){
   const countsByShift = {M:0,T:0,N:0,MA:0};
   const ingresosEmpresaPdf = {OPCSA:0,'La Luz':0,Gesport:0};
   days.forEach(d=>{
-    const e = monthData[d];
-    if(e.shift && countsByShift.hasOwnProperty(e.shift)) countsByShift[e.shift]++;
-    if(e.shift && e.shift!=='L' && e.company && ingresosEmpresaPdf.hasOwnProperty(e.company)){
-      ingresosEmpresaPdf[e.company] += (parseFloat(e.salario)||0);
-    }
+    turnosDe(monthData[d]).forEach(e => {
+      if(e.shift && countsByShift.hasOwnProperty(e.shift)) countsByShift[e.shift]++;
+      if(e.shift && e.shift!=='L' && e.company && ingresosEmpresaPdf.hasOwnProperty(e.company)){
+        ingresosEmpresaPdf[e.company] += (parseFloat(e.salario)||0);
+      }
+    });
   });
   const maxShiftCount = Math.max(1, ...Object.values(countsByShift));
   const shiftBars = SHIFTS.filter(s=>s!=='L').map(s => `
@@ -2134,10 +2356,11 @@ function exportPDF(){
 
   const ingresosPorTurno = {M:0,T:0,N:0,MA:0};
   days.forEach(d=>{
-    const e = monthData[d];
-    if(e.shift && ingresosPorTurno.hasOwnProperty(e.shift)){
-      ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0);
-    }
+    turnosDe(monthData[d]).forEach(e => {
+      if(e.shift && ingresosPorTurno.hasOwnProperty(e.shift)){
+        ingresosPorTurno[e.shift] += (parseFloat(e.salario)||0);
+      }
+    });
   });
   const maxIngresoTurno = Math.max(1, ...Object.values(ingresosPorTurno));
   const turnoSalarioBars = SHIFTS.filter(s=>s!=='L').map(s => `
@@ -2351,8 +2574,7 @@ function calcEquals(){
 function openShiftInfo(shiftCode){
   const key = monthKey(viewYear, viewMonth);
   const monthData = data[key] || {};
-  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b)
-    .filter(d => monthData[d].shift === shiftCode);
+  const days = diasTurnos(monthData, t => t.shift === shiftCode);
 
   document.getElementById('shiftInfoTitle').textContent = SHIFT_NAMES[shiftCode];
   document.getElementById('shiftInfoSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
@@ -2366,8 +2588,7 @@ function openShiftInfo(shiftCode){
   }
 
   let ingresosTotal = 0, movimientosTotal = 0;
-  const items = days.map(d=>{
-    const e = monthData[d];
+  const items = days.map(({d, t: e})=>{
     ingresosTotal += (parseFloat(e.salario)||0);
     movimientosTotal += parseFloat(e.movimientos)||0;
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
@@ -2397,8 +2618,7 @@ function openShiftInfo(shiftCode){
 function openTotalInfo(){
   const key = monthKey(viewYear, viewMonth);
   const monthData = data[key] || {};
-  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b)
-    .filter(d => monthData[d].shift && monthData[d].shift !== 'L');
+  const days = diasTurnos(monthData, t => t.shift && t.shift !== 'L');
 
   document.getElementById('shiftInfoTitle').textContent = 'Turnos totales';
   document.getElementById('shiftInfoSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
@@ -2412,8 +2632,7 @@ function openTotalInfo(){
   }
 
   let ingresosTotal = 0;
-  const items = days.map(d=>{
-    const e = monthData[d];
+  const items = days.map(({d, t: e})=>{
     ingresosTotal += (parseFloat(e.salario)||0);
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;font-size:calc(13.5px*var(--fs,1));font-weight:700;">
@@ -2554,41 +2773,48 @@ function srRun(){
     return;
   }
 
+  // cada turno es un resultado: un día con dos turnos puede dar dos filas
   const res = [];
   let total = 0;
   Object.keys(data).forEach(key => {
     const md = data[key] || {};
     Object.keys(md).forEach(dk => {
-      const e = md[dk];
-      if(!e) return;
+      const dia = md[dk];
+      if(!dia) return;
       total++;
       const d = parseInt(dk, 10);
       const ymd = key + '-' + String(d).padStart(2, '0');
-      if(srShifts.size && !srShifts.has(e.shift)) return;
-      if(emp && e.company !== emp) return;
-      if(pue && e.puesto !== pue) return;
-      if(buq && !buquesDe(e).some(n => srNorm(n).includes(buq))) return;
-      const crew = e.companeros || [];
-      if(com && !crew.some(c => srNorm(c.nombre).includes(com) || srNorm(c.censo).includes(com))) return;
       if(mes && key !== mes) return;
-      const mv = parseFloat(e.movimientos) || 0, sa = parseFloat(e.salario) || 0, ex = parseFloat(e.extra) || 0;
-      if(m1 !== null && mv < m1) return;
-      if(m2 !== null && mv > m2) return;
-      if(s1 !== null && sa < s1) return;
-      if(s2 !== null && sa > s2) return;
-      if(ext === 'con' && !(ex > 0)) return;
-      if(ext === 'sin' && ex > 0) return;
-      const hasNote = !!String(e.note || '').trim();
+      // la nota es del día entero
+      const hasNote = !!String(dia.note || '').trim();
       if(nota === 'con' && !hasNote) return;
       if(nota === 'sin' && hasNote) return;
-      if(liq === 'si' && !e.liquidado) return;
-      if(liq === 'no' && (!e.shift || e.shift === 'L' || e.liquidado)) return;   // sin liquidar: solo turnos trabajados
-      if(words.length){
-        const hay = srNorm([buquesTxt(e, ' '), e.note, e.company, e.shift ? SHIFT_NAMES[e.shift] : '']
-          .concat(crew.map(c => (c.nombre || '') + ' ' + (c.censo || ''))).join(' '));
-        if(!words.every(w => hay.includes(w))) return;
-      }
-      res.push({key, d, ymd, e, mv, sal: sa});
+      const turnos = turnosDe(dia);
+      let primero = true;
+      turnos.forEach((e, idx) => {
+        if(srShifts.size && !srShifts.has(e.shift)) return;
+        if(emp && e.company !== emp) return;
+        if(pue && e.puesto !== pue) return;
+        if(buq && !buquesDe(e).some(n => srNorm(n).includes(buq))) return;
+        const crew = e.companeros || [];
+        if(com && !crew.some(c => srNorm(c.nombre).includes(com) || srNorm(c.censo).includes(com))) return;
+        const mv = parseFloat(e.movimientos) || 0, sa = parseFloat(e.salario) || 0, ex = parseFloat(e.extra) || 0;
+        if(m1 !== null && mv < m1) return;
+        if(m2 !== null && mv > m2) return;
+        if(s1 !== null && sa < s1) return;
+        if(s2 !== null && sa > s2) return;
+        if(ext === 'con' && !(ex > 0)) return;
+        if(ext === 'sin' && ex > 0) return;
+        if(liq === 'si' && !e.liquidado) return;
+        if(liq === 'no' && (!e.shift || e.shift === 'L' || e.liquidado)) return;   // sin liquidar: solo turnos trabajados
+        if(words.length){
+          const hay = srNorm([buquesTxt(e, ' '), dia.note, e.company, e.shift ? SHIFT_NAMES[e.shift] : '']
+            .concat(crew.map(c => (c.nombre || '') + ' ' + (c.censo || ''))).join(' '));
+          if(!words.every(w => hay.includes(w))) return;
+        }
+        res.push({key, d, ymd, e, dia, idx, dos: turnos.length === 2, mv, sal: sa, mostrarNota: primero});
+        primero = false;
+      });
     });
   });
   res.sort((a, b) => a.ymd < b.ymd ? 1 : (a.ymd > b.ymd ? -1 : 0));
@@ -2607,11 +2833,11 @@ function srRun(){
     const parts = [r.e.company ? esc(r.e.company) : '', buquesDe(r.e).length ? esc(buquesTxt(r.e)) : '', r.mv ? r.mv + ' mov.' : '', pu ? pu.label : ''].filter(Boolean);
     const crew = r.e.companeros || [];
     return '<div class="sr-item" onclick="srGo(\'' + r.key + '\',' + r.d + ')">' +
-      '<div class="r1"><span>' + r.d + ' ' + MONTH_NAMES[m - 1].slice(0, 3) + ' ' + y + (r.e.shift ? ' &middot; ' + SHIFT_NAMES[r.e.shift] : '') + (r.e.liquidado ? ' <span style="color:#4cd08a;">&#10003;</span>' : '') + '</span>' +
+      '<div class="r1"><span>' + r.d + ' ' + MONTH_NAMES[m - 1].slice(0, 3) + ' ' + y + (r.e.shift ? ' &middot; ' + SHIFT_NAMES[r.e.shift] : '') + (r.dos ? ' <span style="color:var(--text-dim);font-weight:600;">(turno ' + (r.idx + 1) + ')</span>' : '') + (r.e.liquidado ? ' <span style="color:#4cd08a;">&#10003;</span>' : '') + '</span>' +
       '<span>' + (r.sal ? r.sal.toFixed(2) + ' €' : '') + '</span></div>' +
       (parts.length ? '<div class="r2">' + parts.join(' &middot; ') + '</div>' : '') +
       (showCrew && crew.length ? '<div class="r2">' + crew.map(c => esc(c.nombre || c.censo)).join(', ') + '</div>' : '') +
-      (r.e.note ? '<div class="r2" style="font-style:italic;">' + esc(r.e.note) + '</div>' : '') +
+      (r.mostrarNota && r.dia.note ? '<div class="r2" style="font-style:italic;">' + esc(r.dia.note) + '</div>' : '') +
       '</div>';
   }).join('');
 
@@ -2668,20 +2894,22 @@ function buquesCollect(){
   Object.keys(data).forEach(key => {
     const md = data[key] || {};
     Object.keys(md).forEach(dk => {
-      const e = md[dk];
-      const names = buquesDe(e);
-      if(!names.length) return;
       const ymd = key + '-' + String(parseInt(dk, 10)).padStart(2, '0');
-      names.forEach(nm => {
-        const raw = nm.replace(/\s+/g, ' ');
-        const k = srNorm(raw);
-        let b = map.get(k);
-        if(!b){ b = {k, names:{}, services:0, movs:0, last:'', lastName:raw}; map.set(k, b); }
-        b.names[raw] = (b.names[raw] || 0) + 1;
-        b.services++;
-        // los movimientos se apuntan por turno: solo se atribuyen al buque si el turno tiene uno solo
-        if(names.length === 1) b.movs += parseFloat(e.movimientos) || 0;
-        if(ymd > b.last){ b.last = ymd; b.lastName = raw; }
+      // cada turno del día (uno o dos) es un servicio de sus buques
+      turnosDe(md[dk]).forEach(e => {
+        const names = buquesDe(e);
+        if(!names.length) return;
+        names.forEach(nm => {
+          const raw = nm.replace(/\s+/g, ' ');
+          const k = srNorm(raw);
+          let b = map.get(k);
+          if(!b){ b = {k, names:{}, services:0, movs:0, last:'', lastName:raw}; map.set(k, b); }
+          b.names[raw] = (b.names[raw] || 0) + 1;
+          b.services++;
+          // los movimientos se apuntan por turno: solo se atribuyen al buque si el turno tiene uno solo
+          if(names.length === 1) b.movs += parseFloat(e.movimientos) || 0;
+          if(ymd > b.last){ b.last = ymd; b.lastName = raw; }
+        });
       });
     });
   });
@@ -2776,8 +3004,7 @@ function bqCapacidadWeb(){
 function openCompanyInfo(company){
   const key = monthKey(viewYear, viewMonth);
   const monthData = data[key] || {};
-  const days = Object.keys(monthData).map(n=>parseInt(n)).sort((a,b)=>a-b)
-    .filter(d => monthData[d].shift && monthData[d].shift !== 'L' && monthData[d].company === company);
+  const days = diasTurnos(monthData, t => t.shift && t.shift !== 'L' && t.company === company);
 
   document.getElementById('shiftInfoTitle').textContent = company;
   document.getElementById('shiftInfoSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
@@ -2791,8 +3018,7 @@ function openCompanyInfo(company){
   }
 
   let ingresosTotal = 0;
-  const items = days.map(d=>{
-    const e = monthData[d];
+  const items = days.map(({d, t: e})=>{
     ingresosTotal += (parseFloat(e.salario)||0);
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;font-size:calc(13.5px*var(--fs,1));font-weight:700;">
@@ -2822,7 +3048,9 @@ function openCompanyInfo(company){
 function dashBarras(){
   const key = monthKey(viewYear, viewMonth);
   const monthData = data[key] || {};
-  const entries = Object.entries(monthData).filter(([d,e]) => e.shift);
+  // cada turno cuenta aparte: un día con dos turnos aporta dos entradas
+  const entries = [];
+  Object.keys(monthData).forEach(d => { turnosDe(monthData[d]).forEach(t => { if(t.shift) entries.push([d, t]); }); });
 
   document.getElementById('dashSub').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
   const body = document.getElementById('dashBody');
@@ -2936,8 +3164,12 @@ function dashEmpty(msg){
 }
 function dashMonthEntries(){
   const md = data[monthKey(viewYear, viewMonth)] || {};
-  return Object.keys(md).map(n=>parseInt(n)).sort((a,b)=>a-b)
-    .map(d => ({d:d, e:md[d]})).filter(x => x.e.shift);
+  // una entrada por turno (un día con dos turnos da dos)
+  const out = [];
+  Object.keys(md).map(n=>parseInt(n)).sort((a,b)=>a-b).forEach(d => {
+    turnosDe(md[d]).forEach(t => { if(t.shift) out.push({d:d, e:t}); });
+  });
+  return out;
 }
 // ¿Cuenta este turno como festivo? (mismas reglas que la tarifa del salario)
 function esFestivoEfectivo(y, m, d, shift){
@@ -3063,8 +3295,8 @@ function dashCalorHtml(){
   let max = 1;
   for(let d=1; d<=dim; d++){
     const e = md[d];
-    if(e && e.shift && e.shift !== 'L'){
-      const v = parseFloat(e.salario) || 0;
+    if(e && turnosDe(e).some(x => x.shift && x.shift !== 'L')){
+      const v = salarioDia(e);
       vals[d] = v;
       if(v > max) max = v;
     }
@@ -3085,7 +3317,7 @@ function dashCalorHtml(){
   const top = Object.keys(vals).map(Number).sort((a,b)=>vals[b]-vals[a]).slice(0,3);
   const topHtml = top.map(d => `
     <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:calc(13px*var(--fs,1));">
-      <span><b>Día ${d}</b> <span style="color:var(--text-dim);">· ${SHIFT_NAMES[md[d].shift]}</span></span><b>${vals[d].toFixed(2)} €</b>
+      <span><b>Día ${d}</b> <span style="color:var(--text-dim);">· ${nombresTurnos(md[d])}</span></span><b>${vals[d].toFixed(2)} €</b>
     </div>`).join('');
   return `
     <div class="dash-section">
@@ -3112,7 +3344,7 @@ function dashAcumHtml(){
   let lastD = 0, total = 0, n = 0;
   for(let d=1; d<=dim; d++){
     const e = md[d];
-    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    const v = salarioDia(e);
     vals.push(v);
     if(v > 0){ lastD = d; total += v; n++; }
   }
@@ -3169,7 +3401,7 @@ function dashBolsaHtml(){
   const worked = [];
   for(let d=1; d<=dim; d++){
     const e = md[d];
-    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    const v = salarioDia(e);
     if(v > 0) worked.push({d:d, v:v});
   }
   if(!worked.length) return '';
@@ -3238,7 +3470,7 @@ function dashBolsaLineaHtml(){
   const w = [];
   for(let d=1; d<=dim; d++){
     const e = md[d];
-    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    const v = salarioDia(e);
     if(v > 0) w.push({d:d, v:v});
   }
   if(!w.length) return '';
@@ -3315,7 +3547,7 @@ function dashDiaAltHtml(){
   let max = 0;
   for(let d=1; d<=dim; d++){
     const e = md[d];
-    const v = (e && e.shift && e.shift !== 'L') ? (parseFloat(e.salario)||0) : 0;
+    const v = salarioDia(e);
     vals.push(v);
     if(v > max) max = v;
   }
@@ -3344,11 +3576,12 @@ function dashCifrasHtml(){
   let salTot = 0, movs = 0, festN = 0, festEur = 0, bestD = trab[0].d, bestV = -1;
   const porTurno = {M:0,T:0,N:0,MA:0};
   const buq = {};
+  const porDia = {};   // el mejor día suma los turnos del día
   trab.forEach(({d,e})=>{
     const b = parseFloat(e.salario) || 0;
     salTot += b;
     movs += parseFloat(e.movimientos) || 0;
-    if(b > bestV){ bestV = b; bestD = d; }
+    porDia[d] = (porDia[d] || 0) + b;
     if(esFestivoEfectivo(viewYear, viewMonth, d, e.shift)){ festN++; festEur += b; }
     if(porTurno.hasOwnProperty(e.shift)) porTurno[e.shift] += (parseFloat(e.salario)||0);
     const nm = String(e.buque||'').trim();   // solo el primer buque cuenta aquí: el segundo es solo registro
@@ -3359,6 +3592,7 @@ function dashCifrasHtml(){
       buq[k].sal += (parseFloat(e.salario)||0);
     }
   });
+  Object.keys(porDia).forEach(k => { if(porDia[k] > bestV){ bestV = porDia[k]; bestD = parseInt(k, 10); } });
   let topT = 'M';
   Object.keys(porTurno).forEach(k=>{ if(porTurno[k] > porTurno[topT]) topT = k; });
   const lista = Object.values(buq).sort((a,b)=>b.n-a.n || b.sal-a.sal).slice(0,5);
@@ -3468,19 +3702,23 @@ function panelMes(y, m){
   const md = data[monthKey(y, m)] || {};
   const o = {turnos:0, libres:0, horas:0, movs:0, salario:0, extras:0, salTrab:0, fest:0, bestD:0, bestV:-1};
   Object.keys(md).forEach(k=>{
-    const d = parseInt(k, 10), e = md[k];
-    o.movs += parseFloat(e.movimientos) || 0;
-    o.salario += parseFloat(e.salario) || 0;
-    o.extras += parseFloat(e.extra) || 0;
-    if(e.shift === 'L') o.libres++;
-    else if(e.shift){
-      o.turnos++;
-      o.horas += (settings[e.shift] && settings[e.shift].horas) || 0;
-      const sv = parseFloat(e.salario) || 0;
-      o.salTrab += sv;
-      if(sv > o.bestV){ o.bestV = sv; o.bestD = d; }
-      if(esFestivoEfectivo(y, m, d, e.shift)) o.fest++;
-    }
+    const d = parseInt(k, 10);
+    let dia = 0, trab = 0;   // salario del día y turnos trabajados ese día
+    turnosDe(md[k]).forEach(e => {
+      o.movs += parseFloat(e.movimientos) || 0;
+      o.salario += parseFloat(e.salario) || 0;
+      o.extras += parseFloat(e.extra) || 0;
+      if(e.shift === 'L') o.libres++;
+      else if(e.shift){
+        o.turnos++;
+        o.horas += (settings[e.shift] && settings[e.shift].horas) || 0;
+        const sv = parseFloat(e.salario) || 0;
+        o.salTrab += sv;
+        dia += sv; trab++;
+        if(esFestivoEfectivo(y, m, d, e.shift)) o.fest++;
+      }
+    });
+    if(trab && dia > o.bestV){ o.bestV = dia; o.bestD = d; }
   });
   return o;
 }
@@ -3492,9 +3730,9 @@ function panelAno(y){
     o.bruto += b;
     if(b > 0) o.neto += nominaCalcKey(key).neto;
     const md = data[key] || {};
-    Object.values(md).forEach(e=>{
+    Object.values(md).forEach(dia => turnosDe(dia).forEach(e => {
       if(e.shift && e.shift !== 'L'){ o.turnos++; o.horas += (settings[e.shift] && settings[e.shift].horas) || 0; }
-    });
+    }));
   }
   return o;
 }
@@ -3679,7 +3917,24 @@ function ajustesReset(){
   renderAjustes();
 }
 
+// Versión de la app: se cambia en cada actualización del archivo (año.mes.día-número)
+const APP_VERSION = '2026.11.09-1';
+function renderAppVersion(){
+  const el = document.getElementById('appVersion');
+  if(!el) return;
+  el.textContent = 'Mis Turnos · versión ' + APP_VERSION;
+  // nombre de la caché sin conexión que tiene instalada el navegador (sirve para ver si se ha actualizado)
+  if(window.caches && caches.keys){
+    caches.keys().then(ks => {
+      const k = ks.filter(x => /^mis-turnos/.test(x)).sort().pop();
+      if(k) el.innerHTML = 'Mis Turnos · versión ' + APP_VERSION + '<br>Caché sin conexión: ' + esc(k);
+    }).catch(() => {});
+  }
+}
 function openSettings(){
+  renderAppVersion();
+  backupStatusRender();
+  undoRender();
   document.querySelectorAll('.mlabel').forEach(el => { el.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear; });
   document.getElementById('settingsOverlay').classList.add('open');
 }
@@ -3694,25 +3949,149 @@ function clearMonth(){
     alert('Ese mes ya está vacío.');
     return;
   }
-  if(confirm('¿Borrar todos los turnos de ' + label + '? Esta acción no se puede deshacer.')){
+  if(confirm('¿Borrar todos los turnos de ' + label + '? Podrás deshacerlo justo después.')){
+    // red de seguridad: se guardan los turnos del mes antes de borrarlos
+    const guardado = undoSave('mes', label, {key: key, monthData: JSON.parse(JSON.stringify(data[key]))});
+    if(!guardado && !confirm('No hay espacio para guardar los turnos y poder deshacer. ¿Borrar igualmente?')) return;
     delete data[key];
     persist();
     closeSettings();
     render();
+    if(guardado) undoShowToast('Turnos de ' + label + ' borrados.');
   }
 }
 
+// ===== Red de seguridad: deshacer borrados =====
+const UNDO_KEY = 'turnos_undo_v1';
+const UNDO_DAYS = 14;           // el último borrado se puede recuperar durante estos días
+let undoTimer = null;
+
+function undoGet(){
+  try{
+    const u = JSON.parse(localStorage.getItem(UNDO_KEY));
+    if(!u || !u.t || !u.payload) return null;
+    if(Date.now() - u.t > UNDO_DAYS * 86400000){ localStorage.removeItem(UNDO_KEY); return null; }
+    return u;
+  }catch(e){ return null; }
+}
+function undoSave(tipo, label, payload){
+  try{ localStorage.setItem(UNDO_KEY, JSON.stringify({t: Date.now(), tipo: tipo, label: label, payload: payload})); return true; }
+  catch(e){ return false; }
+}
+function undoShowToast(msg){
+  document.getElementById('undoToastText').textContent = msg;
+  document.getElementById('undoToast').classList.add('show');
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(undoHideToast, 12000);
+}
+function undoHideToast(){
+  clearTimeout(undoTimer);
+  document.getElementById('undoToast').classList.remove('show');
+}
+function undoRender(){
+  const box = document.getElementById('undoBox');
+  if(!box) return;
+  const u = undoGet();
+  if(!u){ box.style.display = 'none'; return; }
+  document.getElementById('undoText').textContent = 'Último borrado: ' + (u.tipo === 'mes' ? 'turnos de ' + u.label : u.label) + ' (' + bkAgo(bkDays(u.t)) + ')';
+  box.style.display = 'flex';
+}
+function undoRestore(){
+  const u = undoGet();
+  if(!u){ undoHideToast(); undoRender(); return; }
+  if(u.tipo === 'mes'){
+    const k = u.payload.key, back = u.payload.monthData || {};
+    const cur = data[k] || {};
+    // no pisa lo que se haya apuntado después: solo vuelve lo que falta
+    Object.keys(back).forEach(d => { if(!cur[d]) cur[d] = back[d]; });
+    data[k] = cur;
+    persist();
+    const p = k.split('-');
+    viewYear = parseInt(p[0], 10);
+    viewMonth = parseInt(p[1], 10) - 1;
+  } else {
+    if(!confirm('Se volverá a los datos anteriores a la importación. Lo que hayas cambiado desde entonces se perderá. ¿Continuar?')) return;
+    aplicarCopia(u.payload);
+  }
+  try{ localStorage.removeItem(UNDO_KEY); }catch(e){}
+  closeSettings();
+  render();
+  if(currentView === 'ano') renderYear();
+  undoRender();
+  undoShowToast('Recuperado.');
+}
+
+// ===== Recordatorio de copia de seguridad =====
+const BACKUP_KEY = 'turnos_lastbackup_v1';
+const BACKUP_SNOOZE_KEY = 'turnos_backup_snooze_v1';
+const BACKUP_DAYS = 30;          // días sin copia antes de avisar
+const BACKUP_SNOOZE_DAYS = 7;    // «Más tarde» aplaza el aviso estos días
+let bkPersisted = null;          // null = no se sabe; true/false = respuesta del navegador
+
+function bkNum(key){ try{ return parseInt(localStorage.getItem(key), 10) || 0; }catch(e){ return 0; } }
+function bkHasData(){ return Object.keys(data).some(k => data[k] && Object.keys(data[k]).length); }
+function bkDays(ts){ return Math.floor((Date.now() - ts) / 86400000); }
+function bkAgo(days){ return days <= 0 ? 'hoy' : (days === 1 ? 'ayer' : 'hace ' + days + ' días'); }
+
+// se llama al exportar la copia
+function backupDone(){
+  try{ localStorage.setItem(BACKUP_KEY, String(Date.now())); localStorage.removeItem(BACKUP_SNOOZE_KEY); }catch(e){}
+  backupCheck();
+  backupStatusRender();
+}
+function backupCheck(){
+  const box = document.getElementById('backupBanner');
+  const last = bkNum(BACKUP_KEY);
+  const due = bkHasData() && (!last || bkDays(last) >= BACKUP_DAYS) && Date.now() >= bkNum(BACKUP_SNOOZE_KEY);
+  if(!due){ box.style.display = 'none'; return; }
+  document.getElementById('bkText').textContent = last
+    ? 'Hace ' + bkDays(last) + ' días que no haces una copia de seguridad.'
+    : 'Todavía no has hecho ninguna copia de seguridad. Tus turnos solo están en este móvil.';
+  box.style.display = 'block';
+}
+function backupLater(){
+  try{ localStorage.setItem(BACKUP_SNOOZE_KEY, String(Date.now() + BACKUP_SNOOZE_DAYS * 86400000)); }catch(e){}
+  backupCheck();
+}
+function backupNow(){ exportData(); }
+function backupStatusRender(){
+  const el = document.getElementById('bkStatus');
+  if(!el) return;
+  const last = bkNum(BACKUP_KEY);
+  let h = last
+    ? 'Última copia: ' + new Date(last).toLocaleDateString('es-ES') + ' (' + bkAgo(bkDays(last)) + ')'
+    : 'Todavía no has hecho ninguna copia.';
+  if(bkPersisted === true) h += '<br>El navegador protege estos datos de borrados automáticos por falta de espacio. No te protege si borras los datos del navegador o cambias de móvil: para eso sirve la copia.';
+  else if(bkPersisted === false) h += '<br>El navegador no ha confirmado la protección de estos datos, así que las copias son aún más importantes.';
+  el.innerHTML = h;
+}
+function backupInit(){
+  // pide al navegador que no borre los datos de la app si falta espacio
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      navigator.storage.persist().then(g => { bkPersisted = !!g; backupStatusRender(); }).catch(() => {});
+    }
+  }catch(e){}
+  backupCheck();
+}
+
+// todo el estado de la app en un solo objeto (para exportar y para la red de seguridad)
+function copiaCompleta(){
+  return {data, settings, crew: crewReg, nomina: nominaData, tarifas: TARIFAS, puesto: ajustePuesto, extraDefault: EXTRA_DEFAULT, panel: panelSel, buquesFichas: bqFichas};
+}
 function exportData(){
-  const payload = JSON.stringify({data, settings, crew: crewReg, nomina: nominaData, tarifas: TARIFAS, puesto: ajustePuesto, extraDefault: EXTRA_DEFAULT, panel: panelSel, buquesFichas: bqFichas}, null, 2);
+  const payload = JSON.stringify(copiaCompleta(), null, 2);
   const blob = new Blob([payload], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'turnos_backup.json';
+  const hoy = new Date();
+  a.download = 'turnos_backup_' + hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0') + '-' + String(hoy.getDate()).padStart(2,'0') + '.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  backupDone();
 }
 const EQUIPO_MAP = {capataz:[0,'Capataz'], apuntador:[1,'Apuntador'], gruero1:[2,'Gruero'], gruero2:[3,'Gruero'], especialista:[4,'Especialista']};
 // Convierte copias del formato anterior (equipo / companeros / retenciones) al formato de esta versión
@@ -3751,6 +4130,26 @@ function convertirCopiaAntigua(parsed){
     persistNomina();
   }
 }
+// aplica una copia (archivo importado o estado guardado por la red de seguridad)
+function aplicarCopia(parsed){
+  if(parsed.data) data = parsed.data;
+  if(parsed.settings) settings = parsed.settings;
+  convertirCopiaAntigua(parsed);
+  if(parsed.crew){ crewReg = parsed.crew; }
+  crewNormalize();
+  persistCrew();
+  if(parsed.nomina){ nominaData = parsed.nomina; persistNomina(); }
+  if(parsed.buquesFichas && typeof parsed.buquesFichas === 'object' && !Array.isArray(parsed.buquesFichas)){ bqFichas = parsed.buquesFichas; persistBqFichas(); }
+  if(Array.isArray(parsed.panel)){ panelSel = parsed.panel.filter(k => PANEL_ITEMS.some(x => x.k === k)); persistPanel(); }
+  if(Array.isArray(parsed.tarifas) && parsed.tarifas.length === TARIFAS_DEF.length){
+    TARIFAS = parsed.tarifas;
+    if(parsed.puesto && PUESTOS.some(x=>x.k===parsed.puesto)) ajustePuesto = parsed.puesto;
+    if(typeof parsed.extraDefault === 'number' && parsed.extraDefault >= 0) EXTRA_DEFAULT = parsed.extraDefault;
+    persistTarifas();
+  }
+  persist();
+  persistSettings();
+}
 function importData(evt){
   const file = evt.target.files[0];
   if(!file) return;
@@ -3759,26 +4158,14 @@ function importData(evt){
     try{
       const parsed = JSON.parse(e.target.result);
       if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('formato');
-      if(!confirm('Importar esta copia sustituirá todos los datos actuales de la app. ¿Quieres continuar?')) return;
-      if(parsed.data) data = parsed.data;
-      if(parsed.settings) settings = parsed.settings;
-      convertirCopiaAntigua(parsed);
-      if(parsed.crew){ crewReg = parsed.crew; }
-      crewNormalize();
-      persistCrew();
-      if(parsed.nomina){ nominaData = parsed.nomina; persistNomina(); }
-      if(parsed.buquesFichas && typeof parsed.buquesFichas === 'object' && !Array.isArray(parsed.buquesFichas)){ bqFichas = parsed.buquesFichas; persistBqFichas(); }
-      if(Array.isArray(parsed.panel)){ panelSel = parsed.panel.filter(k => PANEL_ITEMS.some(x => x.k === k)); persistPanel(); }
-      if(Array.isArray(parsed.tarifas) && parsed.tarifas.length === TARIFAS_DEF.length){
-        TARIFAS = parsed.tarifas;
-        if(parsed.puesto && PUESTOS.some(x=>x.k===parsed.puesto)) ajustePuesto = parsed.puesto;
-        if(typeof parsed.extraDefault === 'number' && parsed.extraDefault >= 0) EXTRA_DEFAULT = parsed.extraDefault;
-        persistTarifas();
-      }
-      persist();
-      persistSettings();
+      if(!confirm('Importar esta copia sustituirá todos los datos actuales de la app. Después podrás deshacerlo. ¿Quieres continuar?')) return;
+      // red de seguridad: se guarda el estado actual antes de sustituirlo
+      const guardado = undoSave('import', 'datos anteriores a la importación', copiaCompleta());
+      if(!guardado && !confirm('No hay espacio para guardar los datos actuales y poder deshacer. ¿Importar igualmente?')) return;
+      aplicarCopia(parsed);
       render();
       closeSettings();
+      if(guardado) undoShowToast('Copia importada.');
     }catch(err){
       alert('El archivo no es una copia válida.');
     }
@@ -3811,7 +4198,7 @@ function changeAnnualYear(delta){
 function monthIngresosByKey(key){
   const monthData = data[key] || {};
   let t = 0;
-  Object.values(monthData).forEach(e=>{ t += (parseFloat(e.salario)||0) + (parseFloat(e.extra)||0); });
+  Object.values(monthData).forEach(e => turnosDe(e).forEach(x => { t += (parseFloat(x.salario)||0) + (parseFloat(x.extra)||0); }));
   return nomRound(t);
 }
 // Neto de un mes con los mismos cálculos de la herramienta Nómina
@@ -3829,6 +4216,7 @@ function nominaCalcKey(key){
 
 function renderYear(){
   document.getElementById('yearLabel').textContent = annualYear;
+  updateTodayBtns();
 
   const monthTurnos = [];
   const monthBruto = [];
@@ -3839,12 +4227,12 @@ function renderYear(){
     const key = monthKey(annualYear, m);
     const monthData = data[key] || {};
     let turnos = 0, horas = 0;
-    Object.values(monthData).forEach(e=>{
-      if(e.shift && e.shift !== 'L'){
+    Object.values(monthData).forEach(e => turnosDe(e).forEach(t => {
+      if(t.shift && t.shift !== 'L'){
         turnos++;
-        horas += (settings[e.shift]?.horas || 0);
+        horas += (settings[t.shift]?.horas || 0);
       }
-    });
+    }));
     const bruto = monthIngresosByKey(key);
     let neto = null;
     if(bruto > 0){
@@ -4566,10 +4954,44 @@ function applyToolFlags(){
     b.querySelector('.tool-soon').textContent = TOOLS_ON[k] ? '' : 'En construcción';
   });
 }
+// Deslizar el dedo sobre el calendario: izquierda = mes siguiente, derecha = mes anterior
+(function(){
+  const g = document.getElementById('grid');
+  let x0 = 0, y0 = 0, t0 = 0, on = false;
+  g.addEventListener('touchstart', e => {
+    if(e.touches.length !== 1){ on = false; return; }
+    const t = e.touches[0];
+    x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
+    on = x0 > 24 && x0 < window.innerWidth - 24;      // los bordes quedan para el gesto «atrás» del móvil
+  }, {passive:true});
+  g.addEventListener('touchend', e => {
+    if(!on) return;
+    on = false;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    if(Date.now() - t0 > 700) return;                                 // un arrastre lento no cuenta
+    if(Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return; // solo un deslizado claro y más horizontal que vertical
+    changeMonth(dx < 0 ? 1 : -1);
+  }, {passive:true});
+  g.addEventListener('touchcancel', () => { on = false; }, {passive:true});
+})();
+
 applyToolFlags();
+
+// Al abrir cualquier ventana (día, buscador, ajustes...) empieza desde arriba, sin conservar el desplazamiento de la vez anterior
+(function(){
+  const obs = new MutationObserver(muts => muts.forEach(m => {
+    const o = m.target;
+    if(o.classList.contains('open')){
+      const sh = o.querySelector('.sheet');
+      if(sh) sh.scrollTop = 0;
+    }
+  }));
+  document.querySelectorAll('.overlay').forEach(o => obs.observe(o, {attributes:true, attributeFilter:['class']}));
+})();
 
 load();
 render();
+backupInit();
 
 // PWA: registra el Service Worker cuando la app está publicada en HTTPS.
 if ('serviceWorker' in navigator) {
